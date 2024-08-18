@@ -27,7 +27,7 @@ class TestCreateUserEndpoint:
     ) -> None:
         mock_action.return_value.execute.return_value = UserFactory().create()
         response = client.post(
-            "api/v1/users/signup",
+            "api/v1/users/",
             json={
                 "email": "rubensoljim@gmail.com",
                 "password": "Passw0rd!",
@@ -56,7 +56,7 @@ class TestCreateUserEndpoint:
     ) -> None:
         mock_action.return_value.execute.side_effect = UserAlreadyExistsException
         response = client.post(
-            "api/v1/users/signup",
+            "api/v1/users/",
             json={
                 "email": "rubensoljim@gmail.com",
                 "password": "Passw0rd!",

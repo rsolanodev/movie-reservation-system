@@ -12,7 +12,7 @@ from app.auth.domain.exceptions import (
 )
 
 
-class TestLoginAccessToken:
+class TestAuthenticateUserEndpoint:
     @pytest.fixture
     def mock_action(self) -> Generator[Mock, None, None]:
         with patch("app.auth.infrastructure.api.endpoints.Authenticate") as mock:
@@ -37,7 +37,7 @@ class TestLoginAccessToken:
             expires_in=86400,
         )
         response = client.post(
-            "api/v1/login/access-token",
+            "api/v1/auth/access-token/",
             data={
                 "username": "rubensoljim@gmail.com",
                 "password": "Passw0rd!",
@@ -62,7 +62,7 @@ class TestLoginAccessToken:
     ) -> None:
         mock_action.return_value.execute.side_effect = expected_exception
         response = client.post(
-            "api/v1/login/access-token",
+            "api/v1/auth/access-token/",
             data={
                 "username": "rsolanodev",
                 "password": "Passw0rd!",
@@ -76,7 +76,7 @@ class TestLoginAccessToken:
     ) -> None:
         mock_action.return_value.execute.side_effect = UserInactiveException
         response = client.post(
-            "api/v1/login/access-token",
+            "api/v1/auth/access-token/",
             data={
                 "username": "rsolanodev",
                 "password": "Passw0rd!",

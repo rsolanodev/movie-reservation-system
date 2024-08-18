@@ -18,8 +18,8 @@ from app.users.infrastructure.repositories.sql_model_user_repository import (
 router = APIRouter()
 
 
-@router.post("/login/access-token")
-def login(
+@router.post("/access-token/", response_model=TokenSchema)
+def authenticate_user(
     session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> TokenSchema:
     try:

@@ -11,7 +11,7 @@ from app.users.infrastructure.repositories.sql_model_user_repository import (
 router = APIRouter()
 
 
-@router.post("/signup", status_code=201)
+@router.post("/", response_model=UserSchema, status_code=201)
 def create_user(
     session: SessionDep, create_user_schema: CreateUserSchema
 ) -> UserSchema:
