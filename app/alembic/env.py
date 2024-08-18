@@ -6,8 +6,10 @@ from sqlalchemy import engine_from_config, pool
 
 from app.settings import settings
 from app.users.infrastructure.models import UserModel
+from app.movies.infrastructure.models import MovieModel
 
 target_metadata = UserModel.metadata
+target_metadata = MovieModel.metadata
 
 config = context.config
 
