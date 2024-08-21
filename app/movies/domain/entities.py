@@ -1,7 +1,12 @@
 import uuid
 from dataclasses import dataclass
 
-from fastapi import UploadFile
+
+@dataclass
+class PosterImage:
+    filename: str | None
+    content: bytes
+    content_type: str | None
 
 
 @dataclass
@@ -13,11 +18,11 @@ class Movie:
 
     @classmethod
     def create(
-        cls, title: str, description: str | None, poster_image: UploadFile
+        cls, title: str, description: str | None, poster_image: str | None
     ) -> "Movie":
         return cls(
             id=uuid.uuid4(),
             title=title,
             description=description,
-            poster_image=poster_image.filename,
+            poster_image=poster_image,
         )
