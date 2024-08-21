@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from fastapi import UploadFile
-
-from app.movies.domain.entities import Movie
+from app.movies.domain.entities import Movie, PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 
@@ -10,7 +8,7 @@ from app.movies.domain.repositories.movie_repository import MovieRepository
 class CreateMovieParams:
     title: str
     description: str | None
-    poster_image: UploadFile
+    poster_image: PosterImage | None
 
 
 class CreateMovie:
@@ -21,7 +19,12 @@ class CreateMovie:
         movie = Movie.create(
             title=params.title,
             description=params.description,
-            poster_image=params.poster_image,
+            poster_image=self._get_poster_image_filename(params.poster_image),
         )
         self._repository.save(movie=movie)
         return movie
+
+    def _get_poster_image_filename(
+        self, poster_image: PosterImage | None
+    ) -> str | None:
+        return poster_image.filename if poster_image else None
