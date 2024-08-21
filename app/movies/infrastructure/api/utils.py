@@ -3,7 +3,7 @@ from fastapi import UploadFile
 from app.movies.domain.entities import PosterImage
 
 
-def build_poster_image(uploaded_file: UploadFile | None = None) -> PosterImage | None:
+def build_poster_image(uploaded_file: UploadFile | None) -> PosterImage | None:
     if uploaded_file is None:
         return None
 
