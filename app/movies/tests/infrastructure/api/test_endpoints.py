@@ -35,11 +35,7 @@ class TestCreateMovieEndpoint:
             "api/v1/movies/",
             data={
                 "title": "Deadpool & Wolverine",
-                "description": (
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                "description": "Deadpool and a variant of Wolverine.",
             },
             files={"poster_image": ("deadpool_and_wolverine.jpg", b"image")},
             headers=superuser_token_headers,
@@ -49,11 +45,7 @@ class TestCreateMovieEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
-                description=(
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                description="Deadpool and a variant of Wolverine.",
                 poster_image=PosterImage(
                     filename="deadpool_and_wolverine.jpg",
                     content=b"image",
@@ -66,11 +58,7 @@ class TestCreateMovieEndpoint:
         assert response.json() == {
             "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
             "title": "Deadpool & Wolverine",
-            "description": (
-                "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                "Variance Authority, but instead recruits a variant of Wolverine to save "
-                "his universe from extinction."
-            ),
+            "description": "Deadpool and a variant of Wolverine.",
             "poster_image": "deadpool_and_wolverine.jpg",
         }
 
@@ -89,11 +77,7 @@ class TestCreateMovieEndpoint:
             "api/v1/movies/",
             data={
                 "title": "Deadpool & Wolverine",
-                "description": (
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                "description": "Deadpool and a variant of Wolverine.",
             },
             headers=superuser_token_headers,
         )
@@ -102,11 +86,7 @@ class TestCreateMovieEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
-                description=(
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                description="Deadpool and a variant of Wolverine.",
                 poster_image=None,
             )
         )
@@ -115,11 +95,7 @@ class TestCreateMovieEndpoint:
         assert response.json() == {
             "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
             "title": "Deadpool & Wolverine",
-            "description": (
-                "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                "Variance Authority, but instead recruits a variant of Wolverine to save "
-                "his universe from extinction."
-            ),
+            "description": "Deadpool and a variant of Wolverine.",
             "poster_image": None,
         }
 
@@ -133,11 +109,7 @@ class TestCreateMovieEndpoint:
             "api/v1/movies/",
             data={
                 "title": "Deadpool & Wolverine",
-                "description": (
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                "description": "Deadpool and a variant of Wolverine.",
             },
         )
 
@@ -158,11 +130,7 @@ class TestCreateMovieEndpoint:
             "api/v1/movies/",
             data={
                 "title": "Deadpool & Wolverine",
-                "description": (
-                    "Deadpool is offered a place in the Marvel Cinematic Universe by the Time "
-                    "Variance Authority, but instead recruits a variant of Wolverine to save "
-                    "his universe from extinction."
-                ),
+                "description": "Deadpool and a variant of Wolverine.",
             },
             headers=user_token_headers,
         )
