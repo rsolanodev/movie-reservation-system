@@ -26,3 +26,10 @@ class Movie:
             description=description,
             poster_image=poster_image,
         )
+
+    def update(
+        self, title: str, description: str | None, poster_image: str | None
+    ) -> None:
+        self.title = title
+        self.description = description
+        self.poster_image = poster_image
