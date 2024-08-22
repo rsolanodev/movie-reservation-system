@@ -38,3 +38,11 @@ class TestSqlModelMovieRepository:
         assert movie_model.title == "The Super Mario Bros. Movie"
         assert movie_model.description == "An animated adaptation of the video game."
         assert movie_model.poster_image == "super_mario_bros.jpg"
+
+    def test_get_movie(self, session: Session) -> None:
+        movie = MovieFactory().create()
+
+        session.add(MovieModel.from_domain(movie=movie))
+        session.commit()
+
+        assert SqlModelMovieRepository(session=session).get(id=movie.id) == movie

@@ -12,5 +12,6 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
         self._session.merge(movie_model)
         self._session.commit()
 
-    def get(self, id: UUID) -> Movie:  # type: ignore
-        ...
+    def get(self, id: UUID) -> Movie | None:
+        movie_model = self._session.get(MovieModel, id)
+        return movie_model.to_domain() if movie_model else None
