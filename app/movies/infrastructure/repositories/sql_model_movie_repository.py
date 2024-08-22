@@ -7,5 +7,5 @@ from app.movies.infrastructure.models import MovieModel
 class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
     def save(self, movie: Movie) -> None:
         movie_model = MovieModel.from_domain(movie=movie)
-        self._session.add(movie_model)
+        self._session.merge(movie_model)
         self._session.commit()
