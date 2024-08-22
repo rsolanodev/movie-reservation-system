@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import SessionDep
 from app.users.actions.create_user import CreateUser, CreateUserParams
@@ -11,7 +11,11 @@ from app.users.infrastructure.repositories.sql_model_user_repository import (
 router = APIRouter()
 
 
-@router.post("/", response_model=UserSchema, status_code=201)
+@router.post(
+    "/",
+    response_model=UserSchema,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_user(
     session: SessionDep, create_user_schema: CreateUserSchema
 ) -> UserSchema:
@@ -27,6 +31,7 @@ def create_user(
         )
     except UserAlreadyExistsException:
         raise HTTPException(
-            status_code=400, detail="The user with this email already exists"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The user with this email already exists",
         )
     return UserSchema.from_domain(user)

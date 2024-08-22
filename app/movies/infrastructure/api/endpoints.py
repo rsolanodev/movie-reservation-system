@@ -1,6 +1,6 @@
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, get_current_active_superuser
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.infrastructure.api.schemas import MovieSchema
 from app.movies.infrastructure.api.utils import build_poster_image
@@ -11,7 +11,12 @@ from app.movies.infrastructure.repositories.sql_model_movie_repository import (
 router = APIRouter()
 
 
-@router.post("/", response_model=MovieSchema, status_code=201)
+@router.post(
+    "/",
+    response_model=MovieSchema,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(get_current_active_superuser)],
+)
 def create_movie(
     session: SessionDep,
     title: str = Form(min_length=1, max_length=100),

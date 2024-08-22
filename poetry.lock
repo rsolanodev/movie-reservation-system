@@ -1794,6 +1794,34 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
+name = "sqlalchemy-utils"
+version = "0.41.2"
+description = "Various utility functions for SQLAlchemy."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "SQLAlchemy-Utils-0.41.2.tar.gz", hash = "sha256:bc599c8c3b3319e53ce6c5c3c471120bd325d0071fb6f38a10e924e3d07b9990"},
+    {file = "SQLAlchemy_Utils-0.41.2-py3-none-any.whl", hash = "sha256:85cf3842da2bf060760f955f8467b87983fb2e30f1764fd0e24a48307dc8ec6e"},
+]
+
+[package.dependencies]
+SQLAlchemy = ">=1.3"
+
+[package.extras]
+arrow = ["arrow (>=0.3.4)"]
+babel = ["Babel (>=1.3)"]
+color = ["colour (>=0.0.4)"]
+encrypted = ["cryptography (>=0.6)"]
+intervals = ["intervals (>=0.7.1)"]
+password = ["passlib (>=1.6,<2.0)"]
+pendulum = ["pendulum (>=2.0.5)"]
+phone = ["phonenumbers (>=5.9.2)"]
+test = ["Jinja2 (>=2.3)", "Pygments (>=1.2)", "backports.zoneinfo", "docutils (>=0.10)", "flake8 (>=2.4.0)", "flexmock (>=0.9.7)", "isort (>=4.2.2)", "pg8000 (>=1.12.4)", "psycopg (>=3.1.8)", "psycopg2 (>=2.5.1)", "psycopg2cffi (>=2.8.1)", "pymysql", "pyodbc", "pytest (==7.4.4)", "python-dateutil (>=2.6)", "pytz (>=2014.2)"]
+test-all = ["Babel (>=1.3)", "Jinja2 (>=2.3)", "Pygments (>=1.2)", "arrow (>=0.3.4)", "backports.zoneinfo", "colour (>=0.0.4)", "cryptography (>=0.6)", "docutils (>=0.10)", "flake8 (>=2.4.0)", "flexmock (>=0.9.7)", "furl (>=0.4.1)", "intervals (>=0.7.1)", "isort (>=4.2.2)", "passlib (>=1.6,<2.0)", "pendulum (>=2.0.5)", "pg8000 (>=1.12.4)", "phonenumbers (>=5.9.2)", "psycopg (>=3.1.8)", "psycopg2 (>=2.5.1)", "psycopg2cffi (>=2.8.1)", "pymysql", "pyodbc", "pytest (==7.4.4)", "python-dateutil", "python-dateutil (>=2.6)", "pytz (>=2014.2)"]
+timezone = ["python-dateutil"]
+url = ["furl (>=0.4.1)"]
+
+[[package]]
 name = "sqlmodel"
 version = "0.0.21"
 description = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
@@ -1864,6 +1892,20 @@ files = [
     {file = "types-passlib-1.7.7.20240327.tar.gz", hash = "sha256:4cce6a1a3a6afee9fc4728b4d9784300764ac2be747f5bcc01646d904b85f4bb"},
     {file = "types_passlib-1.7.7.20240327-py3-none-any.whl", hash = "sha256:3a3b7f4258b71034d2e2f4f307d6810f9904f906cdf375514c8bdbdb28a4ad23"},
 ]
+
+[[package]]
+name = "types-sqlalchemy-utils"
+version = "1.1.0"
+description = "Type Stubs for sqlalchemy-utils"
+optional = false
+python-versions = "<4,>=3.7"
+files = [
+    {file = "types_sqlalchemy_utils-1.1.0-py3-none-any.whl", hash = "sha256:60b28fe3453f67fc90bb0a106063025cffc1efa6eedb59a7ea5b043644c3d16a"},
+    {file = "types_sqlalchemy_utils-1.1.0.tar.gz", hash = "sha256:af9d92992687c9e7c920b9a1b814fd10915b9b3a7b1f731b7fd2fff8ce2f3bfb"},
+]
+
+[package.extras]
+dev = ["mypy (==1.10.0)", "pipenv-setup (==3.2.0)", "sqlalchemy-utils (==0.41.2)", "sqlalchemy2-stubs (==0.0.2a38)", "twine (==5.0.0)"]
 
 [[package]]
 name = "typing-extensions"
@@ -2176,4 +2218,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "44c4078b954d3930abee60478c81ba9ad8193b04c4ca8ca4ca88f18dfe29cc48"
+content-hash = "53abd9baf62427d9f8e2b7f26b6575ffc2219c665ae0b58b5a2ef15809591a97"

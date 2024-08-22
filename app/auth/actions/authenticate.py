@@ -1,10 +1,4 @@
-from datetime import datetime, timedelta
-from uuid import UUID
-from zoneinfo import ZoneInfo
-
-import jwt
-
-from app.auth.domain.entities import Token, TokenType
+from app.auth.domain.entities import Token
 from app.auth.domain.exceptions import (
     IncorrectPasswordException,
     UserDoesNotExistException,
@@ -21,29 +15,17 @@ class Authenticate:
     def execute(self, email: str, password: str) -> Token:
         user = self._repository.find_by_email(email=email)
 
-        if not user:
+        if user is None:
             raise UserDoesNotExistException()
 
-        if not user.verify_password(password):
+        if user.verify_password(password) is False:
             raise IncorrectPasswordException()
 
-        if not user.is_active:
+        if user.is_active is False:
             raise UserInactiveException()
 
-        return Token(
-            access_token=self._create_access_token(user_id=user.id),
-            token_type=TokenType.BEARER,
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-        )
-
-    def _create_access_token(self, user_id: UUID, algorithm: str = "HS256") -> str:
-        return jwt.encode(
-            payload={"exp": self._get_expire_date(), "sub": str(user_id)},
-            key=settings.SECRET_KEY,
-            algorithm=algorithm,
-        )
-
-    def _get_expire_date(self) -> datetime:
-        return datetime.now(tz=ZoneInfo("UTC")) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        return Token.create(
+            user_id=user.id,
+            secret_key=settings.SECRET_KEY,
+            expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
         )
