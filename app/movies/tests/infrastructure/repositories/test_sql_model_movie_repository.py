@@ -46,3 +46,13 @@ class TestSqlModelMovieRepository:
         session.commit()
 
         assert SqlModelMovieRepository(session=session).get(id=movie.id) == movie
+
+    def test_delete_movie(self, session: Session) -> None:
+        movie = MovieFactory().create()
+
+        session.add(MovieModel.from_domain(movie=movie))
+        session.commit()
+
+        SqlModelMovieRepository(session=session).delete(id=movie.id)
+
+        assert session.get(MovieModel, movie.id) is None
