@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         list[AnyUrl] | str, BeforeValidator(parse_cors)
     ] = []
 
-    PROJECT_NAME: str = "Cinema Ticketing"
+    PROJECT_NAME: str = "Movie Reservation System"
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432

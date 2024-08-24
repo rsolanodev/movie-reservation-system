@@ -1,4 +1,4 @@
-# Cinema Ticketing - Backend
+# Movie Reservation System
 
 Personal project to consolidate knowledge in backend development. An application was built with FastAPI to make cinema ticket reservations. Applying clean code principles to ensure long-term maintainability and scalability.
 
