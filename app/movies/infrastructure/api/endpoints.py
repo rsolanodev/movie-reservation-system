@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
+from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import MovieDoesNotExistException
@@ -24,8 +25,8 @@ router = APIRouter()
 def create_movie(
     session: SessionDep,
     title: str = Form(min_length=1, max_length=100),
-    description: str | None = Form(None),
-    poster_image: UploadFile | None = File(None),
+    description: str | None = Form(default=None),
+    poster_image: UploadFile | None = File(default=None),
 ) -> MovieSchema:
     movie = CreateMovie(
         repository=SqlModelMovieRepository(session=session),
@@ -33,7 +34,7 @@ def create_movie(
         params=CreateMovieParams(
             title=title,
             description=description,
-            poster_image=build_poster_image(uploaded_file=poster_image),
+            poster_image=build_poster_image(uploaded_file=poster_image),  # type: ignore
         )
     )
     return MovieSchema.from_domain(movie)
@@ -48,9 +49,9 @@ def create_movie(
 def update_movie(
     session: SessionDep,
     movie_id: UUID,
-    title: str = Form(min_length=1, max_length=100),
-    description: str | None = Form(None),
-    poster_image: UploadFile | None = File(None),
+    title: str = Form(min_length=1, max_length=100, default=UNSET),
+    description: str | None = Form(default=UNSET),
+    poster_image: UploadFile | None = File(default=UNSET),
 ) -> MovieSchema:
     try:
         movie = UpdateMovie(

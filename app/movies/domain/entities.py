@@ -1,6 +1,8 @@
 import uuid
 from dataclasses import dataclass
 
+from app.core.domain.constants.unset import UnsetType
+
 
 @dataclass
 class PosterImage:
@@ -28,8 +30,16 @@ class Movie:
         )
 
     def update(
-        self, title: str, description: str | None, poster_image: str | None
+        self,
+        title: str | UnsetType,
+        description: str | None | UnsetType,
+        poster_image: str | None | UnsetType,
     ) -> None:
-        self.title = title
-        self.description = description
-        self.poster_image = poster_image
+        if not isinstance(title, UnsetType):
+            self.title = title
+
+        if not isinstance(description, UnsetType):
+            self.description = description
+
+        if not isinstance(poster_image, UnsetType):
+            self.poster_image = poster_image
