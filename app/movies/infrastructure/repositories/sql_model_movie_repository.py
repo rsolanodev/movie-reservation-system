@@ -15,3 +15,8 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
     def get(self, id: UUID) -> Movie | None:
         movie_model = self._session.get(MovieModel, id)
         return movie_model.to_domain() if movie_model else None
+
+    def delete(self, id: UUID) -> None:
+        movie_model = self._session.get(MovieModel, id)
+        self._session.delete(movie_model)
+        self._session.commit()
