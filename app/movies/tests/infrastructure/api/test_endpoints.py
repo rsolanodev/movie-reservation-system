@@ -304,3 +304,94 @@ class TestUpdateMovieEndpoint:
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
+
+
+class TestDeleteMovieEndpoint:
+    @pytest.fixture
+    def mock_action(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.DeleteMovie") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_repository(self) -> Generator[Mock, None, None]:
+        with patch(
+            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
+        ) as mock:
+            yield mock.return_value
+
+    def test_returns_200_and_calls_action(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        superuser_token_headers: dict[str, str],
+    ) -> None:
+        mock_action.return_value.execute.return_value = None
+
+        response = client.delete(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
+            headers=superuser_token_headers,
+        )
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+
+        assert response.status_code == 200
+
+    def test_returns_404_when_movie_does_not_exist(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        superuser_token_headers: dict[str, str],
+    ) -> None:
+        mock_action.return_value.execute.side_effect = MovieDoesNotExistException()
+
+        response = client.delete(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
+            headers=superuser_token_headers,
+        )
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+        )
+
+        assert response.status_code == 404
+        assert response.json() == {"detail": "The movie does not exist"}
+
+    def test_returns_401_when_user_is_not_authenticated(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+    ) -> None:
+        response = client.delete(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
+        )
+
+        mock_action.assert_not_called()
+        mock_repository.assert_not_called()
+
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Not authenticated"}
+
+    def test_returns_403_when_user_is_not_superuser(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        user_token_headers: dict[str, str],
+    ) -> None:
+        response = client.delete(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
+            headers=user_token_headers,
+        )
+
+        mock_action.assert_not_called()
+        mock_repository.assert_not_called()
+
+        assert response.status_code == 403
+        assert response.json() == {"detail": "The user doesn't have enough privileges"}

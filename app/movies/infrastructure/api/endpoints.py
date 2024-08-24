@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
+from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.infrastructure.api.schemas import MovieSchema
@@ -68,5 +69,20 @@ def update_movie(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
         )
-
     return MovieSchema.from_domain(movie)
+
+
+@router.delete(
+    "/{movie_id}/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(get_current_active_superuser)],
+)
+def delete_movie(session: SessionDep, movie_id: UUID) -> None:
+    try:
+        DeleteMovie(
+            repository=SqlModelMovieRepository(session=session),
+        ).execute(id=movie_id)
+    except MovieDoesNotExistException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
+        )
