@@ -5,6 +5,7 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovieParams
 from app.movies.actions.update_movie import UpdateMovieParams
 from app.movies.domain.entities import PosterImage
@@ -199,23 +200,17 @@ class TestUpdateMovieEndpoint:
             "poster_image": "deadpool_and_wolverine.jpg",
         }
 
-    def test_returns_200_and_calls_action_when_does_not_have_poster_image(
+    def test_returns_200_and_calls_action_when_data_is_not_sent(
         self,
         client: TestClient,
         mock_action: Mock,
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.return_value = MovieFactory().create(
-            poster_image=None
-        )
+        mock_action.return_value.execute.return_value = MovieFactory().create()
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
-            data={
-                "title": "Deadpool & Wolverine",
-                "description": "Deadpool and a variant of Wolverine.",
-            },
             headers=superuser_token_headers,
         )
 
@@ -223,9 +218,9 @@ class TestUpdateMovieEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                title="Deadpool & Wolverine",
-                description="Deadpool and a variant of Wolverine.",
-                poster_image=None,
+                title=UNSET,
+                description=UNSET,
+                poster_image=UNSET,
             )
         )
 
@@ -234,7 +229,7 @@ class TestUpdateMovieEndpoint:
             "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
             "title": "Deadpool & Wolverine",
             "description": "Deadpool and a variant of Wolverine.",
-            "poster_image": None,
+            "poster_image": "deadpool_and_wolverine.jpg",
         }
 
     def test_returns_404_when_movie_does_not_exist(
@@ -261,7 +256,7 @@ class TestUpdateMovieEndpoint:
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
-                poster_image=None,
+                poster_image=UNSET,
             )
         )
 

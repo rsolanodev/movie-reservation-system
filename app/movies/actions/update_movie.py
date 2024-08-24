@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from app.core.domain.constants.unset import UnsetType
 from app.movies.domain.entities import Movie, PosterImage
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -9,9 +10,9 @@ from app.movies.domain.repositories.movie_repository import MovieRepository
 @dataclass
 class UpdateMovieParams:
     id: UUID
-    title: str
-    description: str | None
-    poster_image: PosterImage | None
+    title: str | UnsetType
+    description: str | None | UnsetType
+    poster_image: PosterImage | None | UnsetType
 
 
 class UpdateMovie:
@@ -35,6 +36,8 @@ class UpdateMovie:
         return movie
 
     def _get_poster_image_filename(
-        self, poster_image: PosterImage | None
-    ) -> str | None:
-        return poster_image.filename if poster_image else None
+        self, poster_image: PosterImage | None | UnsetType
+    ) -> str | None | UnsetType:
+        if isinstance(poster_image, PosterImage):
+            return poster_image.filename
+        return poster_image
