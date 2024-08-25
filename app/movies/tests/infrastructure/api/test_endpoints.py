@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovieParams
 from app.movies.actions.update_movie import UpdateMovieParams
-from app.movies.domain.entities import Category, PosterImage
+from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.tests.factories.movie_factory import MovieFactory
 
@@ -397,18 +397,16 @@ class TestDeleteMovieEndpoint:
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
 
 
-class TestRetrieveCategoriesEndpoint:
+class TestRetrieveGenresEndpoint:
     @pytest.fixture
     def mock_action(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.RetrieveCategories"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.RetrieveGenres") as mock:
             yield mock
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
         with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelCategoryRepository"
+            "app.movies.infrastructure.api.endpoints.SqlModelGenreRepository"
         ) as mock:
             yield mock.return_value
 
@@ -418,24 +416,24 @@ class TestRetrieveCategoriesEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
     ) -> None:
-        action_category = Category.create(name="Action")
-        adventure_category = Category.create(name="Adventure")
-        comedy_category = Category.create(name="Comedy")
+        action_genre = Genre.create(name="Action")
+        adventure_genre = Genre.create(name="Adventure")
+        comedy_genre = Genre.create(name="Comedy")
 
         mock_action.return_value.execute.return_value = [
-            action_category,
-            adventure_category,
-            comedy_category,
+            action_genre,
+            adventure_genre,
+            comedy_genre,
         ]
 
-        response = client.get("api/v1/movies/categories/")
+        response = client.get("api/v1/movies/genres/")
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once()
 
         assert response.status_code == 200
         assert response.json() == [
-            {"id": str(action_category.id), "name": "Action"},
-            {"id": str(adventure_category.id), "name": "Adventure"},
-            {"id": str(comedy_category.id), "name": "Comedy"},
+            {"id": str(action_genre.id), "name": "Action"},
+            {"id": str(adventure_genre.id), "name": "Adventure"},
+            {"id": str(comedy_genre.id), "name": "Comedy"},
         ]

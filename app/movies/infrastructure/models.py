@@ -2,12 +2,12 @@ import uuid
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.movies.domain.entities import Category, Movie
+from app.movies.domain.entities import Genre, Movie
 
 
-class MovieCategoryLink(SQLModel, table=True):
+class MovieGenreLink(SQLModel, table=True):
     movie_id: uuid.UUID = Field(foreign_key="moviemodel.id", primary_key=True)
-    category_id: uuid.UUID = Field(foreign_key="categorymodel.id", primary_key=True)
+    genre_id: uuid.UUID = Field(foreign_key="genremodel.id", primary_key=True)
 
 
 class MovieModel(SQLModel, table=True):
@@ -15,8 +15,8 @@ class MovieModel(SQLModel, table=True):
     title: str = Field(max_length=255)
     description: str | None = None
     poster_image: str | None = None
-    categories: list["CategoryModel"] = Relationship(
-        back_populates="movies", link_model=MovieCategoryLink
+    genres: list["GenreModel"] = Relationship(
+        back_populates="movies", link_model=MovieGenreLink
     )
 
     @classmethod
@@ -37,16 +37,16 @@ class MovieModel(SQLModel, table=True):
         )
 
 
-class CategoryModel(SQLModel, table=True):
+class GenreModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(max_length=255)
     movies: list[MovieModel] = Relationship(
-        back_populates="categories", link_model=MovieCategoryLink
+        back_populates="genres", link_model=MovieGenreLink
     )
 
     @classmethod
-    def from_domain(cls, category: Category) -> "CategoryModel":
-        return CategoryModel(id=category.id, name=category.name)
+    def from_domain(cls, genre: Genre) -> "GenreModel":
+        return GenreModel(id=genre.id, name=genre.name)
 
-    def to_domain(self) -> Category:
-        return Category(id=self.id, name=self.name)
+    def to_domain(self) -> Genre:
+        return Genre(id=self.id, name=self.name)

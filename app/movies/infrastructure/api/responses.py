@@ -10,6 +10,6 @@ class MovieResponse(SQLModel):
     poster_image: str | None
 
 
-class CategoryResponse(SQLModel):
+class GenreResponse(SQLModel):
     id: uuid.UUID
     name: str
