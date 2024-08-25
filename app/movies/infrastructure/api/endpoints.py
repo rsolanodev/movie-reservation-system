@@ -6,14 +6,14 @@ from app.api.deps import SessionDep, get_current_active_superuser
 from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
-from app.movies.actions.retrieve_categories import RetrieveCategories
+from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
-from app.movies.domain.entities import Category, Movie
+from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import MovieDoesNotExistException
-from app.movies.infrastructure.api.responses import CategoryResponse, MovieResponse
+from app.movies.infrastructure.api.responses import GenreResponse, MovieResponse
 from app.movies.infrastructure.api.utils import build_poster_image
-from app.movies.infrastructure.repositories.sql_model_category_repository import (
-    SqlModelCategoryRepository,
+from app.movies.infrastructure.repositories.sql_model_genre_repository import (
+    SqlModelGenreRepository,
 )
 from app.movies.infrastructure.repositories.sql_model_movie_repository import (
     SqlModelMovieRepository,
@@ -93,11 +93,9 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
 
 
 @router.get(
-    "/categories/",
-    response_model=list[CategoryResponse],
+    "/genres/",
+    response_model=list[GenreResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_categories(session: SessionDep) -> list[Category]:
-    return RetrieveCategories(
-        repository=SqlModelCategoryRepository(session=session)
-    ).execute()
+def retrieve_genres(session: SessionDep) -> list[Genre]:
+    return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()

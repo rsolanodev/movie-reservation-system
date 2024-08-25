@@ -12,12 +12,12 @@ class PosterImage:
 
 
 @dataclass
-class Category:
+class Genre:
     id: uuid.UUID
     name: str
 
     @classmethod
-    def create(cls, name: str) -> "Category":
+    def create(cls, name: str) -> "Genre":
         return cls(id=uuid.uuid4(), name=name)
 
 
