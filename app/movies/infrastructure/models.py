@@ -47,3 +47,6 @@ class CategoryModel(SQLModel, table=True):
     @classmethod
     def from_domain(cls, category: Category) -> "CategoryModel":
         return CategoryModel(id=category.id, name=category.name)
+
+    def to_domain(self) -> Category:
+        return Category(id=self.id, name=self.name)
