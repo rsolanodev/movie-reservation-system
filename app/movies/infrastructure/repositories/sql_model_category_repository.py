@@ -10,13 +10,4 @@ class SqlModelCategoryRepository(CategoryRepository, SqlModelRepository):
     def get_all(self) -> list[Category]:
         statement = select(CategoryModel).order_by(CategoryModel.name)
         category_models = self._session.exec(statement).all()
-
-        categories: list[Category] = []
-        for category_model in category_models:
-            category = self._build_category(category_model)
-            categories.append(category)
-
-        return categories
-
-    def _build_category(self, category_model: CategoryModel) -> Category:
-        return Category(id=category_model.id, name=category_model.name)
+        return [category_model.to_domain() for category_model in category_models]
