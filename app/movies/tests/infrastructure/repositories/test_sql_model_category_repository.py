@@ -13,7 +13,7 @@ class TestSqlModelCategoryRepository:
         adventure_category = Category.create(name="Adventure")
         comedy_category = Category.create(name="Comedy")
 
-        category_models = [
+        category_models: list[CategoryModel] = [
             CategoryModel.from_domain(action_category),
             CategoryModel.from_domain(adventure_category),
             CategoryModel.from_domain(comedy_category),
