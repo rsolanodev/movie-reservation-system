@@ -8,8 +8,9 @@ from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.retrieve_categories import RetrieveCategories
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
+from app.movies.domain.entities import Category, Movie
 from app.movies.domain.exceptions import MovieDoesNotExistException
-from app.movies.infrastructure.api.schemas import CategorySchema, MovieSchema
+from app.movies.infrastructure.api.responses import CategoryResponse, MovieResponse
 from app.movies.infrastructure.api.utils import build_poster_image
 from app.movies.infrastructure.repositories.sql_model_category_repository import (
     SqlModelCategoryRepository,
@@ -23,7 +24,7 @@ router = APIRouter()
 
 @router.post(
     "/",
-    response_model=MovieSchema,
+    response_model=MovieResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_active_superuser)],
 )
@@ -32,8 +33,8 @@ def create_movie(
     title: str = Form(min_length=1, max_length=100),
     description: str | None = Form(default=None),
     poster_image: UploadFile | None = File(default=None),
-) -> MovieSchema:
-    movie = CreateMovie(
+) -> Movie:
+    return CreateMovie(
         repository=SqlModelMovieRepository(session=session),
     ).execute(
         params=CreateMovieParams(
@@ -42,12 +43,11 @@ def create_movie(
             poster_image=build_poster_image(uploaded_file=poster_image),  # type: ignore
         )
     )
-    return MovieSchema.from_domain(movie)
 
 
 @router.patch(
     "/{movie_id}/",
-    response_model=MovieSchema,
+    response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
@@ -57,7 +57,7 @@ def update_movie(
     title: str = Form(min_length=1, max_length=100, default=UNSET),
     description: str | None = Form(default=UNSET),
     poster_image: UploadFile | None = File(default=UNSET),
-) -> MovieSchema:
+) -> Movie:
     try:
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
@@ -73,7 +73,7 @@ def update_movie(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
         )
-    return MovieSchema.from_domain(movie)
+    return movie
 
 
 @router.delete(
@@ -94,12 +94,10 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
 
 @router.get(
     "/categories/",
-    response_model=list[CategorySchema],
+    response_model=list[CategoryResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_categories(session: SessionDep) -> list[CategorySchema]:
-    categories = RetrieveCategories(
+def retrieve_categories(session: SessionDep) -> list[Category]:
+    return RetrieveCategories(
         repository=SqlModelCategoryRepository(session=session)
     ).execute()
-
-    return [CategorySchema.from_domain(category) for category in categories]
