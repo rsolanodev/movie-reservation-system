@@ -19,7 +19,6 @@ class TestSqlModelGenreRepository:
             GenreModel.from_domain(comedy_genre),
         ]
         session.add_all(genre_models)
-        session.commit()
 
         genres = SqlModelGenreRepository(session=session).get_all()
 

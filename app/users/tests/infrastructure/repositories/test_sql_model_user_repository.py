@@ -12,8 +12,7 @@ class TestSqlModelUserRepository:
         user = UserFactory().create()
         SqlModelUserRepository(session=session).create(user=user)
 
-        user_model = session.get(UserModel, user.id)
-        assert user_model is not None
+        user_model = session.get_one(UserModel, user.id)
         assert user_model.to_domain() == user
 
     def test_find_user_by_email(self, session: Session) -> None:
@@ -23,7 +22,6 @@ class TestSqlModelUserRepository:
             hashed_password="hashed_password",
         )
         session.add(user_model)
-        session.commit()
 
         user = SqlModelUserRepository(session=session).find_by_email(
             email="rubensoljim@gmail.com"
