@@ -2,7 +2,7 @@ import uuid
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.movies.domain.entities import Movie
+from app.movies.domain.entities import Category, Movie
 
 
 class MovieCategoryLink(SQLModel, table=True):
@@ -43,3 +43,7 @@ class CategoryModel(SQLModel, table=True):
     movies: list[MovieModel] = Relationship(
         back_populates="categories", link_model=MovieCategoryLink
     )
+
+    @classmethod
+    def from_domain(cls, category: Category) -> "CategoryModel":
+        return CategoryModel(id=category.id, name=category.name)
