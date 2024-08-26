@@ -1,11 +1,21 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+    status,
+)
 
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.core.domain.constants.unset import UNSET
+from app.movies.actions.add_movie_genre import AddMovieGenre
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
+from app.movies.actions.remove_movie_genre import RemoveMovieGenre
 from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
@@ -99,3 +109,27 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
 )
 def retrieve_genres(session: SessionDep) -> list[Genre]:
     return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()
+
+
+@router.post(
+    "/{movie_id}/genres/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(get_current_active_superuser)],
+)
+def add_movie_genre(
+    session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)
+) -> None:
+    AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
+        movie_id=movie_id, genre_id=genre_id
+    )
+
+
+@router.delete(
+    "/{movie_id}/genres/{genre_id}/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(get_current_active_superuser)],
+)
+def remove_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID) -> None:
+    RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
+        movie_id=movie_id, genre_id=genre_id
+    )

@@ -437,3 +437,78 @@ class TestRetrieveGenresEndpoint:
             {"id": str(adventure_genre.id), "name": "Adventure"},
             {"id": str(comedy_genre.id), "name": "Comedy"},
         ]
+
+
+class TestAddMovieGenreEndpoint:
+    @pytest.fixture
+    def mock_action(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.AddMovieGenre") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_repository(self) -> Generator[Mock, None, None]:
+        with patch(
+            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
+        ) as mock:
+            yield mock.return_value
+
+    def test_returns_200_and_calls_action(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        superuser_token_headers: dict[str, str],
+    ) -> None:
+        mock_action.return_value.execute.return_value = None
+
+        response = client.post(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
+            data={"genre_id": "2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"},
+            headers=superuser_token_headers,
+        )
+        assert response.status_code == 200
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+        )
+
+        assert response.status_code == 200
+
+
+class TestRemoveMovieGenreEndpoint:
+    @pytest.fixture
+    def mock_action(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.RemoveMovieGenre") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_repository(self) -> Generator[Mock, None, None]:
+        with patch(
+            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
+        ) as mock:
+            yield mock.return_value
+
+    def test_returns_200_and_calls_action(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        superuser_token_headers: dict[str, str],
+    ) -> None:
+        mock_action.return_value.execute.return_value = None
+
+        response = client.delete(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e/",
+            headers=superuser_token_headers,
+        )
+        assert response.status_code == 200
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+        )
+
+        assert response.status_code == 200
