@@ -10,6 +10,7 @@ from app.movies.actions.create_movie import CreateMovieParams
 from app.movies.actions.update_movie import UpdateMovieParams
 from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import (
+    GenreAlreadyAssignedException,
     GenreNotAssignedException,
     MovieDoesNotExistException,
 )
@@ -478,6 +479,32 @@ class TestAddMovieGenreEndpoint:
         )
 
         assert response.status_code == 200
+
+    def test_returns_400_and_calls_action_when_genre_already_assigned(
+        self,
+        client: TestClient,
+        mock_action: Mock,
+        mock_repository: Mock,
+        superuser_token_headers: dict[str, str],
+    ) -> None:
+        mock_action.return_value.execute.side_effect = GenreAlreadyAssignedException()
+
+        response = client.post(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
+            data={"genre_id": "2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"},
+            headers=superuser_token_headers,
+        )
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+        )
+
+        assert response.status_code == 400
+        assert response.json() == {
+            "detail": "The genre is already assigned to the movie"
+        }
 
 
 class TestRemoveMovieGenreEndpoint:

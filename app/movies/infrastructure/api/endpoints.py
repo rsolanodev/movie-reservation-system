@@ -20,6 +20,7 @@ from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
+    GenreAlreadyAssignedException,
     GenreNotAssignedException,
     MovieDoesNotExistException,
 )
@@ -122,9 +123,15 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
 def add_movie_genre(
     session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)
 ) -> None:
-    AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-        movie_id=movie_id, genre_id=genre_id
-    )
+    try:
+        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
+            movie_id=movie_id, genre_id=genre_id
+        )
+    except GenreAlreadyAssignedException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The genre is already assigned to the movie",
+        )
 
 
 @router.delete(
