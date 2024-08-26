@@ -26,6 +26,7 @@ class MovieModel(SQLModel, table=True):
             title=movie.title,
             description=movie.description,
             poster_image=movie.poster_image,
+            genres=[GenreModel.from_domain(genre) for genre in movie.genres],
         )
 
     def to_domain(self) -> Movie:
@@ -34,6 +35,7 @@ class MovieModel(SQLModel, table=True):
             title=self.title,
             description=self.description,
             poster_image=self.poster_image,
+            genres=[genre.to_domain() for genre in self.genres],
         )
 
 
