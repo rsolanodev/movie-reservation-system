@@ -19,7 +19,10 @@ from app.movies.actions.remove_movie_genre import RemoveMovieGenre
 from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
-from app.movies.domain.exceptions import MovieDoesNotExistException
+from app.movies.domain.exceptions import (
+    GenreNotAssignedException,
+    MovieDoesNotExistException,
+)
 from app.movies.infrastructure.api.responses import GenreResponse, MovieResponse
 from app.movies.infrastructure.api.utils import build_poster_image
 from app.movies.infrastructure.repositories.sql_model_genre_repository import (
@@ -130,6 +133,12 @@ def add_movie_genre(
     dependencies=[Depends(get_current_active_superuser)],
 )
 def remove_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID) -> None:
-    RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-        movie_id=movie_id, genre_id=genre_id
-    )
+    try:
+        RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
+            movie_id=movie_id, genre_id=genre_id
+        )
+    except GenreNotAssignedException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The genre is not assigned to the movie",
+        )

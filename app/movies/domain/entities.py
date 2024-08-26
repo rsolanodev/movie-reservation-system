@@ -1,5 +1,5 @@
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.core.domain.constants.unset import UnsetType
 
@@ -27,6 +27,7 @@ class Movie:
     title: str
     description: str | None
     poster_image: str | None
+    genres: list[Genre] = field(default_factory=list)
 
     @classmethod
     def create(
@@ -53,3 +54,9 @@ class Movie:
 
         if not isinstance(poster_image, UnsetType):
             self.poster_image = poster_image
+
+    def add_genre(self, genre: Genre) -> None:
+        self.genres.append(genre)
+
+    def has_genre(self, genre_id: uuid.UUID) -> bool:
+        return any(genre.id == genre_id for genre in self.genres)
