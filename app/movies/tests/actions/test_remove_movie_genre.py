@@ -32,7 +32,7 @@ class TestRemoveMovieGenre:
             movie_id=movie.id, genre_id=genre.id
         )
 
-    def test_does_not_remove_genre_from_movie_when_genre_is_not_assigned(
+    def test_raise_exception_when_genre_is_not_assigned_in_movie(
         self, mock_repository: Mock
     ) -> None:
         movie = MovieFactory().create()

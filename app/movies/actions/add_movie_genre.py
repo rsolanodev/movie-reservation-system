@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from app.movies.domain.exceptions import GenreAlreadyAssignedException
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 
@@ -8,4 +9,9 @@ class AddMovieGenre:
         self._repository = repository
 
     def execute(self, movie_id: UUID, genre_id: UUID) -> None:
+        movie = self._repository.get(id=movie_id)
+
+        if movie.has_genre(genre_id=genre_id):  # type: ignore
+            raise GenreAlreadyAssignedException()
+
         self._repository.add_genre(movie_id=movie_id, genre_id=genre_id)
