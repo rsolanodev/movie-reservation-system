@@ -625,3 +625,56 @@ class TestRetrieveMovieEndpoint:
 
         assert response.status_code == 404
         assert response.json() == {"detail": "The movie does not exist"}
+
+
+class TestRetrieveAllMoviesEndpoint:
+    @pytest.fixture
+    def mock_action(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.RetrieveAllMovies") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_repository(self) -> Generator[Mock, None, None]:
+        with patch(
+            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
+        ) as mock:
+            yield mock.return_value
+
+    def test_returns_200_and_calls_action(
+        self, client: TestClient, mock_action: Mock, mock_repository: Mock
+    ) -> None:
+        movie = MovieFactory().create()
+        genre = GenreFactory().create()
+        movie.add_genre(genre=genre)
+        mock_action.return_value.execute.return_value = [movie]
+
+        response = client.get("api/v1/movies/")
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once()
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+                "title": "Deadpool & Wolverine",
+                "description": "Deadpool and a variant of Wolverine.",
+                "poster_image": "deadpool_and_wolverine.jpg",
+                "genres": [
+                    {"id": "913822a0-750b-4cb6-b7b9-e01869d7d62d", "name": "Action"}
+                ],
+            }
+        ]
+
+    def test_returns_empty_list_when_no_movies(
+        self, client: TestClient, mock_action: Mock, mock_repository: Mock
+    ) -> None:
+        mock_action.return_value.execute.return_value = []
+
+        response = client.get("api/v1/movies/")
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once()
+
+        assert response.status_code == 200
+        assert response.json() == []

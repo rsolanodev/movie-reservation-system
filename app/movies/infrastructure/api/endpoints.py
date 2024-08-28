@@ -16,6 +16,7 @@ from app.movies.actions.add_movie_genre import AddMovieGenre
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.remove_movie_genre import RemoveMovieGenre
+from app.movies.actions.retrieve_all_movies import RetrieveAllMovies
 from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.retrieve_movie import RetrieveMovie
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
@@ -49,6 +50,17 @@ router = APIRouter()
 )
 def retrieve_genres(session: SessionDep) -> list[Genre]:
     return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()
+
+
+@router.get(
+    "/",
+    response_model=list[RetrieveMovieResponse],
+    status_code=status.HTTP_200_OK,
+)
+def retrieve_all_movies(session: SessionDep) -> list[Movie]:
+    return RetrieveAllMovies(
+        repository=SqlModelMovieRepository(session=session),
+    ).execute()
 
 
 @router.post(

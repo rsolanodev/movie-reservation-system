@@ -84,3 +84,22 @@ class TestSqlModelMovieRepository:
 
         session.refresh(movie_model)
         assert movie_model.genres == []
+
+    def test_get_all_movies(self, session: Session) -> None:
+        SqlModelMovieFactory(session).create().add_genre()
+
+        movies = SqlModelMovieRepository(session=session).get_all()
+
+        assert movies == [
+            Movie(
+                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                title="Deadpool & Wolverine",
+                description="Deadpool and a variant of Wolverine.",
+                poster_image="deadpool_and_wolverine.jpg",
+                genres=[
+                    Genre(
+                        id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"
+                    )
+                ],
+            )
+        ]
