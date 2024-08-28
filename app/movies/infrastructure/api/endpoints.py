@@ -26,9 +26,10 @@ from app.movies.domain.exceptions import (
     MovieDoesNotExistException,
 )
 from app.movies.infrastructure.api.responses import (
+    CreateMovieResponse,
     GenreResponse,
-    MovieDetailResponse,
-    MovieResponse,
+    RetrieveMovieResponse,
+    UpdateMovieResponse,
 )
 from app.movies.infrastructure.api.utils import build_poster_image
 from app.movies.infrastructure.repositories.sql_model_genre_repository import (
@@ -52,7 +53,7 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
 
 @router.post(
     "/",
-    response_model=MovieResponse,
+    response_model=CreateMovieResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_active_superuser)],
 )
@@ -75,7 +76,7 @@ def create_movie(
 
 @router.get(
     "/{movie_id}/",
-    response_model=MovieDetailResponse,
+    response_model=RetrieveMovieResponse,
     status_code=status.HTTP_200_OK,
 )
 def retrieve_movie(session: SessionDep, movie_id: UUID) -> Movie:
@@ -91,7 +92,7 @@ def retrieve_movie(session: SessionDep, movie_id: UUID) -> Movie:
 
 @router.patch(
     "/{movie_id}/",
-    response_model=MovieResponse,
+    response_model=UpdateMovieResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
