@@ -1,5 +1,6 @@
 from typing import Any
 from unittest.mock import Mock, create_autospec
+from uuid import UUID
 
 import pytest
 
@@ -22,3 +23,28 @@ class TestRetrieveAllMovies:
         mock_repository.get_all.assert_called_once()
 
         assert movies == expected_movies
+
+    def test_retrieves_movies_filtered_by_genre(self, mock_repository: Mock) -> None:
+        expected_movies = [MovieFactory().create_with_genre()]
+        mock_repository.get_all.return_value = expected_movies
+
+        movies = RetrieveAllMovies(repository=mock_repository).execute(
+            genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9")
+        )
+
+        mock_repository.get_all.assert_called_once()
+
+        assert movies == expected_movies
+
+    def test_retrieves_movies_filtered_by_genre_that_does_not_exist(
+        self, mock_repository: Mock
+    ) -> None:
+        mock_repository.get_all.return_value = [MovieFactory().create_with_genre()]
+
+        movies = RetrieveAllMovies(repository=mock_repository).execute(
+            genre_id=UUID("e219f84b-3568-446b-896c-3ba2bc74ceb0")
+        )
+
+        mock_repository.get_all.assert_called_once()
+
+        assert movies == []

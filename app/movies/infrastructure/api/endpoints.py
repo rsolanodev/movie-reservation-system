@@ -57,10 +57,12 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     response_model=list[RetrieveMovieResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_all_movies(session: SessionDep) -> list[Movie]:
+def retrieve_all_movies(
+    session: SessionDep, genre_id: UUID | None = None
+) -> list[Movie]:
     return RetrieveAllMovies(
         repository=SqlModelMovieRepository(session=session),
-    ).execute()
+    ).execute(genre_id=genre_id)
 
 
 @router.post(
