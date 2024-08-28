@@ -17,6 +17,7 @@ from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.remove_movie_genre import RemoveMovieGenre
 from app.movies.actions.retrieve_genres import RetrieveGenres
+from app.movies.actions.retrieve_movie import RetrieveMovie
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
@@ -24,7 +25,11 @@ from app.movies.domain.exceptions import (
     GenreNotAssignedException,
     MovieDoesNotExistException,
 )
-from app.movies.infrastructure.api.responses import GenreResponse, MovieResponse
+from app.movies.infrastructure.api.responses import (
+    GenreResponse,
+    MovieDetailResponse,
+    MovieResponse,
+)
 from app.movies.infrastructure.api.utils import build_poster_image
 from app.movies.infrastructure.repositories.sql_model_genre_repository import (
     SqlModelGenreRepository,
@@ -34,6 +39,15 @@ from app.movies.infrastructure.repositories.sql_model_movie_repository import (
 )
 
 router = APIRouter()
+
+
+@router.get(
+    "/genres/",
+    response_model=list[GenreResponse],
+    status_code=status.HTTP_200_OK,
+)
+def retrieve_genres(session: SessionDep) -> list[Genre]:
+    return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()
 
 
 @router.post(
@@ -57,6 +71,22 @@ def create_movie(
             poster_image=build_poster_image(uploaded_file=poster_image),  # type: ignore
         )
     )
+
+
+@router.get(
+    "/{movie_id}/",
+    response_model=MovieDetailResponse,
+    status_code=status.HTTP_200_OK,
+)
+def retrieve_movie(session: SessionDep, movie_id: UUID) -> Movie:
+    try:
+        return RetrieveMovie(
+            repository=SqlModelMovieRepository(session=session),
+        ).execute(id=movie_id)
+    except MovieDoesNotExistException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
+        )
 
 
 @router.patch(
@@ -104,15 +134,6 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
         )
-
-
-@router.get(
-    "/genres/",
-    response_model=list[GenreResponse],
-    status_code=status.HTTP_200_OK,
-)
-def retrieve_genres(session: SessionDep) -> list[Genre]:
-    return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()
 
 
 @router.post(
