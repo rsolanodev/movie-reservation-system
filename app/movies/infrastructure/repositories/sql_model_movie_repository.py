@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from sqlmodel import select
+
 from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.movies.domain.entities import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -38,3 +40,8 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             movie_model.genres.remove(genre_model)
             self._session.add(movie_model)
             self._session.commit()
+
+    def get_all(self) -> list[Movie]:
+        statement = select(MovieModel)
+        results = self._session.exec(statement).all()
+        return [movie_model.to_domain() for movie_model in results]
