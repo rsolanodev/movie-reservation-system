@@ -604,7 +604,7 @@ class TestRetrieveMovieEndpoint:
             "description": "Deadpool and a variant of Wolverine.",
             "poster_image": "deadpool_and_wolverine.jpg",
             "genres": [
-                {"id": "913822a0-750b-4cb6-b7b9-e01869d7d62d", "name": "Action"}
+                {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
             ],
         }
 
@@ -651,7 +651,7 @@ class TestRetrieveAllMoviesEndpoint:
         response = client.get("api/v1/movies/")
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once()
+        mock_action.return_value.execute.assert_called_once_with(genre_id=None)
 
         assert response.status_code == 200
         assert response.json() == [
@@ -661,7 +661,35 @@ class TestRetrieveAllMoviesEndpoint:
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",
                 "genres": [
-                    {"id": "913822a0-750b-4cb6-b7b9-e01869d7d62d", "name": "Action"}
+                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
+                ],
+            }
+        ]
+
+    def test_returns_200_and_calls_action_with_genre_filter(
+        self, client: TestClient, mock_action: Mock, mock_repository: Mock
+    ) -> None:
+        movie = MovieFactory().create()
+        genre = GenreFactory().create()
+        movie.add_genre(genre=genre)
+        mock_action.return_value.execute.return_value = [movie]
+
+        response = client.get(
+            "api/v1/movies/?genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9"
+        )
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(genre_id=genre.id)
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+                "title": "Deadpool & Wolverine",
+                "description": "Deadpool and a variant of Wolverine.",
+                "poster_image": "deadpool_and_wolverine.jpg",
+                "genres": [
+                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
                 ],
             }
         ]
@@ -674,7 +702,7 @@ class TestRetrieveAllMoviesEndpoint:
         response = client.get("api/v1/movies/")
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once()
+        mock_action.return_value.execute.assert_called_once_with(genre_id=None)
 
         assert response.status_code == 200
         assert response.json() == []

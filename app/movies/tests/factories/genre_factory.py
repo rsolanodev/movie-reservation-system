@@ -6,6 +6,6 @@ from app.movies.domain.entities import Genre
 class GenreFactory:
     def create(self) -> Genre:
         return Genre(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
             name="Action",
         )
