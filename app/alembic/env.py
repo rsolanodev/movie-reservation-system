@@ -7,9 +7,11 @@ from sqlalchemy import engine_from_config, pool
 from app.settings import settings
 from app.users.infrastructure.models import UserModel
 from app.movies.infrastructure.models import MovieModel
+from app.showtimes.infrastructure.models import ShowtimeModel
 
 target_metadata = UserModel.metadata
 target_metadata = MovieModel.metadata
+target_metadata = ShowtimeModel.metadata
 
 config = context.config
 
