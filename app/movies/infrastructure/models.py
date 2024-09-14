@@ -3,6 +3,7 @@ import uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.movies.domain.entities import Genre, Movie
+from app.showtimes.infrastructure.models import ShowtimeModel
 
 
 class MovieGenreLink(SQLModel, table=True):
@@ -18,6 +19,7 @@ class MovieModel(SQLModel, table=True):
     genres: list["GenreModel"] = Relationship(
         back_populates="movies", link_model=MovieGenreLink
     )
+    showtimes: list[ShowtimeModel] = Relationship(back_populates="movie")
 
     @classmethod
     def from_domain(self, movie: Movie) -> "MovieModel":
