@@ -1,8 +1,10 @@
+from datetime import datetime
 from uuid import UUID
 
 from sqlmodel import Session
 
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.showtimes.infrastructure.models import ShowtimeModel
 
 
 class SqlModelMovieFactory:
@@ -26,6 +28,16 @@ class SqlModelMovieFactory:
             id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"
         )
         self._movie_model.genres.append(genre_model)
+        self._session.add(self._movie_model)
+        return self
+
+    def add_showtime(self, show_datetime: datetime) -> "SqlModelMovieFactory":
+        showtime_model = ShowtimeModel(
+            id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+            movie_id=self._movie_model.id,
+            show_datetime=show_datetime,
+        )
+        self._movie_model.showtimes.append(showtime_model)
         self._session.add(self._movie_model)
         return self
 
