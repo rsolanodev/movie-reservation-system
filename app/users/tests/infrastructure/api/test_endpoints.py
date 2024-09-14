@@ -26,6 +26,7 @@ class TestCreateUserEndpoint:
         self, client: TestClient, mock_action: Mock, mock_repository: Mock
     ) -> None:
         mock_action.return_value.execute.return_value = UserFactory().create()
+
         response = client.post(
             "api/v1/users/",
             json={
@@ -34,6 +35,7 @@ class TestCreateUserEndpoint:
                 "full_name": "Rubén Solano",
             },
         )
+
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateUserParams(
@@ -42,6 +44,7 @@ class TestCreateUserEndpoint:
                 full_name="Rubén Solano",
             ),
         )
+
         assert response.status_code == 201
         assert response.json() == {
             "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
@@ -55,6 +58,7 @@ class TestCreateUserEndpoint:
         self, client: TestClient, mock_action: Mock
     ) -> None:
         mock_action.return_value.execute.side_effect = UserAlreadyExistsException
+
         response = client.post(
             "api/v1/users/",
             json={
@@ -63,5 +67,6 @@ class TestCreateUserEndpoint:
                 "full_name": "Rubén Solano",
             },
         )
+
         assert response.status_code == 400
         assert response.json()["detail"] == "The user with this email already exists"

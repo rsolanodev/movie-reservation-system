@@ -244,7 +244,7 @@ class TestUpdateMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException()
+        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -352,7 +352,7 @@ class TestDeleteMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException()
+        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -488,7 +488,7 @@ class TestAddMovieGenreEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = GenreAlreadyAssignedException()
+        mock_action.return_value.execute.side_effect = GenreAlreadyAssignedException
 
         response = client.post(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
@@ -551,7 +551,7 @@ class TestRemoveMovieGenreEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = GenreNotAssignedException()
+        mock_action.return_value.execute.side_effect = GenreNotAssignedException
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e/",
@@ -614,7 +614,7 @@ class TestRetrieveMovieEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException()
+        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/")
 

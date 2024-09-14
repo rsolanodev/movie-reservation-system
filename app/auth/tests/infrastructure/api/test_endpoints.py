@@ -61,6 +61,7 @@ class TestAuthenticateUserEndpoint:
         self, client: TestClient, mock_action: Mock, expected_exception: Exception
     ) -> None:
         mock_action.return_value.execute.side_effect = expected_exception
+
         response = client.post(
             "api/v1/auth/access-token/",
             data={
@@ -68,6 +69,7 @@ class TestAuthenticateUserEndpoint:
                 "password": "Passw0rd!",
             },
         )
+
         assert response.status_code == 400
         assert response.json()["detail"] == "Incorrect email or password"
 
@@ -75,6 +77,7 @@ class TestAuthenticateUserEndpoint:
         self, client: TestClient, mock_action: Mock
     ) -> None:
         mock_action.return_value.execute.side_effect = UserInactiveException
+
         response = client.post(
             "api/v1/auth/access-token/",
             data={
@@ -82,5 +85,6 @@ class TestAuthenticateUserEndpoint:
                 "password": "Passw0rd!",
             },
         )
+
         assert response.status_code == 400
         assert response.json()["detail"] == "Inactive user"
