@@ -1,7 +1,6 @@
 import uuid
 
-from app.movies.domain.entities import Genre, Movie
-from app.showtimes.domain.entities import Showtime
+from app.movies.domain.entities import Genre, Movie, MovieShowtime
 
 
 class MovieBuilder:
@@ -12,7 +11,7 @@ class MovieBuilder:
         self.poster_image: str | None = "deadpool_and_wolverine.jpg"
 
         self.genres: list[Genre] = []
-        self.showtimes: list[Showtime] = []
+        self.showtimes: list[MovieShowtime] = []
 
     def with_id(self, id: uuid.UUID) -> "MovieBuilder":
         self.id = id
@@ -38,6 +37,10 @@ class MovieBuilder:
         self.genres.append(genre)
         return self
 
+    def with_showtime(self, showtime: MovieShowtime) -> "MovieBuilder":
+        self.showtimes.append(showtime)
+        return self
+
     def build(self) -> Movie:
         movie = Movie(
             id=self.id,
@@ -48,5 +51,8 @@ class MovieBuilder:
 
         for genre in self.genres:
             movie.add_genre(genre)
+
+        for showtime in self.showtimes:
+            movie.add_showtime(showtime)
 
         return movie

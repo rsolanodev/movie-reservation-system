@@ -11,6 +11,11 @@ class RetrieveMovie:
 
     def execute(self, id: UUID) -> Movie:
         movie = self._repository.get(id)
+
         if movie is None:
             raise MovieDoesNotExistException()
+
+        for movie_showtime in self._repository.get_showtimes(movie_id=id):
+            movie.add_showtime(movie_showtime)
+
         return movie
