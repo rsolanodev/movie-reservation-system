@@ -1,9 +1,10 @@
+from datetime import datetime
 from unittest.mock import ANY
 from uuid import UUID
 
 from sqlmodel import Session
 
-from app.movies.domain.entities import Genre, Movie
+from app.movies.domain.entities import Genre, Movie, MovieShowtime
 from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sql_model_movie_repository import (
     SqlModelMovieRepository,
@@ -14,6 +15,9 @@ from app.movies.tests.infrastructure.factories.genre_model_factory import (
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 from app.shared.tests.infrastructure.builders.movie_model_builder import (
     MovieModelBuilder,
+)
+from app.shared.tests.infrastructure.factories.showtime_model_factory import (
+    ShowtimeModelFactory,
 )
 
 
@@ -162,3 +166,47 @@ class TestSqlModelMovieRepository:
                 ],
             ),
         ]
+
+    def test_get_movie_showtimes_ordered_by_show_datetime(
+        self, session: Session
+    ) -> None:
+        movie_model = (
+            MovieModelBuilder(session=session)
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_showtime(
+                showtime_model=ShowtimeModelFactory(session=session).create(
+                    id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                    movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                )
+            )
+            .with_showtime(
+                showtime_model=ShowtimeModelFactory(session=session).create(
+                    id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                    movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                    show_datetime=datetime(2023, 4, 3, 20, 0),
+                )
+            )
+            .build()
+        )
+        repository = SqlModelMovieRepository(session=session)
+        showtimes = repository.get_showtimes(movie_model.id)
+
+        assert showtimes == [
+            MovieShowtime(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                show_datetime=datetime(2023, 4, 3, 20, 0),
+            ),
+            MovieShowtime(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                show_datetime=datetime(2023, 4, 3, 22, 0),
+            ),
+        ]
+
+    def test_get_movie_showtimes_no_showtimes(self, session: Session) -> None:
+        movie_model = MovieModelBuilder(session=session).build()
+
+        repository = SqlModelMovieRepository(session=session)
+        showtimes = repository.get_showtimes(movie_model.id)
+
+        assert showtimes == []
