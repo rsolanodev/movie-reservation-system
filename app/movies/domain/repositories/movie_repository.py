@@ -1,7 +1,7 @@
 from typing import Protocol
 from uuid import UUID
 
-from app.movies.domain.entities import Movie
+from app.movies.domain.entities import Movie, MovieShowtime
 
 
 class MovieRepository(Protocol):
@@ -16,3 +16,5 @@ class MovieRepository(Protocol):
     def remove_genre(self, movie_id: UUID, genre_id: UUID) -> None: ...
 
     def get_all(self) -> list[Movie]: ...
+
+    def get_showtimes(self, movie_id: UUID) -> list[MovieShowtime]: ...

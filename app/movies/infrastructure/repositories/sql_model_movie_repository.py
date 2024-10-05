@@ -3,9 +3,10 @@ from uuid import UUID
 from sqlmodel import select
 
 from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
-from app.movies.domain.entities import Movie
+from app.movies.domain.entities import Movie, MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.showtimes.infrastructure.models import ShowtimeModel
 
 
 class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
@@ -16,7 +17,14 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
 
     def get(self, id: UUID) -> Movie | None:
         movie_model = self._session.get(MovieModel, id)
-        return movie_model.to_domain() if movie_model else None
+
+        if movie_model is None:
+            return None
+
+        movie = movie_model.to_domain()
+        for genre in movie_model.genres:
+            movie.add_genre(genre.to_domain())
+        return movie
 
     def delete(self, id: UUID) -> None:
         movie_model = self._session.get(MovieModel, id)
@@ -43,5 +51,32 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
 
     def get_all(self) -> list[Movie]:
         statement = select(MovieModel).order_by(MovieModel.title)
-        results = self._session.exec(statement).all()
-        return [movie_model.to_domain() for movie_model in results]
+        movie_models = self._session.exec(statement).all()
+
+        movies: list[Movie] = []
+        for movie_model in movie_models:
+            movie = movie_model.to_domain()
+
+            for genre_model in movie_model.genres:
+                movie.add_genre(genre_model.to_domain())
+
+            movies.append(movie)
+        return movies
+
+    def get_showtimes(self, movie_id: UUID) -> list[MovieShowtime]:
+        statement = (
+            select(ShowtimeModel)
+            .where(ShowtimeModel.movie_id == movie_id)
+            .order_by(ShowtimeModel.show_datetime)  # type: ignore
+        )
+        showtime_models = self._session.exec(statement).all()
+        return [
+            self._build_movie_showtime(showtime_model)
+            for showtime_model in showtime_models
+        ]
+
+    def _build_movie_showtime(self, showtime_model: ShowtimeModel) -> MovieShowtime:
+        return MovieShowtime(
+            id=showtime_model.id,
+            show_datetime=showtime_model.show_datetime,
+        )

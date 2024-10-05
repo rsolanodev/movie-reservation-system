@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from app.core.domain.constants.unset import UnsetType
 
@@ -19,6 +20,12 @@ class Genre:
     @classmethod
     def create(cls, name: str) -> "Genre":
         return cls(id=uuid.uuid4(), name=name)
+
+
+@dataclass
+class MovieShowtime:
+    id: uuid.UUID
+    show_datetime: datetime
 
 
 @dataclass
