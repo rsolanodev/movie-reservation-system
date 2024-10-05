@@ -14,8 +14,8 @@ from app.movies.domain.exceptions import (
     GenreNotAssignedException,
     MovieDoesNotExistException,
 )
-from app.movies.tests.factories.genre_factory import GenreFactory
-from app.movies.tests.factories.movie_factory import MovieFactory
+from app.movies.tests.domain.factories.genre_factory import GenreFactory
+from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
 class TestCreateMovieEndpoint:
@@ -38,7 +38,11 @@ class TestCreateMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.return_value = MovieFactory().create()
+        mock_action.return_value.execute.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         response = client.post(
             "api/v1/movies/",
@@ -79,7 +83,10 @@ class TestCreateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_action.return_value.execute.return_value = (
-            MovieFactory().create_without_poster()
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .without_poster_image()
+            .build()
         )
 
         response = client.post(
@@ -171,7 +178,11 @@ class TestUpdateMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.return_value = MovieFactory().create()
+        mock_action.return_value.execute.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -212,7 +223,11 @@ class TestUpdateMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.return_value = MovieFactory().create()
+        mock_action.return_value.execute.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -587,9 +602,24 @@ class TestRetrieveMovieEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
     ) -> None:
-        movie = MovieFactory().create()
-        genre = GenreFactory().create()
-        movie.add_genre(genre=genre)
+        movie = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                    name="Action",
+                )
+            )
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"),
+                    name="Comedy",
+                )
+            )
+            .build()
+        )
+
         mock_action.return_value.execute.return_value = movie
 
         response = client.get(f"api/v1/movies/{movie.id}/")
@@ -604,7 +634,8 @@ class TestRetrieveMovieEndpoint:
             "description": "Deadpool and a variant of Wolverine.",
             "poster_image": "deadpool_and_wolverine.jpg",
             "genres": [
-                {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
+                {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"},
+                {"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"},
             ],
         }
 
@@ -643,10 +674,30 @@ class TestRetrieveAllMoviesEndpoint:
     def test_returns_200_and_calls_action(
         self, client: TestClient, mock_action: Mock, mock_repository: Mock
     ) -> None:
-        movie = MovieFactory().create()
-        genre = GenreFactory().create()
-        movie.add_genre(genre=genre)
-        mock_action.return_value.execute.return_value = [movie]
+        mock_action.return_value.execute.return_value = [
+            MovieBuilder()
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_title("Deadpool & Wolverine")
+            .with_description("Deadpool and a variant of Wolverine.")
+            .with_poster_image("deadpool_and_wolverine.jpg")
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"
+                )
+            )
+            .build(),
+            MovieBuilder()
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_title("The Super Mario Bros. Movie")
+            .with_description("An animated adaptation of the video game.")
+            .with_poster_image("super_mario_bros.jpg")
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"
+                )
+            )
+            .build(),
+        ]
 
         response = client.get("api/v1/movies/")
 
@@ -656,35 +707,52 @@ class TestRetrieveAllMoviesEndpoint:
         assert response.status_code == 200
         assert response.json() == [
             {
-                "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+                "id": "ec725625-f502-4d39-9401-a415d8c1f964",
                 "title": "Deadpool & Wolverine",
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",
                 "genres": [
-                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
+                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"}
                 ],
-            }
+            },
+            {
+                "id": "ec725625-f502-4d39-9401-a415d8c1f965",
+                "title": "The Super Mario Bros. Movie",
+                "description": "An animated adaptation of the video game.",
+                "poster_image": "super_mario_bros.jpg",
+                "genres": [
+                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Adventure"}
+                ],
+            },
         ]
 
     def test_returns_200_and_calls_action_with_genre_filter(
         self, client: TestClient, mock_action: Mock, mock_repository: Mock
     ) -> None:
-        movie = MovieFactory().create()
-        genre = GenreFactory().create()
-        movie.add_genre(genre=genre)
-        mock_action.return_value.execute.return_value = [movie]
+        mock_action.return_value.execute.return_value = [
+            MovieBuilder()
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
+                )
+            )
+            .build()
+        ]
 
         response = client.get(
             "api/v1/movies/?genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9"
         )
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(genre_id=genre.id)
+        mock_action.return_value.execute.assert_called_once_with(
+            genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9")
+        )
 
         assert response.status_code == 200
         assert response.json() == [
             {
-                "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+                "id": "ec725625-f502-4d39-9401-a415d8c1f964",
                 "title": "Deadpool & Wolverine",
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",

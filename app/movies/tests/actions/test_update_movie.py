@@ -9,7 +9,7 @@ from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import PosterImage
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.movies.tests.factories.movie_factory import MovieFactory
+from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
 class TestUpdateMovie:
@@ -18,7 +18,11 @@ class TestUpdateMovie:
         return create_autospec(MovieRepository, instance=True)
 
     def test_updates_movie(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = MovieFactory().create()
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         movie = UpdateMovie(repository=mock_repository).execute(
             params=UpdateMovieParams(
@@ -66,7 +70,11 @@ class TestUpdateMovie:
     def test_does_not_update_title_when_is_not_sent(
         self, mock_repository: Mock
     ) -> None:
-        mock_repository.get.return_value = MovieFactory().create()
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         movie = UpdateMovie(repository=mock_repository).execute(
             params=UpdateMovieParams(
@@ -89,7 +97,11 @@ class TestUpdateMovie:
     def test_does_not_update_description_when_is_not_sent(
         self, mock_repository: Mock
     ) -> None:
-        mock_repository.get.return_value = MovieFactory().create()
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         movie = UpdateMovie(repository=mock_repository).execute(
             params=UpdateMovieParams(
@@ -112,7 +124,11 @@ class TestUpdateMovie:
     def test_does_not_update_poster_image_when_is_not_sent(
         self, mock_repository: Mock
     ) -> None:
-        mock_repository.get.return_value = MovieFactory().create()
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .build()
+        )
 
         movie = UpdateMovie(repository=mock_repository).execute(
             params=UpdateMovieParams(

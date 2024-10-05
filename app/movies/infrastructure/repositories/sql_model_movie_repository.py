@@ -42,6 +42,6 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             self._session.commit()
 
     def get_all(self) -> list[Movie]:
-        statement = select(MovieModel)
+        statement = select(MovieModel).order_by(MovieModel.title)
         results = self._session.exec(statement).all()
         return [movie_model.to_domain() for movie_model in results]
