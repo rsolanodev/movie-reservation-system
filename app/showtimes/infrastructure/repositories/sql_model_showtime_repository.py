@@ -29,12 +29,3 @@ class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
         if showtime_model:
             self._session.delete(showtime_model)
             self._session.commit()
-
-    def get_by_movie_id(self, movie_id: uuid.UUID) -> list[Showtime]:
-        statement = (
-            select(ShowtimeModel)
-            .where(ShowtimeModel.movie_id == movie_id)
-            .order_by(ShowtimeModel.show_datetime)  # type: ignore
-        )
-        showtime_models = self._session.exec(statement).all()
-        return [showtime_model.to_domain() for showtime_model in showtime_models]

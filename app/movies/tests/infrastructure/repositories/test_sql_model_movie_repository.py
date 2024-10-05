@@ -1,3 +1,4 @@
+from unittest.mock import ANY
 from uuid import UUID
 
 from sqlmodel import Session
@@ -7,14 +8,18 @@ from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sql_model_movie_repository import (
     SqlModelMovieRepository,
 )
-from app.movies.tests.factories.movie_factory import MovieFactory
-from app.movies.tests.factories.sql_model_genre_factory import SqlModelGenreFactory
-from app.movies.tests.factories.sql_model_movie_factory import SqlModelMovieFactory
+from app.movies.tests.infrastructure.factories.genre_model_factory import (
+    GenreModelFactory,
+)
+from app.shared.tests.domain.builders.movie_builder import MovieBuilder
+from app.shared.tests.infrastructure.builders.movie_model_builder import (
+    MovieModelBuilder,
+)
 
 
 class TestSqlModelMovieRepository:
     def test_creates_movie(self, session: Session) -> None:
-        movie = MovieFactory().create()
+        movie = MovieBuilder().build()
 
         SqlModelMovieRepository(session=session).save(movie=movie)
 
@@ -24,7 +29,7 @@ class TestSqlModelMovieRepository:
         assert movie_model.poster_image == "deadpool_and_wolverine.jpg"
 
     def test_updates_movie(self, session: Session) -> None:
-        movie_model = SqlModelMovieFactory(session).create().get()
+        movie_model = MovieModelBuilder(session=session).build()
 
         movie = movie_model.to_domain()
         movie.title = "The Super Mario Bros. Movie"
@@ -39,11 +44,26 @@ class TestSqlModelMovieRepository:
         assert movie_model.poster_image == "super_mario_bros.jpg"
 
     def test_get_movie(self, session: Session) -> None:
-        SqlModelMovieFactory(session).create().add_genre()
-
-        movie = SqlModelMovieRepository(session=session).get(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        genre_model_factory = GenreModelFactory(session=session)
+        movie_model = (
+            MovieModelBuilder(session=session)
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_genre(
+                genre_model=genre_model_factory.create(
+                    id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
+                    name="Action",
+                )
+            )
+            .with_genre(
+                genre_model=genre_model_factory.create(
+                    id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77b"),
+                    name="Comedy",
+                )
+            )
+            .build()
         )
+
+        movie = SqlModelMovieRepository(session=session).get(id=movie_model.id)
 
         assert movie == Movie(
             id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
@@ -51,31 +71,44 @@ class TestSqlModelMovieRepository:
             description="Deadpool and a variant of Wolverine.",
             poster_image="deadpool_and_wolverine.jpg",
             genres=[
-                Genre(id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action")
+                Genre(id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"),
+                Genre(id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77b"), name="Comedy"),
             ],
         )
 
     def test_delete_movie(self, session: Session) -> None:
-        model_movie = SqlModelMovieFactory(session).create().get()
+        movie_model = MovieModelBuilder(session=session).build()
 
-        SqlModelMovieRepository(session=session).delete(id=model_movie.id)
+        SqlModelMovieRepository(session=session).delete(id=movie_model.id)
 
-        assert session.get(MovieModel, model_movie.id) is None
+        assert session.get(MovieModel, movie_model.id) is None
 
     def test_add_genre_to_movie(self, session: Session) -> None:
-        movie_model = SqlModelMovieFactory(session).create().get()
-        genre_model = SqlModelGenreFactory(session).create().get()
+        genre_model = GenreModelFactory(session=session).create(
+            id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
+            name="Action",
+        )
+        movie_model = MovieModelBuilder(session=session).build()
 
         SqlModelMovieRepository(session=session).add_genre(
             movie_id=movie_model.id, genre_id=genre_model.id
         )
 
         session.refresh(movie_model)
-        assert movie_model.genres[0].id == genre_model.id
+        assert movie_model.genres[0].id == UUID("393210d5-80ce-4d03-b896-5d89f15aa77a")
         assert movie_model.genres[0].name == "Action"
 
     def test_remove_genre_from_movie(self, session: Session) -> None:
-        movie_model = SqlModelMovieFactory(session).create().add_genre().get()
+        movie_model = (
+            MovieModelBuilder(session=session)
+            .with_genre(
+                genre_model=GenreModelFactory(session=session).create(
+                    id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
+                    name="Action",
+                )
+            )
+            .build()
+        )
 
         SqlModelMovieRepository(session=session).remove_genre(
             movie_id=movie_model.id,
@@ -85,9 +118,27 @@ class TestSqlModelMovieRepository:
         session.refresh(movie_model)
         assert movie_model.genres == []
 
-    def test_get_all_movies(self, session: Session) -> None:
-        SqlModelMovieFactory(session).create().add_genre()
-
+    def test_get_all_movies_ordered_by_title(self, session: Session) -> None:
+        genre_model_factory = GenreModelFactory(session=session)
+        (
+            MovieModelBuilder(session=session)
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_title("The Super Mario Bros. Movie")
+            .with_description("An animated adaptation of the video game.")
+            .with_poster_image("super_mario_bros.jpg")
+            .with_genre(genre_model=genre_model_factory.create(name="Adventure"))
+            .with_genre(genre_model=genre_model_factory.create(name="Comedy"))
+            .build()
+        )
+        (
+            MovieModelBuilder(session=session)
+            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_title("Deadpool & Wolverine")
+            .with_description("Deadpool and a variant of Wolverine.")
+            .with_poster_image("deadpool_and_wolverine.jpg")
+            .with_genre(genre_model=genre_model_factory.create(name="Action"))
+            .build()
+        )
         movies = SqlModelMovieRepository(session=session).get_all()
 
         assert movies == [
@@ -97,9 +148,17 @@ class TestSqlModelMovieRepository:
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
                 genres=[
-                    Genre(
-                        id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"
-                    )
+                    Genre(id=ANY, name="Action"),
                 ],
-            )
+            ),
+            Movie(
+                id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"),
+                title="The Super Mario Bros. Movie",
+                description="An animated adaptation of the video game.",
+                poster_image="super_mario_bros.jpg",
+                genres=[
+                    Genre(id=ANY, name="Adventure"),
+                    Genre(id=ANY, name="Comedy"),
+                ],
+            ),
         ]
