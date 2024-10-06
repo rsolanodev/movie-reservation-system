@@ -16,6 +16,7 @@ class RetrieveMovie:
             raise MovieDoesNotExistException()
 
         for movie_showtime in self._repository.get_showtimes(movie_id=id):
-            movie.add_showtime(movie_showtime)
+            if movie_showtime.is_future():
+                movie.add_showtime(movie_showtime)
 
         return movie

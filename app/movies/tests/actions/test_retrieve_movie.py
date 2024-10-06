@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from unittest.mock import Mock, create_autospec
 from uuid import UUID
 
 import pytest
+from freezegun import freeze_time
 
 from app.movies.actions.retrieve_movie import RetrieveMovie
 from app.movies.domain.entities import Genre, Movie, MovieShowtime
@@ -16,6 +17,7 @@ from app.movies.tests.domain.factories.movie_showtime_factory import (
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
+@freeze_time("2023-04-03T22:00:00Z")
 class TestRetrieveMovie:
     @pytest.fixture
     def mock_repository(self) -> Any:
@@ -36,11 +38,56 @@ class TestRetrieveMovie:
             )
             .build()
         )
+        mock_repository.get_showtimes.return_value = []
+
+        movie = RetrieveMovie(repository=mock_repository).execute(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+
+        mock_repository.get.assert_called_once_with(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+        mock_repository.get_showtimes.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+        assert movie == Movie(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            title="The Super Mario Bros. Movie",
+            description="An animated adaptation of the video game.",
+            poster_image="super_mario_bros.jpg",
+            genres=[
+                Genre(
+                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
+                    name="Adventure",
+                )
+            ],
+            showtimes=[],
+        )
+
+    def test_retrieves_movie_with_showtimes(self, mock_repository: Mock) -> None:
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_title("The Super Mario Bros. Movie")
+            .with_description("An animated adaptation of the video game.")
+            .with_poster_image("super_mario_bros.jpg")
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
+                    name="Adventure",
+                )
+            )
+            .build()
+        )
         mock_repository.get_showtimes.return_value = [
             MovieShowtimeFactory().create(
                 id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                show_datetime=datetime(2023, 4, 3, 22, 0),
-            )
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            ),
+            MovieShowtimeFactory().create(
+                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+            ),
         ]
 
         movie = RetrieveMovie(repository=mock_repository).execute(
@@ -67,7 +114,66 @@ class TestRetrieveMovie:
             showtimes=[
                 MovieShowtime(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                ),
+                MovieShowtime(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+                ),
+            ],
+        )
+
+    def does_not_retrieve_old_showtimes(self, mock_repository: Mock) -> None:
+        mock_repository.get.return_value = (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_title("The Super Mario Bros. Movie")
+            .with_description("An animated adaptation of the video game.")
+            .with_poster_image("super_mario_bros.jpg")
+            .with_genre(
+                genre=GenreFactory().create(
+                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
+                    name="Adventure",
+                )
+            )
+            .build()
+        )
+        mock_repository.get_showtimes.return_value = [
+            MovieShowtimeFactory().create(
+                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                show_datetime=datetime(2023, 4, 3, 18, 0, tzinfo=timezone.utc),
+            ),
+            MovieShowtimeFactory().create(
+                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+            ),
+        ]
+
+        movie = RetrieveMovie(repository=mock_repository).execute(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+
+        mock_repository.get.assert_called_once_with(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+        mock_repository.get_showtimes.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+        assert movie == Movie(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            title="The Super Mario Bros. Movie",
+            description="An animated adaptation of the video game.",
+            poster_image="super_mario_bros.jpg",
+            genres=[
+                Genre(
+                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
+                    name="Adventure",
+                )
+            ],
+            showtimes=[
+                MovieShowtime(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                 )
             ],
         )

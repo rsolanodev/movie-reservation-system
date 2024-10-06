@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 from uuid import UUID
 
@@ -624,7 +624,7 @@ class TestRetrieveMovieEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build()
@@ -650,7 +650,7 @@ class TestRetrieveMovieEndpoint:
             "showtimes": [
                 {
                     "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
-                    "show_datetime": "2023-04-03T22:00:00",
+                    "show_datetime": "2023-04-03T22:00:00Z",
                 }
             ],
         }
@@ -704,7 +704,7 @@ class TestRetrieveAllMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build(),
@@ -721,7 +721,7 @@ class TestRetrieveAllMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                    show_datetime=datetime(2023, 4, 3, 23, 0),
+                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                 )
             )
             .build(),
@@ -745,7 +745,7 @@ class TestRetrieveAllMoviesEndpoint:
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
-                        "show_datetime": "2023-04-03T22:00:00",
+                        "show_datetime": "2023-04-03T22:00:00Z",
                     }
                 ],
             },
@@ -760,7 +760,7 @@ class TestRetrieveAllMoviesEndpoint:
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd44f",
-                        "show_datetime": "2023-04-03T23:00:00",
+                        "show_datetime": "2023-04-03T23:00:00Z",
                     }
                 ],
             },
@@ -780,7 +780,7 @@ class TestRetrieveAllMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build()
@@ -808,7 +808,7 @@ class TestRetrieveAllMoviesEndpoint:
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
-                        "show_datetime": "2023-04-03T22:00:00",
+                        "show_datetime": "2023-04-03T22:00:00Z",
                     }
                 ],
             }

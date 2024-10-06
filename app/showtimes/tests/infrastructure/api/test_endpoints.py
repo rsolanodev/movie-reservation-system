@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 from uuid import UUID
 
@@ -34,7 +34,7 @@ class TestCreateShowtimeEndpoint:
             "api/v1/showtimes/",
             json={
                 "movie_id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
-                "show_datetime": "2022-08-10 22:00:00",
+                "show_datetime": "2022-08-10T22:00:00Z",
             },
             headers=superuser_token_headers,
         )
@@ -43,7 +43,7 @@ class TestCreateShowtimeEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                show_datetime=datetime(2022, 8, 10, 22, 0, 0),
+                show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
             )
         )
 
@@ -62,7 +62,7 @@ class TestCreateShowtimeEndpoint:
             "api/v1/showtimes/",
             json={
                 "movie_id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
-                "show_datetime": "2022-08-10 22:00:00",
+                "show_datetime": "2022-08-10T22:00:00Z",
             },
             headers=superuser_token_headers,
         )
@@ -71,7 +71,7 @@ class TestCreateShowtimeEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                show_datetime=datetime(2022, 8, 10, 22, 0, 0),
+                show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
             )
         )
 
@@ -88,7 +88,7 @@ class TestCreateShowtimeEndpoint:
             "api/v1/showtimes/",
             json={
                 "movie_id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
-                "show_datetime": "2022-08-10 22:00:00",
+                "show_datetime": "2022-08-10T22:00:00Z",
             },
         )
 
@@ -109,7 +109,7 @@ class TestCreateShowtimeEndpoint:
             "api/v1/showtimes/",
             json={
                 "movie_id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
-                "show_datetime": "2022-08-10 22:00:00",
+                "show_datetime": "2022-08-10T22:00:00Z",
             },
             headers=user_token_headers,
         )

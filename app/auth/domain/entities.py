@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 import jwt
 
@@ -25,9 +24,7 @@ class Token:
         expire_minutes: int,
         token_type: TokenType = TokenType.BEARER,
     ) -> "Token":
-        expire_date = datetime.now(tz=ZoneInfo("UTC")) + timedelta(
-            minutes=expire_minutes
-        )
+        expire_date = datetime.now(tz=timezone.utc) + timedelta(minutes=expire_minutes)
         access_token = jwt.encode(
             payload={"exp": expire_date, "sub": str(user_id)},
             key=secret_key,
