@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from datetime import datetime
 from unittest.mock import Mock, patch
 from uuid import UUID
 
@@ -15,6 +16,9 @@ from app.movies.domain.exceptions import (
     MovieDoesNotExistException,
 )
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
+from app.movies.tests.domain.factories.movie_showtime_factory import (
+    MovieShowtimeFactory,
+)
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -602,7 +606,7 @@ class TestRetrieveMovieEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
     ) -> None:
-        movie = (
+        mock_action.return_value.execute.return_value = (
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
@@ -617,15 +621,21 @@ class TestRetrieveMovieEndpoint:
                     name="Comedy",
                 )
             )
+            .with_showtime(
+                showtime=MovieShowtimeFactory().create(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                )
+            )
             .build()
         )
 
-        mock_action.return_value.execute.return_value = movie
-
-        response = client.get(f"api/v1/movies/{movie.id}/")
+        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/")
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(id=movie.id)
+        mock_action.return_value.execute.assert_called_once_with(
+            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
 
         assert response.status_code == 200
         assert response.json() == {
@@ -636,6 +646,12 @@ class TestRetrieveMovieEndpoint:
             "genres": [
                 {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"},
                 {"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"},
+            ],
+            "showtimes": [
+                {
+                    "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
+                    "show_datetime": "2023-04-03T22:00:00",
+                }
             ],
         }
 
@@ -685,6 +701,12 @@ class TestRetrieveAllMoviesEndpoint:
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"
                 )
             )
+            .with_showtime(
+                showtime=MovieShowtimeFactory().create(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                )
+            )
             .build(),
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"))
@@ -694,6 +716,12 @@ class TestRetrieveAllMoviesEndpoint:
             .with_genre(
                 genre=GenreFactory().create(
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"
+                )
+            )
+            .with_showtime(
+                showtime=MovieShowtimeFactory().create(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                    show_datetime=datetime(2023, 4, 3, 23, 0),
                 )
             )
             .build(),
@@ -714,6 +742,12 @@ class TestRetrieveAllMoviesEndpoint:
                 "genres": [
                     {"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"}
                 ],
+                "showtimes": [
+                    {
+                        "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
+                        "show_datetime": "2023-04-03T22:00:00",
+                    }
+                ],
             },
             {
                 "id": "ec725625-f502-4d39-9401-a415d8c1f965",
@@ -722,6 +756,12 @@ class TestRetrieveAllMoviesEndpoint:
                 "poster_image": "super_mario_bros.jpg",
                 "genres": [
                     {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Adventure"}
+                ],
+                "showtimes": [
+                    {
+                        "id": "d7c10c00-9598-4618-956a-ff3aa82dd44f",
+                        "show_datetime": "2023-04-03T23:00:00",
+                    }
                 ],
             },
         ]
@@ -735,6 +775,12 @@ class TestRetrieveAllMoviesEndpoint:
             .with_genre(
                 genre=GenreFactory().create(
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
+                )
+            )
+            .with_showtime(
+                showtime=MovieShowtimeFactory().create(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    show_datetime=datetime(2023, 4, 3, 22, 0),
                 )
             )
             .build()
@@ -758,6 +804,12 @@ class TestRetrieveAllMoviesEndpoint:
                 "poster_image": "deadpool_and_wolverine.jpg",
                 "genres": [
                     {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
+                ],
+                "showtimes": [
+                    {
+                        "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
+                        "show_datetime": "2023-04-03T22:00:00",
+                    }
                 ],
             }
         ]

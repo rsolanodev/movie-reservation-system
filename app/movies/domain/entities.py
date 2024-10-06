@@ -34,7 +34,9 @@ class Movie:
     title: str
     description: str | None
     poster_image: str | None
+
     genres: list[Genre] = field(default_factory=list)
+    showtimes: list[MovieShowtime] = field(default_factory=list)
 
     @classmethod
     def create(
@@ -64,6 +66,9 @@ class Movie:
 
     def add_genre(self, genre: Genre) -> None:
         self.genres.append(genre)
+
+    def add_showtime(self, showtime: MovieShowtime) -> None:
+        self.showtimes.append(showtime)
 
     def has_genre(self, genre_id: uuid.UUID) -> bool:
         return any(genre.id == genre_id for genre in self.genres)
