@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.core.domain.constants.unset import UnsetType
 
@@ -26,6 +26,9 @@ class Genre:
 class MovieShowtime:
     id: uuid.UUID
     show_datetime: datetime
+
+    def is_future(self) -> bool:
+        return self.show_datetime >= datetime.now(tz=timezone.utc)
 
 
 @dataclass

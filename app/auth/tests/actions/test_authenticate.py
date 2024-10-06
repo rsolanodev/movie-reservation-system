@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -22,7 +22,7 @@ class TestAuthenticate:
     def mock_repository(self) -> Any:
         return create_autospec(UserRepository, instance=True)
 
-    @freeze_time("2021-08-01 12:00:00")
+    @freeze_time("2021-08-01T12:00:00Z")
     def test_authenticate_user(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = UserFactory().create()
 
@@ -38,7 +38,10 @@ class TestAuthenticate:
             token.access_token, key=settings.SECRET_KEY, algorithms=["HS256"]
         )
         assert decoded_token["sub"] == "913822a0-750b-4cb6-b7b9-e01869d7d62d"
-        assert decoded_token["exp"] == datetime(2021, 8, 9, 12, 0, 0).timestamp()
+        assert (
+            decoded_token["exp"]
+            == datetime(2021, 8, 9, 12, 0, 0, tzinfo=timezone.utc).timestamp()
+        )
 
     def test_does_not_authenticate_user_when_password_is_incorrect(
         self, mock_repository: Mock

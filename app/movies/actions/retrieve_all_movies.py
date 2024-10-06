@@ -14,7 +14,8 @@ class RetrieveAllMovies:
 
         for movie in movies_filtered:
             for movie_showtime in self._repository.get_showtimes(movie_id=movie.id):
-                movie.add_showtime(movie_showtime)
+                if movie_showtime.is_future():
+                    movie.add_showtime(movie_showtime)
 
         return movies_filtered
 

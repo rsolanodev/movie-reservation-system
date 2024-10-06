@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import ANY
 from uuid import UUID
 
@@ -177,14 +177,14 @@ class TestSqlModelMovieRepository:
                 showtime_model=ShowtimeModelFactory(session=session).create(
                     id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                     movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .with_showtime(
                 showtime_model=ShowtimeModelFactory(session=session).create(
                     id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                     movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                    show_datetime=datetime(2023, 4, 3, 20, 0),
+                    show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
                 )
             )
             .build()
@@ -195,11 +195,11 @@ class TestSqlModelMovieRepository:
         assert showtimes == [
             MovieShowtime(
                 id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 3, 20, 0),
+                show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
             ),
             MovieShowtime(
                 id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                show_datetime=datetime(2023, 4, 3, 22, 0),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
             ),
         ]
 
