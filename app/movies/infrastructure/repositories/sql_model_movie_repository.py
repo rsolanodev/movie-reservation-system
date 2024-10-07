@@ -87,7 +87,7 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
                 func.date(ShowtimeModel.show_datetime) == available_date,
                 MovieModel.id == ShowtimeModel.movie_id,
             )
-            .order_by(MovieModel.title.asc, ShowtimeModel.show_datetime)  # type: ignore
+            .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
         )
         movie_showtime_models = self._session.exec(statement).all()
 
