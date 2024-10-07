@@ -1,5 +1,8 @@
+from datetime import date, timezone
 from uuid import UUID
 
+from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
@@ -75,8 +78,41 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             for showtime_model in showtime_models
         ]
 
-    def _build_movie_showtime(self, showtime_model: ShowtimeModel) -> MovieShowtime:
+    def get_available_movies_for_date(self, available_date: date) -> list[Movie]:
+        statement = (
+            select(MovieModel, ShowtimeModel)
+            .options(selectinload(MovieModel.genres))  # type: ignore
+            .join(ShowtimeModel)
+            .where(
+                func.date(ShowtimeModel.show_datetime) == available_date,
+                MovieModel.id == ShowtimeModel.movie_id,
+            )
+            .order_by(MovieModel.title.asc, ShowtimeModel.show_datetime)  # type: ignore
+        )
+        movie_showtime_models = self._session.exec(statement).all()
+
+        movies: dict[UUID, Movie] = {}
+        for movie_model, showtime_model in movie_showtime_models:
+            if movie_model.id not in movies:
+                movie = movie_model.to_domain()
+
+                for genre_model in movie_model.genres:
+                    movie.add_genre(genre_model.to_domain())
+                movies[movie_model.id] = movie
+
+            movie_showtime = self._build_movie_showtime(showtime_model)
+            movies[movie_model.id].add_showtime(movie_showtime)
+
+        return list(movies.values())
+
+    @staticmethod
+    def _build_movie_showtime(showtime_model: ShowtimeModel) -> MovieShowtime:
+        show_datetime = showtime_model.show_datetime
+
+        if show_datetime.tzinfo is None:
+            show_datetime = show_datetime.replace(tzinfo=timezone.utc)
+
         return MovieShowtime(
             id=showtime_model.id,
-            show_datetime=showtime_model.show_datetime,
+            show_datetime=show_datetime,
         )
