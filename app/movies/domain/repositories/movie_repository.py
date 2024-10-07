@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Protocol
 from uuid import UUID
 
@@ -18,3 +19,5 @@ class MovieRepository(Protocol):
     def get_all(self) -> list[Movie]: ...
 
     def get_showtimes(self, movie_id: UUID) -> list[MovieShowtime]: ...
+
+    def get_available_movies_for_date(self, available_date: date) -> list[Movie]: ...

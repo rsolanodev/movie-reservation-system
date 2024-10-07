@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from unittest.mock import ANY
 from uuid import UUID
 
@@ -210,3 +210,130 @@ class TestSqlModelMovieRepository:
         showtimes = repository.get_showtimes(movie_model.id)
 
         assert showtimes == []
+
+    def test_get_available_movies_for_date(self, session: Session) -> None:
+        MovieModelBuilder(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+        ).build()
+
+        MovieModelBuilder(session=session).with_id(
+            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("fc725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
+            )
+        ).build()
+
+        movies = SqlModelMovieRepository(session=session).get_available_movies_for_date(
+            available_date=date(2023, 4, 3)
+        )
+
+        assert movies == [
+            Movie(
+                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                title="Deadpool & Wolverine",
+                description="Deadpool and a variant of Wolverine.",
+                poster_image="deadpool_and_wolverine.jpg",
+                genres=[],
+                showtimes=[
+                    MovieShowtime(
+                        id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    ),
+                ],
+            ),
+        ]
+
+    def test_get_available_movies_for_date_with_showtimes_on_date(
+        self, session: Session
+    ) -> None:
+        MovieModelBuilder(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+        ).build()
+
+        MovieModelBuilder(session=session).with_id(
+            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("fc725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
+            )
+        ).build()
+
+        movies = SqlModelMovieRepository(session=session).get_available_movies_for_date(
+            available_date=date(2023, 4, 3)
+        )
+
+        assert movies == [
+            Movie(
+                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                title="Deadpool & Wolverine",
+                description="Deadpool and a variant of Wolverine.",
+                poster_image="deadpool_and_wolverine.jpg",
+                genres=[],
+                showtimes=[
+                    MovieShowtime(
+                        id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    ),
+                ],
+            ),
+        ]
+
+    def test_get_available_movies_for_date_with_showtimes_ordered(
+        self, session: Session
+    ) -> None:
+        MovieModelBuilder(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+            )
+        ).with_showtime(
+            showtime_model=ShowtimeModelFactory(session=session).create(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+        ).build()
+
+        movies = SqlModelMovieRepository(session=session).get_available_movies_for_date(
+            available_date=date(2023, 4, 3)
+        )
+
+        assert movies == [
+            Movie(
+                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                title="Deadpool & Wolverine",
+                description="Deadpool and a variant of Wolverine.",
+                poster_image="deadpool_and_wolverine.jpg",
+                genres=[],
+                showtimes=[
+                    MovieShowtime(
+                        id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    ),
+                    MovieShowtime(
+                        id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+                    ),
+                ],
+            ),
+        ]
