@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from fastapi import (
@@ -16,9 +17,9 @@ from app.movies.actions.add_movie_genre import AddMovieGenre
 from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.remove_movie_genre import RemoveMovieGenre
-from app.movies.actions.retrieve_all_movies import RetrieveAllMovies
 from app.movies.actions.retrieve_genres import RetrieveGenres
 from app.movies.actions.retrieve_movie import RetrieveMovie
+from app.movies.actions.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
@@ -57,12 +58,14 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     response_model=list[RetrieveMovieResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_all_movies(
-    session: SessionDep, genre_id: UUID | None = None
+def retrieve_movies(
+    session: SessionDep, available_date: date, genre_id: UUID | None = None
 ) -> list[Movie]:
-    return RetrieveAllMovies(
+    return RetrieveMovies(
         repository=SqlModelMovieRepository(session=session),
-    ).execute(genre_id=genre_id)
+    ).execute(
+        params=RetrieveMoviesParams(available_date=available_date, genre_id=genre_id)
+    )
 
 
 @router.post(
