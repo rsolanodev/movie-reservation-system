@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from unittest.mock import Mock, patch
 from uuid import UUID
 
@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovieParams
+from app.movies.actions.retrieve_movies import RetrieveMoviesParams
 from app.movies.actions.update_movie import UpdateMovieParams
 from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import (
@@ -674,10 +675,10 @@ class TestRetrieveMovieEndpoint:
         assert response.json() == {"detail": "The movie does not exist"}
 
 
-class TestRetrieveAllMoviesEndpoint:
+class TestRetrieveMoviesEndpoint:
     @pytest.fixture
     def mock_action(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.RetrieveAllMovies") as mock:
+        with patch("app.movies.infrastructure.api.endpoints.RetrieveMovies") as mock:
             yield mock
 
     @pytest.fixture
@@ -727,10 +728,12 @@ class TestRetrieveAllMoviesEndpoint:
             .build(),
         ]
 
-        response = client.get("api/v1/movies/")
+        response = client.get("api/v1/movies/?available_date=2023-04-03")
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(genre_id=None)
+        mock_action.return_value.execute.assert_called_once_with(
+            params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
+        )
 
         assert response.status_code == 200
         assert response.json() == [
@@ -787,12 +790,15 @@ class TestRetrieveAllMoviesEndpoint:
         ]
 
         response = client.get(
-            "api/v1/movies/?genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9"
+            "api/v1/movies/?available_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9"
         )
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
-            genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9")
+            params=RetrieveMoviesParams(
+                available_date=date(2023, 4, 3),
+                genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+            )
         )
 
         assert response.status_code == 200
@@ -819,10 +825,12 @@ class TestRetrieveAllMoviesEndpoint:
     ) -> None:
         mock_action.return_value.execute.return_value = []
 
-        response = client.get("api/v1/movies/")
+        response = client.get("api/v1/movies/?available_date=2023-04-03")
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(genre_id=None)
+        mock_action.return_value.execute.assert_called_once_with(
+            params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
+        )
 
         assert response.status_code == 200
         assert response.json() == []
