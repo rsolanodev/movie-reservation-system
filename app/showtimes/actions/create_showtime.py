@@ -21,7 +21,5 @@ class CreateShowtime:
         if self._repository.exists(params.movie_id, params.show_datetime):
             raise ShowtimeAlreadyExistsException()
 
-        showtime = Showtime.create(
-            movie_id=params.movie_id, show_datetime=params.show_datetime
-        )
+        showtime = Showtime.create(movie_id=params.movie_id, show_datetime=params.show_datetime)
         self._repository.create(showtime=showtime)

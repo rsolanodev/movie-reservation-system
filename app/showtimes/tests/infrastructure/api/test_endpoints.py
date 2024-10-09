@@ -18,9 +18,7 @@ class TestCreateShowtimeEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository"
-        ) as mock:
+        with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
             yield mock.return_value
 
     def test_returns_201_and_calls_action(
@@ -129,9 +127,7 @@ class TestDeleteShowtimeEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository"
-        ) as mock:
+        with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(

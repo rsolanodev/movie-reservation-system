@@ -20,13 +20,9 @@ router = APIRouter()
 
 
 @router.post("/access-token/", response_model=TokenResponse)
-def authenticate_user(
-    session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> Token:
+def authenticate_user(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     try:
-        token = Authenticate(
-            repository=SqlModelUserRepository(session=session)
-        ).execute(
+        token = Authenticate(repository=SqlModelUserRepository(session=session)).execute(
             email=form_data.username,
             password=form_data.password,
         )

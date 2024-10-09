@@ -18,9 +18,7 @@ class RetrieveMovie:
         self._repository = repository
 
     def execute(self, params: RetrieveMovieParams) -> Movie:
-        movie = self._repository.get_movie_for_date(
-            movie_id=params.movie_id, showtime_date=params.showtime_date
-        )
+        movie = self._repository.get_movie_for_date(movie_id=params.movie_id, showtime_date=params.showtime_date)
         if movie is None:
             raise MovieDoesNotExistException()
         return movie

@@ -32,9 +32,7 @@ class TestCreateMovieEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_201_and_calls_action(
@@ -45,9 +43,7 @@ class TestCreateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_action.return_value.execute.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         response = client.post(
@@ -89,10 +85,7 @@ class TestCreateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_action.return_value.execute.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .without_poster_image()
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).without_poster_image().build()
         )
 
         response = client.post(
@@ -172,9 +165,7 @@ class TestUpdateMovieEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -185,9 +176,7 @@ class TestUpdateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_action.return_value.execute.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         response = client.patch(
@@ -230,9 +219,7 @@ class TestUpdateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_action.return_value.execute.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         response = client.patch(
@@ -340,9 +327,7 @@ class TestDeleteMovieEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -360,9 +345,7 @@ class TestDeleteMovieEndpoint:
         )
 
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_action.return_value.execute.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
         assert response.status_code == 200
 
@@ -431,9 +414,7 @@ class TestRetrieveGenresEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelGenreRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelGenreRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -473,9 +454,7 @@ class TestAddMovieGenreEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -524,9 +503,7 @@ class TestAddMovieGenreEndpoint:
         )
 
         assert response.status_code == 400
-        assert response.json() == {
-            "detail": "The genre is already assigned to the movie"
-        }
+        assert response.json() == {"detail": "The genre is already assigned to the movie"}
 
 
 class TestRemoveMovieGenreEndpoint:
@@ -537,9 +514,7 @@ class TestRemoveMovieGenreEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -597,9 +572,7 @@ class TestRetrieveMovieEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
     def test_returns_200_and_calls_action(
@@ -632,9 +605,7 @@ class TestRetrieveMovieEndpoint:
             .build()
         )
 
-        response = client.get(
-            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03"
-        )
+        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
@@ -670,9 +641,7 @@ class TestRetrieveMovieEndpoint:
     ) -> None:
         mock_action.return_value.execute.side_effect = MovieDoesNotExistException
 
-        response = client.get(
-            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03"
-        )
+        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
@@ -694,25 +663,17 @@ class TestRetrieveMoviesEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.movies.infrastructure.api.endpoints.SqlModelMovieRepository"
-        ) as mock:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
-        self, client: TestClient, mock_action: Mock, mock_repository: Mock
-    ) -> None:
+    def test_returns_200_and_calls_action(self, client: TestClient, mock_action: Mock, mock_repository: Mock) -> None:
         mock_action.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"
-                )
-            )
+            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
@@ -725,11 +686,7 @@ class TestRetrieveMoviesEndpoint:
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"
-                )
-            )
+            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"))
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
@@ -753,9 +710,7 @@ class TestRetrieveMoviesEndpoint:
                 "title": "Deadpool & Wolverine",
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",
-                "genres": [
-                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"}
-                ],
+                "genres": [{"id": "d108f84b-3568-446b-896c-3ba2bc74cda8", "name": "Comedy"}],
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
@@ -768,9 +723,7 @@ class TestRetrieveMoviesEndpoint:
                 "title": "The Super Mario Bros. Movie",
                 "description": "An animated adaptation of the video game.",
                 "poster_image": "super_mario_bros.jpg",
-                "genres": [
-                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Adventure"}
-                ],
+                "genres": [{"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Adventure"}],
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd44f",
@@ -786,11 +739,7 @@ class TestRetrieveMoviesEndpoint:
         mock_action.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
-                )
-            )
+            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
             .with_showtime(
                 showtime=MovieShowtimeFactory().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
@@ -800,9 +749,7 @@ class TestRetrieveMoviesEndpoint:
             .build()
         ]
 
-        response = client.get(
-            "api/v1/movies/?available_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9"
-        )
+        response = client.get("api/v1/movies/?available_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9")
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
@@ -819,9 +766,7 @@ class TestRetrieveMoviesEndpoint:
                 "title": "Deadpool & Wolverine",
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",
-                "genres": [
-                    {"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}
-                ],
+                "genres": [{"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}],
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",

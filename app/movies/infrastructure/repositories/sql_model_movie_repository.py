@@ -54,18 +54,16 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             self._session.commit()
 
     def get_available_movies_for_date(self, available_date: date) -> list[Movie]:
-        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = (
-            self._session.exec(
-                select(MovieModel, ShowtimeModel)
-                .options(selectinload(MovieModel.genres))  # type: ignore
-                .join(ShowtimeModel)
-                .where(
-                    func.date(ShowtimeModel.show_datetime) == available_date,
-                    MovieModel.id == ShowtimeModel.movie_id,
-                )
-                .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
-            ).all()
-        )
+        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
+            select(MovieModel, ShowtimeModel)
+            .options(selectinload(MovieModel.genres))  # type: ignore
+            .join(ShowtimeModel)
+            .where(
+                func.date(ShowtimeModel.show_datetime) == available_date,
+                MovieModel.id == ShowtimeModel.movie_id,
+            )
+            .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
+        ).all()
 
         movies: dict[UUID, Movie] = {}
         for movie_model, showtime_model in movie_showtime_models:
@@ -82,18 +80,16 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
         return list(movies.values())
 
     def get_movie_for_date(self, movie_id: UUID, showtime_date: date) -> Movie | None:
-        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = (
-            self._session.exec(
-                select(MovieModel, ShowtimeModel)
-                .options(selectinload(MovieModel.genres))  # type: ignore
-                .join(ShowtimeModel)
-                .where(
-                    func.date(ShowtimeModel.show_datetime) == showtime_date,
-                    MovieModel.id == movie_id,
-                )
-                .order_by(ShowtimeModel.show_datetime)  # type: ignore
-            ).all()
-        )
+        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
+            select(MovieModel, ShowtimeModel)
+            .options(selectinload(MovieModel.genres))  # type: ignore
+            .join(ShowtimeModel)
+            .where(
+                func.date(ShowtimeModel.show_datetime) == showtime_date,
+                MovieModel.id == movie_id,
+            )
+            .order_by(ShowtimeModel.show_datetime)  # type: ignore
+        ).all()
 
         if not movie_showtime_models:
             return None

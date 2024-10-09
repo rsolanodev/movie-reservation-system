@@ -19,9 +19,7 @@ class MovieModel(SQLModel, table=True):
     title: str = Field(max_length=255)
     description: str | None = None
     poster_image: str | None = None
-    genres: list["GenreModel"] = Relationship(
-        back_populates="movies", link_model=MovieGenreLink
-    )
+    genres: list["GenreModel"] = Relationship(back_populates="movies", link_model=MovieGenreLink)
     showtimes: list["ShowtimeModel"] = Relationship(back_populates="movie")
 
     @classmethod
@@ -45,9 +43,7 @@ class MovieModel(SQLModel, table=True):
 class GenreModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(max_length=255)
-    movies: list[MovieModel] = Relationship(
-        back_populates="genres", link_model=MovieGenreLink
-    )
+    movies: list[MovieModel] = Relationship(back_populates="genres", link_model=MovieGenreLink)
 
     @classmethod
     def from_domain(cls, genre: Genre) -> "GenreModel":

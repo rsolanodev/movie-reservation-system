@@ -35,9 +35,7 @@ class UpdateMovie:
             raise MovieDoesNotExistException()
         return movie
 
-    def _get_poster_image_filename(
-        self, poster_image: PosterImage | None | UnsetType
-    ) -> str | None | UnsetType:
+    def _get_poster_image_filename(self, poster_image: PosterImage | None | UnsetType) -> str | None | UnsetType:
         if isinstance(poster_image, PosterImage):
             return poster_image.filename
         return poster_image

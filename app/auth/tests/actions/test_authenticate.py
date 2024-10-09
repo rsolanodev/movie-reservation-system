@@ -26,51 +26,30 @@ class TestAuthenticate:
     def test_authenticate_user(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = UserFactory().create()
 
-        token = Authenticate(repository=mock_repository).execute(
-            email="rubensoljim@gmail.com", password="Passw0rd!"
-        )
+        token = Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
-        mock_repository.find_by_email.assert_called_once_with(
-            email="rubensoljim@gmail.com"
-        )
+        mock_repository.find_by_email.assert_called_once_with(email="rubensoljim@gmail.com")
 
-        decoded_token = jwt.decode(
-            token.access_token, key=settings.SECRET_KEY, algorithms=["HS256"]
-        )
+        decoded_token = jwt.decode(token.access_token, key=settings.SECRET_KEY, algorithms=["HS256"])
         assert decoded_token["sub"] == "913822a0-750b-4cb6-b7b9-e01869d7d62d"
-        assert (
-            decoded_token["exp"]
-            == datetime(2021, 8, 9, 12, 0, 0, tzinfo=timezone.utc).timestamp()
-        )
+        assert decoded_token["exp"] == datetime(2021, 8, 9, 12, 0, 0, tzinfo=timezone.utc).timestamp()
 
-    def test_does_not_authenticate_user_when_password_is_incorrect(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_does_not_authenticate_user_when_password_is_incorrect(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = UserFactory().create()
 
         with pytest.raises(IncorrectPasswordException):
-            Authenticate(repository=mock_repository).execute(
-                email="rubensoljim@gmail.com", password="Password!"
-            )
+            Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Password!")
 
-    def test_raises_exception_when_user_does_not_exist(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_raises_exception_when_user_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = None
 
         with pytest.raises(UserDoesNotExistException):
-            Authenticate(repository=mock_repository).execute(
-                email="rubensoljim@gmail.com", password="Passw0rd!"
-            )
+            Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
-    def test_raises_exception_when_user_is_inactive(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_raises_exception_when_user_is_inactive(self, mock_repository: Mock) -> None:
         user = UserFactory().create()
         user.mark_as_inactive()
         mock_repository.find_by_email.return_value = user
 
         with pytest.raises(UserInactiveException):
-            Authenticate(repository=mock_repository).execute(
-                email="rubensoljim@gmail.com", password="Passw0rd!"
-            )
+            Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")

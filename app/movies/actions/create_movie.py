@@ -24,7 +24,5 @@ class CreateMovie:
         self._repository.save(movie=movie)
         return movie
 
-    def _get_poster_image_filename(
-        self, poster_image: PosterImage | None
-    ) -> str | None:
+    def _get_poster_image_filename(self, poster_image: PosterImage | None) -> str | None:
         return poster_image.filename if poster_image else None

@@ -57,11 +57,7 @@ class TestSqlModelShowtimeRepository:
             show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
         )
 
-        SqlModelShowtimeRepository(session=session).delete(
-            showtime_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600")
-        )
+        SqlModelShowtimeRepository(session=session).delete(showtime_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
 
-        showtime_model = session.get(
-            ShowtimeModel, UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600")
-        )
+        showtime_model = session.get(ShowtimeModel, UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
         assert showtime_model is None

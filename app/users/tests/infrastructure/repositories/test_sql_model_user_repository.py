@@ -23,16 +23,12 @@ class TestSqlModelUserRepository:
         )
         session.add(user_model)
 
-        user = SqlModelUserRepository(session=session).find_by_email(
-            email="rubensoljim@gmail.com"
-        )
+        user = SqlModelUserRepository(session=session).find_by_email(email="rubensoljim@gmail.com")
 
         assert user is not None
         assert user == user_model.to_domain()
 
     def test_find_user_by_email_returns_none(self, session: Session) -> None:
-        user = SqlModelUserRepository(session=session).find_by_email(
-            email="rubensoljim@hotmail.com"
-        )
+        user = SqlModelUserRepository(session=session).find_by_email(email="rubensoljim@hotmail.com")
 
         assert user is None

@@ -75,9 +75,7 @@ class TestRetrieveMovie:
             ],
         )
 
-    def test_raise_exception_when_movie_does_not_exist(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.get_movie_for_date.return_value = None
 
         with pytest.raises(MovieDoesNotExistException):

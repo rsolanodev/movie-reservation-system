@@ -19,9 +19,7 @@ class TestUpdateMovie:
 
     def test_updates_movie(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         movie = UpdateMovie(repository=mock_repository).execute(
@@ -33,18 +31,14 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "The Super Mario Bros. Movie"
         assert movie.description == "An animated adaptation of the video game."
         assert movie.poster_image is None
 
-    def test_raise_exception_when_movie_does_not_exist(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = None
 
         with pytest.raises(MovieDoesNotExistException):
@@ -62,18 +56,12 @@ class TestUpdateMovie:
                 )
             )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.save.assert_not_called()
 
-    def test_does_not_update_title_when_is_not_sent(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_does_not_update_title_when_is_not_sent(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         movie = UpdateMovie(repository=mock_repository).execute(
@@ -85,22 +73,16 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == "An animated adaptation of the video game."
         assert movie.poster_image is None
 
-    def test_does_not_update_description_when_is_not_sent(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_does_not_update_description_when_is_not_sent(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         movie = UpdateMovie(repository=mock_repository).execute(
@@ -112,22 +94,16 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "The Super Mario Bros. Movie"
         assert movie.description == "Deadpool and a variant of Wolverine."
         assert movie.poster_image is None
 
-    def test_does_not_update_poster_image_when_is_not_sent(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_does_not_update_poster_image_when_is_not_sent(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .build()
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         movie = UpdateMovie(repository=mock_repository).execute(
@@ -139,9 +115,7 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "The Super Mario Bros. Movie"
