@@ -5,7 +5,7 @@ from uuid import UUID
 import pytest
 
 from app.movies.application.add_movie_genre import AddMovieGenre
-from app.movies.domain.exceptions import GenreAlreadyAssignedException
+from app.movies.domain.exceptions import GenreAlreadyAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
@@ -41,7 +41,7 @@ class TestAddMovieGenre:
 
         mock_repository.get.return_value = movie
 
-        with pytest.raises(GenreAlreadyAssignedException):
+        with pytest.raises(GenreAlreadyAssigned):
             AddMovieGenre(repository=mock_repository).execute(
                 movie_id=movie.id, genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9")
             )

@@ -5,7 +5,7 @@ from uuid import UUID
 import pytest
 
 from app.movies.application.remove_movie_genre import RemoveMovieGenre
-from app.movies.domain.exceptions import GenreNotAssignedException
+from app.movies.domain.exceptions import GenreNotAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
@@ -39,7 +39,7 @@ class TestRemoveMovieGenre:
             MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
-        with pytest.raises(GenreNotAssignedException):
+        with pytest.raises(GenreNotAssigned):
             RemoveMovieGenre(repository=mock_repository).execute(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"),

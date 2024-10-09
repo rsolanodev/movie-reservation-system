@@ -23,9 +23,9 @@ from app.movies.application.retrieve_movies import RetrieveMovies, RetrieveMovie
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
-    GenreAlreadyAssignedException,
-    GenreNotAssignedException,
-    MovieDoesNotExistException,
+    GenreAlreadyAssigned,
+    GenreNotAssigned,
+    MovieDoesNotExist,
 )
 from app.movies.infrastructure.api.responses import (
     CreateMovieResponse,
@@ -97,7 +97,7 @@ def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> 
         return RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
         ).execute(params=RetrieveMovieParams(movie_id=movie_id, showtime_date=showtime_date))
-    except MovieDoesNotExistException:
+    except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
 
@@ -125,7 +125,7 @@ def update_movie(
                 poster_image=build_poster_image(uploaded_file=poster_image),
             )
         )
-    except MovieDoesNotExistException:
+    except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
     return movie
 
@@ -140,7 +140,7 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
         DeleteMovie(
             repository=SqlModelMovieRepository(session=session),
         ).execute(id=movie_id)
-    except MovieDoesNotExistException:
+    except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
 
@@ -152,7 +152,7 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
 def add_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)) -> None:
     try:
         AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(movie_id=movie_id, genre_id=genre_id)
-    except GenreAlreadyAssignedException:
+    except GenreAlreadyAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The genre is already assigned to the movie",
@@ -169,7 +169,7 @@ def remove_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID) -> N
         RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
             movie_id=movie_id, genre_id=genre_id
         )
-    except GenreNotAssignedException:
+    except GenreNotAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The genre is not assigned to the movie",

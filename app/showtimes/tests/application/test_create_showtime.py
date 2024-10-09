@@ -7,7 +7,7 @@ import pytest
 
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.domain.entities import Showtime
-from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
+from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 
 
@@ -41,7 +41,7 @@ class TestCreateShowtime:
     def test_does_not_create_showtime_when_exists(self, mock_repository: Mock) -> None:
         mock_repository.exists.return_value = True
 
-        with pytest.raises(ShowtimeAlreadyExistsException):
+        with pytest.raises(ShowtimeAlreadyExists):
             CreateShowtime(repository=mock_repository).execute(
                 params=CreateShowtimeParams(
                     movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),

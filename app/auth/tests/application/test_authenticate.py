@@ -8,9 +8,9 @@ from freezegun import freeze_time
 
 from app.auth.application.authenticate import Authenticate
 from app.auth.domain.exceptions import (
-    IncorrectPasswordException,
-    UserDoesNotExistException,
-    UserInactiveException,
+    IncorrectPassword,
+    UserDoesNotExist,
+    UserInactive,
 )
 from app.settings import settings
 from app.users.domain.repositories.user_repository import UserRepository
@@ -37,13 +37,13 @@ class TestAuthenticate:
     def test_does_not_authenticate_user_when_password_is_incorrect(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = UserFactory().create()
 
-        with pytest.raises(IncorrectPasswordException):
+        with pytest.raises(IncorrectPassword):
             Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Password!")
 
     def test_raises_exception_when_user_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.find_by_email.return_value = None
 
-        with pytest.raises(UserDoesNotExistException):
+        with pytest.raises(UserDoesNotExist):
             Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
     def test_raises_exception_when_user_is_inactive(self, mock_repository: Mock) -> None:
@@ -51,5 +51,5 @@ class TestAuthenticate:
         user.mark_as_inactive()
         mock_repository.find_by_email.return_value = user
 
-        with pytest.raises(UserInactiveException):
+        with pytest.raises(UserInactive):
             Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")

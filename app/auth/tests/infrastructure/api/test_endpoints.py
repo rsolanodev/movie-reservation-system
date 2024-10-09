@@ -6,9 +6,9 @@ from fastapi.testclient import TestClient
 
 from app.auth.domain.entities import Token, TokenType
 from app.auth.domain.exceptions import (
-    IncorrectPasswordException,
-    UserDoesNotExistException,
-    UserInactiveException,
+    IncorrectPassword,
+    UserDoesNotExist,
+    UserInactive,
 )
 
 
@@ -50,7 +50,7 @@ class TestAuthenticateUserEndpoint:
             "expires_in": 86400,
         }
 
-    @pytest.mark.parametrize("expected_exception", [UserDoesNotExistException, IncorrectPasswordException])
+    @pytest.mark.parametrize("expected_exception", [UserDoesNotExist, IncorrectPassword])
     def test_returns_400_when_is_incorrect_email_or_password(
         self, client: TestClient, mock_action: Mock, expected_exception: Exception
     ) -> None:
@@ -68,7 +68,7 @@ class TestAuthenticateUserEndpoint:
         assert response.json()["detail"] == "Incorrect email or password"
 
     def test_returns_400_when_user_is_inactive(self, client: TestClient, mock_action: Mock) -> None:
-        mock_action.return_value.execute.side_effect = UserInactiveException
+        mock_action.return_value.execute.side_effect = UserInactive
 
         response = client.post(
             "api/v1/auth/access-token/",

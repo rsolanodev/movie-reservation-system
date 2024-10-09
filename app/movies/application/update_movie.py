@@ -3,7 +3,7 @@ from uuid import UUID
 
 from app.core.domain.constants.unset import UnsetType
 from app.movies.domain.entities import Movie, PosterImage
-from app.movies.domain.exceptions import MovieDoesNotExistException
+from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 
@@ -32,7 +32,7 @@ class UpdateMovie:
     def _get_or_raise_exception(self, id: UUID) -> Movie:
         movie = self._repository.get(id=id)
         if movie is None:
-            raise MovieDoesNotExistException()
+            raise MovieDoesNotExist()
         return movie
 
     def _get_poster_image_filename(self, poster_image: PosterImage | None | UnsetType) -> str | None | UnsetType:

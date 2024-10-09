@@ -1,8 +1,8 @@
 from app.auth.domain.entities import Token
 from app.auth.domain.exceptions import (
-    IncorrectPasswordException,
-    UserDoesNotExistException,
-    UserInactiveException,
+    IncorrectPassword,
+    UserDoesNotExist,
+    UserInactive,
 )
 from app.settings import settings
 from app.users.domain.repositories.user_repository import UserRepository
@@ -16,13 +16,13 @@ class Authenticate:
         user = self._repository.find_by_email(email=email)
 
         if user is None:
-            raise UserDoesNotExistException()
+            raise UserDoesNotExist()
 
         if user.verify_password(password) is False:
-            raise IncorrectPasswordException()
+            raise IncorrectPassword()
 
         if user.is_active is False:
-            raise UserInactiveException()
+            raise UserInactive()
 
         return Token.create(
             user_id=user.id,

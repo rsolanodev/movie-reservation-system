@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.movies.domain.exceptions import GenreNotAssignedException
+from app.movies.domain.exceptions import GenreNotAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 
@@ -12,6 +12,6 @@ class RemoveMovieGenre:
         movie = self._repository.get(id=movie_id)
 
         if not movie.has_genre(genre_id=genre_id):  # type: ignore
-            raise GenreNotAssignedException()
+            raise GenreNotAssigned()
 
         self._repository.remove_genre(movie_id, genre_id)

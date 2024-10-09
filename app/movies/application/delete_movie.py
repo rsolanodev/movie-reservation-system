@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.movies.domain.entities import Movie
-from app.movies.domain.exceptions import MovieDoesNotExistException
+from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 
@@ -16,5 +16,5 @@ class DeleteMovie:
     def _get_or_raise_exception(self, id: UUID) -> Movie:
         movie = self._repository.get(id=id)
         if movie is None:
-            raise MovieDoesNotExistException()
+            raise MovieDoesNotExist()
         return movie

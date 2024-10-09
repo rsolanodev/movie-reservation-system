@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.domain.entities import Genre, Movie, MovieShowtime
-from app.movies.domain.exceptions import MovieDoesNotExistException
+from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.movies.tests.domain.factories.movie_showtime_factory import (
@@ -78,7 +78,7 @@ class TestRetrieveMovie:
     def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.get_movie_for_date.return_value = None
 
-        with pytest.raises(MovieDoesNotExistException):
+        with pytest.raises(MovieDoesNotExist):
             RetrieveMovie(repository=mock_repository).execute(
                 params=RetrieveMovieParams(
                     movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),

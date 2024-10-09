@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.showtimes.application.create_showtime import CreateShowtimeParams
-from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
+from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 
 
 class TestCreateShowtimeEndpoint:
@@ -54,7 +54,7 @@ class TestCreateShowtimeEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = ShowtimeAlreadyExistsException
+        mock_action.return_value.execute.side_effect = ShowtimeAlreadyExists
 
         response = client.post(
             "api/v1/showtimes/",
