@@ -18,7 +18,7 @@ from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
 from app.movies.actions.delete_movie import DeleteMovie
 from app.movies.actions.remove_movie_genre import RemoveMovieGenre
 from app.movies.actions.retrieve_genres import RetrieveGenres
-from app.movies.actions.retrieve_movie import RetrieveMovie
+from app.movies.actions.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.actions.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
 from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
@@ -96,11 +96,13 @@ def create_movie(
     response_model=RetrieveMovieResponse,
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movie(session: SessionDep, movie_id: UUID) -> Movie:
+def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> Movie:
     try:
         return RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
-        ).execute(id=movie_id)
+        ).execute(
+            params=RetrieveMovieParams(movie_id=movie_id, showtime_date=showtime_date)
+        )
     except MovieDoesNotExistException:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"

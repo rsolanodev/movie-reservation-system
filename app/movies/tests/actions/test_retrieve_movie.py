@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 from unittest.mock import Mock, create_autospec
 from uuid import UUID
@@ -6,7 +6,7 @@ from uuid import UUID
 import pytest
 from freezegun import freeze_time
 
-from app.movies.actions.retrieve_movie import RetrieveMovie
+from app.movies.actions.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.domain.entities import Genre, Movie, MovieShowtime
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -24,7 +24,7 @@ class TestRetrieveMovie:
         return create_autospec(MovieRepository, instance=True)
 
     def test_retrieves_movie(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = (
+        mock_repository.get_movie_for_date.return_value = (
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_title("The Super Mario Bros. Movie")
@@ -36,69 +36,25 @@ class TestRetrieveMovie:
                     name="Adventure",
                 )
             )
-            .build()
-        )
-        mock_repository.get_showtimes.return_value = []
-
-        movie = RetrieveMovie(repository=mock_repository).execute(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-        mock_repository.get_showtimes.assert_called_once_with(
-            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-        assert movie == Movie(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            title="The Super Mario Bros. Movie",
-            description="An animated adaptation of the video game.",
-            poster_image="super_mario_bros.jpg",
-            genres=[
-                Genre(
-                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
-                )
-            ],
-            showtimes=[],
-        )
-
-    def test_retrieves_movie_with_showtimes(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_title("The Super Mario Bros. Movie")
-            .with_description("An animated adaptation of the video game.")
-            .with_poster_image("super_mario_bros.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
+            .with_showtime(
+                showtime=MovieShowtimeFactory().create(
+                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build()
         )
-        mock_repository.get_showtimes.return_value = [
-            MovieShowtimeFactory().create(
-                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-            ),
-            MovieShowtimeFactory().create(
-                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
-            ),
-        ]
 
         movie = RetrieveMovie(repository=mock_repository).execute(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+            params=RetrieveMovieParams(
+                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                showtime_date=date(2023, 4, 3),
+            )
         )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-        mock_repository.get_showtimes.assert_called_once_with(
-            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        mock_repository.get_movie_for_date.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            showtime_date=date(2023, 4, 3),
         )
         assert movie == Movie(
             id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -115,65 +71,6 @@ class TestRetrieveMovie:
                 MovieShowtime(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-                ),
-                MovieShowtime(
-                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
-                ),
-            ],
-        )
-
-    def does_not_retrieve_old_showtimes(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = (
-            MovieBuilder()
-            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_title("The Super Mario Bros. Movie")
-            .with_description("An animated adaptation of the video game.")
-            .with_poster_image("super_mario_bros.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
-                )
-            )
-            .build()
-        )
-        mock_repository.get_showtimes.return_value = [
-            MovieShowtimeFactory().create(
-                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                show_datetime=datetime(2023, 4, 3, 18, 0, tzinfo=timezone.utc),
-            ),
-            MovieShowtimeFactory().create(
-                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
-            ),
-        ]
-
-        movie = RetrieveMovie(repository=mock_repository).execute(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-        mock_repository.get_showtimes.assert_called_once_with(
-            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
-        )
-        assert movie == Movie(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            title="The Super Mario Bros. Movie",
-            description="An animated adaptation of the video game.",
-            poster_image="super_mario_bros.jpg",
-            genres=[
-                Genre(
-                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
-                )
-            ],
-            showtimes=[
-                MovieShowtime(
-                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                 )
             ],
         )
@@ -181,13 +78,17 @@ class TestRetrieveMovie:
     def test_raise_exception_when_movie_does_not_exist(
         self, mock_repository: Mock
     ) -> None:
-        mock_repository.get.return_value = None
+        mock_repository.get_movie_for_date.return_value = None
 
         with pytest.raises(MovieDoesNotExistException):
             RetrieveMovie(repository=mock_repository).execute(
-                id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+                params=RetrieveMovieParams(
+                    movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                    showtime_date=date(2023, 4, 3),
+                )
             )
 
-        mock_repository.get.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        mock_repository.get_movie_for_date.assert_called_once_with(
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            showtime_date=date(2023, 4, 3),
         )

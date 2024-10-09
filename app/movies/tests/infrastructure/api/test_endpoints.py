@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from app.core.domain.constants.unset import UNSET
 from app.movies.actions.create_movie import CreateMovieParams
+from app.movies.actions.retrieve_movie import RetrieveMovieParams
 from app.movies.actions.retrieve_movies import RetrieveMoviesParams
 from app.movies.actions.update_movie import UpdateMovieParams
 from app.movies.domain.entities import Genre, PosterImage
@@ -631,11 +632,16 @@ class TestRetrieveMovieEndpoint:
             .build()
         )
 
-        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/")
+        response = client.get(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03"
+        )
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+            params=RetrieveMovieParams(
+                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                showtime_date=date(2023, 4, 3),
+            )
         )
 
         assert response.status_code == 200
@@ -664,11 +670,16 @@ class TestRetrieveMovieEndpoint:
     ) -> None:
         mock_action.return_value.execute.side_effect = MovieDoesNotExistException
 
-        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/")
+        response = client.get(
+            "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03"
+        )
 
         mock_action.assert_called_once_with(repository=mock_repository)
         mock_action.return_value.execute.assert_called_once_with(
-            id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+            params=RetrieveMovieParams(
+                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                showtime_date=date(2023, 4, 3),
+            )
         )
 
         assert response.status_code == 404
