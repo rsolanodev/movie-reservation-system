@@ -2,7 +2,7 @@ from datetime import date
 from typing import Protocol
 from uuid import UUID
 
-from app.movies.domain.entities import Movie, MovieShowtime
+from app.movies.domain.entities import Movie
 
 
 class MovieRepository(Protocol):
@@ -15,10 +15,6 @@ class MovieRepository(Protocol):
     def add_genre(self, movie_id: UUID, genre_id: UUID) -> None: ...
 
     def remove_genre(self, movie_id: UUID, genre_id: UUID) -> None: ...
-
-    def get_all(self) -> list[Movie]: ...
-
-    def get_showtimes(self, movie_id: UUID) -> list[MovieShowtime]: ...
 
     def get_available_movies_for_date(self, available_date: date) -> list[Movie]: ...
 

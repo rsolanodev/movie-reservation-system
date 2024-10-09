@@ -1,5 +1,4 @@
 from datetime import date, datetime, timezone
-from unittest.mock import ANY
 from uuid import UUID
 
 from sqlmodel import Session
@@ -121,95 +120,6 @@ class TestSqlModelMovieRepository:
 
         session.refresh(movie_model)
         assert movie_model.genres == []
-
-    def test_get_all_movies_ordered_by_title(self, session: Session) -> None:
-        genre_model_factory = GenreModelFactory(session=session)
-        (
-            MovieModelBuilder(session=session)
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"))
-            .with_title("The Super Mario Bros. Movie")
-            .with_description("An animated adaptation of the video game.")
-            .with_poster_image("super_mario_bros.jpg")
-            .with_genre(genre_model=genre_model_factory.create(name="Adventure"))
-            .with_genre(genre_model=genre_model_factory.create(name="Comedy"))
-            .build()
-        )
-        (
-            MovieModelBuilder(session=session)
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_title("Deadpool & Wolverine")
-            .with_description("Deadpool and a variant of Wolverine.")
-            .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre_model=genre_model_factory.create(name="Action"))
-            .build()
-        )
-        movies = SqlModelMovieRepository(session=session).get_all()
-
-        assert movies == [
-            Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                title="Deadpool & Wolverine",
-                description="Deadpool and a variant of Wolverine.",
-                poster_image="deadpool_and_wolverine.jpg",
-                genres=[
-                    Genre(id=ANY, name="Action"),
-                ],
-            ),
-            Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"),
-                title="The Super Mario Bros. Movie",
-                description="An animated adaptation of the video game.",
-                poster_image="super_mario_bros.jpg",
-                genres=[
-                    Genre(id=ANY, name="Adventure"),
-                    Genre(id=ANY, name="Comedy"),
-                ],
-            ),
-        ]
-
-    def test_get_movie_showtimes_ordered_by_show_datetime(
-        self, session: Session
-    ) -> None:
-        movie_model = (
-            MovieModelBuilder(session=session)
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_showtime(
-                showtime_model=ShowtimeModelFactory(session=session).create(
-                    id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                    movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-                )
-            )
-            .with_showtime(
-                showtime_model=ShowtimeModelFactory(session=session).create(
-                    id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                    movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                    show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
-                )
-            )
-            .build()
-        )
-        repository = SqlModelMovieRepository(session=session)
-        showtimes = repository.get_showtimes(movie_model.id)
-
-        assert showtimes == [
-            MovieShowtime(
-                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
-            ),
-            MovieShowtime(
-                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-            ),
-        ]
-
-    def test_get_movie_showtimes_no_showtimes(self, session: Session) -> None:
-        movie_model = MovieModelBuilder(session=session).build()
-
-        repository = SqlModelMovieRepository(session=session)
-        showtimes = repository.get_showtimes(movie_model.id)
-
-        assert showtimes == []
 
     def test_get_available_movies_for_date(self, session: Session) -> None:
         MovieModelBuilder(session=session).with_id(
