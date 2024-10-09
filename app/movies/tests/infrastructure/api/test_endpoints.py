@@ -13,9 +13,9 @@ from app.movies.application.retrieve_movies import RetrieveMoviesParams
 from app.movies.application.update_movie import UpdateMovieParams
 from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import (
-    GenreAlreadyAssignedException,
-    GenreNotAssignedException,
-    MovieDoesNotExistException,
+    GenreAlreadyAssigned,
+    GenreNotAssigned,
+    MovieDoesNotExist,
 )
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.movies.tests.domain.factories.movie_showtime_factory import (
@@ -252,7 +252,7 @@ class TestUpdateMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
+        mock_action.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -356,7 +356,7 @@ class TestDeleteMovieEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
+        mock_action.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -488,7 +488,7 @@ class TestAddMovieGenreEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = GenreAlreadyAssignedException
+        mock_action.return_value.execute.side_effect = GenreAlreadyAssigned
 
         response = client.post(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
@@ -547,7 +547,7 @@ class TestRemoveMovieGenreEndpoint:
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_action.return_value.execute.side_effect = GenreNotAssignedException
+        mock_action.return_value.execute.side_effect = GenreNotAssigned
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e/",
@@ -639,7 +639,7 @@ class TestRetrieveMovieEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
     ) -> None:
-        mock_action.return_value.execute.side_effect = MovieDoesNotExistException
+        mock_action.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.application.delete_showtime import DeleteShowtime
-from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
+from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
 from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import (
     SqlModelShowtimeRepository,
@@ -29,7 +29,7 @@ def create_showtime(session: SessionDep, request_body: CreateShowtimePayload) ->
                 show_datetime=request_body.show_datetime,
             )
         )
-    except ShowtimeAlreadyExistsException:
+    except ShowtimeAlreadyExists:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Showtime for movie already exists",

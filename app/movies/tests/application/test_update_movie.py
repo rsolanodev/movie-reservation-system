@@ -7,7 +7,7 @@ import pytest
 from app.core.domain.constants.unset import UNSET
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import PosterImage
-from app.movies.domain.exceptions import MovieDoesNotExistException
+from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -41,7 +41,7 @@ class TestUpdateMovie:
     def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
         mock_repository.get.return_value = None
 
-        with pytest.raises(MovieDoesNotExistException):
+        with pytest.raises(MovieDoesNotExist):
             poster_image = PosterImage(
                 filename="super_mario_bros.jpg",
                 content=b"image",

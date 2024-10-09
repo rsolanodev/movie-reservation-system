@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.api.deps import SessionDep
 from app.users.application.create_user import CreateUser, CreateUserParams
 from app.users.domain.entities import User
-from app.users.domain.exceptions import UserAlreadyExistsException
+from app.users.domain.exceptions import UserAlreadyExists
 from app.users.infrastructure.api.payloads import CreateUserPayload
 from app.users.infrastructure.api.responses import UserResponse
 from app.users.infrastructure.repositories.sql_model_user_repository import (
@@ -29,7 +29,7 @@ def create_user(session: SessionDep, request_body: CreateUserPayload) -> User:
                 full_name=request_body.full_name,
             )
         )
-    except UserAlreadyExistsException:
+    except UserAlreadyExists:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The user with this email already exists",

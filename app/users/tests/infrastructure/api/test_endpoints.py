@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.users.application.create_user import CreateUserParams
-from app.users.domain.exceptions import UserAlreadyExistsException
+from app.users.domain.exceptions import UserAlreadyExists
 from app.users.tests.factories.user_factory import UserFactory
 
 
@@ -53,7 +53,7 @@ class TestCreateUserEndpoint:
         }
 
     def test_returns_400_when_user_already_exists(self, client: TestClient, mock_action: Mock) -> None:
-        mock_action.return_value.execute.side_effect = UserAlreadyExistsException
+        mock_action.return_value.execute.side_effect = UserAlreadyExists
 
         response = client.post(
             "api/v1/users/",
