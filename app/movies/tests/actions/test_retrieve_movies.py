@@ -30,11 +30,7 @@ class TestRetrieveMovies:
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"
-                )
-            )
+            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
             .with_showtime(
                 MovieShowtimeFactory().create(
                     id=UUID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
@@ -47,11 +43,7 @@ class TestRetrieveMovies:
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"
-                )
-            )
+            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"))
             .with_showtime(
                 MovieShowtimeFactory().create(
                     id=UUID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
@@ -61,18 +53,14 @@ class TestRetrieveMovies:
             .build(),
         ]
 
-    def test_retrieves_available_movies_for_date(
-        self, mock_repository: Mock, movies: list[Movie]
-    ) -> None:
+    def test_retrieves_available_movies_for_date(self, mock_repository: Mock, movies: list[Movie]) -> None:
         mock_repository.get_available_movies_for_date.return_value = movies
 
         data = RetrieveMovies(repository=mock_repository).execute(
             params=RetrieveMoviesParams(available_date=date(2023, 4, 3))
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(
-            available_date=date(2023, 4, 3)
-        )
+        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == [
             Movie(
@@ -80,11 +68,7 @@ class TestRetrieveMovies:
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
-                genres=[
-                    Genre(
-                        id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"
-                    )
-                ],
+                genres=[Genre(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy")],
                 showtimes=[
                     MovieShowtime(
                         id=UUID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
@@ -124,9 +108,7 @@ class TestRetrieveMovies:
             )
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(
-            available_date=date(2023, 4, 3)
-        )
+        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == [
             Movie(
@@ -161,8 +143,6 @@ class TestRetrieveMovies:
             )
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(
-            available_date=date(2023, 4, 3)
-        )
+        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == []

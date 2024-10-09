@@ -17,9 +17,7 @@ class TestCreateUserEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.users.infrastructure.api.endpoints.SqlModelUserRepository"
-        ) as mock:
+        with patch("app.users.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
             yield mock.return_value
 
     def test_returns_201_and_calls_action_and_returns_result(
@@ -54,9 +52,7 @@ class TestCreateUserEndpoint:
             "is_superuser": False,
         }
 
-    def test_returns_400_when_user_already_exists(
-        self, client: TestClient, mock_action: Mock
-    ) -> None:
+    def test_returns_400_when_user_already_exists(self, client: TestClient, mock_action: Mock) -> None:
         mock_action.return_value.execute.side_effect = UserAlreadyExistsException
 
         response = client.post(

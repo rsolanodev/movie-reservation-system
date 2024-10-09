@@ -58,14 +58,10 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     response_model=list[RetrieveMovieResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movies(
-    session: SessionDep, available_date: date, genre_id: UUID | None = None
-) -> list[Movie]:
+def retrieve_movies(session: SessionDep, available_date: date, genre_id: UUID | None = None) -> list[Movie]:
     return RetrieveMovies(
         repository=SqlModelMovieRepository(session=session),
-    ).execute(
-        params=RetrieveMoviesParams(available_date=available_date, genre_id=genre_id)
-    )
+    ).execute(params=RetrieveMoviesParams(available_date=available_date, genre_id=genre_id))
 
 
 @router.post(
@@ -100,13 +96,9 @@ def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> 
     try:
         return RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
-        ).execute(
-            params=RetrieveMovieParams(movie_id=movie_id, showtime_date=showtime_date)
-        )
+        ).execute(params=RetrieveMovieParams(movie_id=movie_id, showtime_date=showtime_date))
     except MovieDoesNotExistException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
 
 @router.patch(
@@ -134,9 +126,7 @@ def update_movie(
             )
         )
     except MovieDoesNotExistException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
     return movie
 
 
@@ -151,9 +141,7 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
             repository=SqlModelMovieRepository(session=session),
         ).execute(id=movie_id)
     except MovieDoesNotExistException:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
 
 @router.post(
@@ -161,13 +149,9 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
-def add_movie_genre(
-    session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)
-) -> None:
+def add_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)) -> None:
     try:
-        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-            movie_id=movie_id, genre_id=genre_id
-        )
+        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(movie_id=movie_id, genre_id=genre_id)
     except GenreAlreadyAssignedException:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

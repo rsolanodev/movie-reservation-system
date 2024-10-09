@@ -42,9 +42,7 @@ class Movie:
     showtimes: list[MovieShowtime] = field(default_factory=list)
 
     @classmethod
-    def create(
-        cls, title: str, description: str | None, poster_image: str | None
-    ) -> "Movie":
+    def create(cls, title: str, description: str | None, poster_image: str | None) -> "Movie":
         return cls(
             id=uuid.uuid4(),
             title=title,

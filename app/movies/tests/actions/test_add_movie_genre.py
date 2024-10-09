@@ -22,18 +22,12 @@ class TestAddMovieGenre:
 
         mock_repository.get.return_value = movie
 
-        AddMovieGenre(repository=mock_repository).execute(
-            movie_id=movie.id, genre_id=genre.id
-        )
+        AddMovieGenre(repository=mock_repository).execute(movie_id=movie.id, genre_id=genre.id)
 
         mock_repository.get.assert_called_once_with(id=movie.id)
-        mock_repository.add_genre.assert_called_once_with(
-            movie_id=movie.id, genre_id=genre.id
-        )
+        mock_repository.add_genre.assert_called_once_with(movie_id=movie.id, genre_id=genre.id)
 
-    def test_raise_exception_when_genre_is_already_assigned_in_movie(
-        self, mock_repository: Mock
-    ) -> None:
+    def test_raise_exception_when_genre_is_already_assigned_in_movie(self, mock_repository: Mock) -> None:
         movie = (
             MovieBuilder()
             .with_genre(

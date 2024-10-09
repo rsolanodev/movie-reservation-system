@@ -9,6 +9,4 @@ api_router = APIRouter()
 api_router.include_router(auth_endpoints.router, prefix="/auth", tags=["auth"])
 api_router.include_router(user_endpoints.router, prefix="/users", tags=["users"])
 api_router.include_router(movie_endpoints.router, prefix="/movies", tags=["movies"])
-api_router.include_router(
-    showtimes_endpoints.router, prefix="/showtimes", tags=["showtimes"]
-)
+api_router.include_router(showtimes_endpoints.router, prefix="/showtimes", tags=["showtimes"])

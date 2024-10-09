@@ -12,9 +12,7 @@ from app.users.infrastructure.models import UserModel
 
 SessionDep = Annotated[Session, Depends(get_db)]
 
-reusable_oauth2 = security.OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/auth/access-token/"
-)
+reusable_oauth2 = security.OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/access-token/")
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
 

@@ -20,9 +20,7 @@ class TestAuthenticateUserEndpoint:
 
     @pytest.fixture
     def mock_repository(self) -> Generator[Mock, None, None]:
-        with patch(
-            "app.auth.infrastructure.api.endpoints.SqlModelUserRepository"
-        ) as mock:
+        with patch("app.auth.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
             yield mock.return_value
 
     def test_calls_action_and_returns_access_token(
@@ -44,9 +42,7 @@ class TestAuthenticateUserEndpoint:
             },
         )
         mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(
-            email="rubensoljim@gmail.com", password="Passw0rd!"
-        )
+        mock_action.return_value.execute.assert_called_once_with(email="rubensoljim@gmail.com", password="Passw0rd!")
         assert response.status_code == 200
         assert response.json() == {
             "token_type": "bearer",
@@ -54,9 +50,7 @@ class TestAuthenticateUserEndpoint:
             "expires_in": 86400,
         }
 
-    @pytest.mark.parametrize(
-        "expected_exception", [UserDoesNotExistException, IncorrectPasswordException]
-    )
+    @pytest.mark.parametrize("expected_exception", [UserDoesNotExistException, IncorrectPasswordException])
     def test_returns_400_when_is_incorrect_email_or_password(
         self, client: TestClient, mock_action: Mock, expected_exception: Exception
     ) -> None:
@@ -73,9 +67,7 @@ class TestAuthenticateUserEndpoint:
         assert response.status_code == 400
         assert response.json()["detail"] == "Incorrect email or password"
 
-    def test_returns_400_when_user_is_inactive(
-        self, client: TestClient, mock_action: Mock
-    ) -> None:
+    def test_returns_400_when_user_is_inactive(self, client: TestClient, mock_action: Mock) -> None:
         mock_action.return_value.execute.side_effect = UserInactiveException
 
         response = client.post(

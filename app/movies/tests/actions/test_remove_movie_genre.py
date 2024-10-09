@@ -17,37 +17,33 @@ class TestRemoveMovieGenre:
         return create_autospec(MovieRepository, instance=True)
 
     def test_removes_genre_from_movie(self, mock_repository: Mock) -> None:
-        movie = (
+        mock_repository.get.return_value = (
             MovieBuilder()
-            .with_genre(
-                genre=GenreFactory().create(
-                    id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"), name="Action"
-                )
-            )
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_genre(genre=GenreFactory().create(id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"), name="Action"))
             .build()
         )
 
-        mock_repository.get.return_value = movie
-
         RemoveMovieGenre(repository=mock_repository).execute(
-            movie_id=movie.id, genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961")
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"), genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961")
         )
 
-        mock_repository.get.assert_called_once_with(id=movie.id)
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.remove_genre.assert_called_once_with(
-            movie_id=movie.id, genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961")
+            movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"),
         )
 
-    def test_raise_exception_when_genre_is_not_assigned_in_movie(
-        self, mock_repository: Mock
-    ) -> None:
-        movie = MovieBuilder().build()
-        mock_repository.get.return_value = movie
+    def test_raise_exception_when_genre_is_not_assigned_in_movie(self, mock_repository: Mock) -> None:
+        mock_repository.get.return_value = (
+            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
+        )
 
         with pytest.raises(GenreNotAssignedException):
             RemoveMovieGenre(repository=mock_repository).execute(
-                movie_id=movie.id, genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961")
+                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                genre_id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"),
             )
 
-        mock_repository.get.assert_called_once_with(id=movie.id)
+        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_repository.remove_genre.assert_not_called()
