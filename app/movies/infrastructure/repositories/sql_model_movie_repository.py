@@ -53,32 +53,6 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             self._session.add(movie_model)
             self._session.commit()
 
-    def get_all(self) -> list[Movie]:
-        statement = select(MovieModel).order_by(MovieModel.title)
-        movie_models = self._session.exec(statement).all()
-
-        movies: list[Movie] = []
-        for movie_model in movie_models:
-            movie = movie_model.to_domain()
-
-            for genre_model in movie_model.genres:
-                movie.add_genre(genre_model.to_domain())
-
-            movies.append(movie)
-        return movies
-
-    def get_showtimes(self, movie_id: UUID) -> list[MovieShowtime]:
-        statement = (
-            select(ShowtimeModel)
-            .where(ShowtimeModel.movie_id == movie_id)
-            .order_by(ShowtimeModel.show_datetime)  # type: ignore
-        )
-        showtime_models = self._session.exec(statement).all()
-        return [
-            self._build_movie_showtime(showtime_model)
-            for showtime_model in showtime_models
-        ]
-
     def get_available_movies_for_date(self, available_date: date) -> list[Movie]:
         movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = (
             self._session.exec(
