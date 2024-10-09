@@ -50,6 +50,15 @@ class TestSqlModelShowtimeRepository:
         assert showtime_model.movie_id == UUID("ec725625-f502-4d39-9401-a415d8c1f964")
         assert showtime_model.show_datetime == datetime(2023, 4, 2, 20, 0)
 
+    def test_create_showtime_with_seats(self, session: Session) -> None:
+        movie_model = (
+            MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).build()
+        )
+        showtime = Showtime.create(
+            movie_id=movie_model.id, show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc)
+        )
+        SqlModelShowtimeRepository(session=session).create_with_seats(showtime)
+
     def test_delete_showtime(self, session: Session) -> None:
         ShowtimeModelFactory(session=session).create(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),

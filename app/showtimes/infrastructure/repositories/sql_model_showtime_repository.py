@@ -23,6 +23,8 @@ class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
         self._session.add(showtime_model)
         self._session.commit()
 
+    def create_with_seats(self, showtime: Showtime) -> None: ...
+
     def delete(self, showtime_id: uuid.UUID) -> None:
         statement = select(ShowtimeModel).where(ShowtimeModel.id == showtime_id)
         showtime_model = self._session.exec(statement).first()
