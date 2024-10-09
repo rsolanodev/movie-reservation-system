@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import date, timezone
 from uuid import UUID
 
@@ -79,17 +80,18 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
         ]
 
     def get_available_movies_for_date(self, available_date: date) -> list[Movie]:
-        statement = (
-            select(MovieModel, ShowtimeModel)
-            .options(selectinload(MovieModel.genres))  # type: ignore
-            .join(ShowtimeModel)
-            .where(
-                func.date(ShowtimeModel.show_datetime) == available_date,
-                MovieModel.id == ShowtimeModel.movie_id,
-            )
-            .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
+        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = (
+            self._session.exec(
+                select(MovieModel, ShowtimeModel)
+                .options(selectinload(MovieModel.genres))  # type: ignore
+                .join(ShowtimeModel)
+                .where(
+                    func.date(ShowtimeModel.show_datetime) == available_date,
+                    MovieModel.id == ShowtimeModel.movie_id,
+                )
+                .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
+            ).all()
         )
-        movie_showtime_models = self._session.exec(statement).all()
 
         movies: dict[UUID, Movie] = {}
         for movie_model, showtime_model in movie_showtime_models:
@@ -104,6 +106,35 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             movies[movie_model.id].add_showtime(movie_showtime)
 
         return list(movies.values())
+
+    def get_movie_for_date(self, movie_id: UUID, showtime_date: date) -> Movie | None:
+        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = (
+            self._session.exec(
+                select(MovieModel, ShowtimeModel)
+                .options(selectinload(MovieModel.genres))  # type: ignore
+                .join(ShowtimeModel)
+                .where(
+                    func.date(ShowtimeModel.show_datetime) == showtime_date,
+                    MovieModel.id == movie_id,
+                )
+                .order_by(ShowtimeModel.show_datetime)  # type: ignore
+            ).all()
+        )
+
+        if not movie_showtime_models:
+            return None
+
+        movie_model = movie_showtime_models[0][0]
+        movie = movie_model.to_domain()
+
+        for genre_model in movie_model.genres:
+            movie.add_genre(genre_model.to_domain())
+
+        for _, showtime_model in movie_showtime_models:
+            movie_showtime = self._build_movie_showtime(showtime_model)
+            movie.add_showtime(movie_showtime)
+
+        return movie
 
     @staticmethod
     def _build_movie_showtime(showtime_model: ShowtimeModel) -> MovieShowtime:
