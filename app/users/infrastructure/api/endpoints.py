@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import SessionDep
-from app.users.actions.create_user import CreateUser, CreateUserParams
+from app.users.application.create_user import CreateUser, CreateUserParams
 from app.users.domain.entities import User
 from app.users.domain.exceptions import UserAlreadyExistsException
 from app.users.infrastructure.api.payloads import CreateUserPayload
