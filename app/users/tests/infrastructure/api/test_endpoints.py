@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from app.users.actions.create_user import CreateUserParams
+from app.users.application.create_user import CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExistsException
 from app.users.tests.factories.user_factory import UserFactory
 

@@ -3,7 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.users.actions.create_user import CreateUser, CreateUserParams
+from app.users.application.create_user import CreateUser, CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExistsException
 from app.users.domain.repositories.user_repository import (
     UserRepository,
