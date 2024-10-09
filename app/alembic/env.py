@@ -8,13 +8,12 @@ from app.settings import settings
 from app.users.infrastructure.models import UserModel
 from app.movies.infrastructure.models import MovieModel
 from app.showtimes.infrastructure.models import ShowtimeModel
-from app.rooms.infrastructure.models import RoomModel, SeatModel
+from app.rooms.infrastructure.models import RoomModel
 
 target_metadata = UserModel.metadata
 target_metadata = MovieModel.metadata
 target_metadata = ShowtimeModel.metadata
 target_metadata = RoomModel.metadata
-target_metadata = SeatModel.metadata
 
 config = context.config
 
