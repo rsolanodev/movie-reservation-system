@@ -6,7 +6,7 @@ from uuid import UUID
 import pytest
 from freezegun import freeze_time
 
-from app.movies.actions.retrieve_movie import RetrieveMovie, RetrieveMovieParams
+from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.domain.entities import Genre, Movie, MovieShowtime
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository

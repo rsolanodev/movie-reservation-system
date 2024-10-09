@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from app.showtimes.actions.delete_showtime import DeleteShowtime
+from app.showtimes.application.delete_showtime import DeleteShowtime
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 
 

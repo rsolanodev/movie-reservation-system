@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from app.movies.actions.add_movie_genre import AddMovieGenre
+from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.domain.exceptions import GenreAlreadyAssignedException
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory

@@ -6,7 +6,7 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 
-from app.showtimes.actions.create_showtime import CreateShowtimeParams
+from app.showtimes.application.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
 
 

@@ -7,10 +7,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.domain.constants.unset import UNSET
-from app.movies.actions.create_movie import CreateMovieParams
-from app.movies.actions.retrieve_movie import RetrieveMovieParams
-from app.movies.actions.retrieve_movies import RetrieveMoviesParams
-from app.movies.actions.update_movie import UpdateMovieParams
+from app.movies.application.create_movie import CreateMovieParams
+from app.movies.application.retrieve_movie import RetrieveMovieParams
+from app.movies.application.retrieve_movies import RetrieveMoviesParams
+from app.movies.application.update_movie import UpdateMovieParams
 from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import (
     GenreAlreadyAssignedException,

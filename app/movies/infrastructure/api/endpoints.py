@@ -13,14 +13,14 @@ from fastapi import (
 
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.core.domain.constants.unset import UNSET
-from app.movies.actions.add_movie_genre import AddMovieGenre
-from app.movies.actions.create_movie import CreateMovie, CreateMovieParams
-from app.movies.actions.delete_movie import DeleteMovie
-from app.movies.actions.remove_movie_genre import RemoveMovieGenre
-from app.movies.actions.retrieve_genres import RetrieveGenres
-from app.movies.actions.retrieve_movie import RetrieveMovie, RetrieveMovieParams
-from app.movies.actions.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
-from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
+from app.movies.application.add_movie_genre import AddMovieGenre
+from app.movies.application.create_movie import CreateMovie, CreateMovieParams
+from app.movies.application.delete_movie import DeleteMovie
+from app.movies.application.remove_movie_genre import RemoveMovieGenre
+from app.movies.application.retrieve_genres import RetrieveGenres
+from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
+from app.movies.application.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
+from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
     GenreAlreadyAssignedException,
