@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from app.movies.actions.delete_movie import DeleteMovie
+from app.movies.application.delete_movie import DeleteMovie
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder

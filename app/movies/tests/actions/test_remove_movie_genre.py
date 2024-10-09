@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from app.movies.actions.remove_movie_genre import RemoveMovieGenre
+from app.movies.application.remove_movie_genre import RemoveMovieGenre
 from app.movies.domain.exceptions import GenreNotAssignedException
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory

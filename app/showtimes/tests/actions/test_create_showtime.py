@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-from app.showtimes.actions.create_showtime import CreateShowtime, CreateShowtimeParams
+from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.domain.entities import Showtime
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository

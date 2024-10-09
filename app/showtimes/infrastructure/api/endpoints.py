@@ -3,8 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
-from app.showtimes.actions.create_showtime import CreateShowtime, CreateShowtimeParams
-from app.showtimes.actions.delete_showtime import DeleteShowtime
+from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
+from app.showtimes.application.delete_showtime import DeleteShowtime
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExistsException
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
 from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import (

@@ -5,7 +5,7 @@ from uuid import UUID
 import pytest
 
 from app.core.domain.constants.unset import UNSET
-from app.movies.actions.update_movie import UpdateMovie, UpdateMovieParams
+from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.entities import PosterImage
 from app.movies.domain.exceptions import MovieDoesNotExistException
 from app.movies.domain.repositories.movie_repository import MovieRepository
