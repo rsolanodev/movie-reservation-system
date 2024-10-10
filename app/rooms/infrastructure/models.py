@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
-from app.rooms.domain.entities import Room
+from app.rooms.domain.room import Room
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel

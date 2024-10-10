@@ -1,8 +1,8 @@
 from sqlmodel import select
 
 from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
-from app.users.domain.entities import User
 from app.users.domain.repositories.user_repository import UserRepository
+from app.users.domain.user import User
 from app.users.infrastructure.models import UserModel
 
 

@@ -4,12 +4,12 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from app.auth.domain.entities import Token, TokenType
 from app.auth.domain.exceptions import (
     IncorrectPassword,
     UserDoesNotExist,
     UserInactive,
 )
+from app.auth.domain.token import Token, TokenType
 
 
 class TestAuthenticateUserEndpoint:

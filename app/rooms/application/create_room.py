@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from app.rooms.domain.entities import Room
 from app.rooms.domain.repositories.room_repository import RoomRepository
+from app.rooms.domain.room import Room
 
 
 @dataclass(frozen=True)

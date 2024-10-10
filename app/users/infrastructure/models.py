@@ -3,7 +3,7 @@ import uuid
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
-from app.users.domain.entities import User
+from app.users.domain.user import User
 
 
 class UserModel(SQLModel, table=True):

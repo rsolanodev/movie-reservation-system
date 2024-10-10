@@ -5,12 +5,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import SessionDep
 from app.auth.application.authenticate import Authenticate
-from app.auth.domain.entities import Token
 from app.auth.domain.exceptions import (
     IncorrectPassword,
     UserDoesNotExist,
     UserInactive,
 )
+from app.auth.domain.token import Token
 from app.auth.infrastructure.responses import TokenResponse
 from app.users.infrastructure.repositories.sql_model_user_repository import (
     SqlModelUserRepository,
