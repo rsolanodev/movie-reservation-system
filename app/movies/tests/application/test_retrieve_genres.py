@@ -4,7 +4,7 @@ from unittest.mock import Mock, create_autospec
 import pytest
 
 from app.movies.application.retrieve_genres import RetrieveGenres
-from app.movies.domain.entities import Genre
+from app.movies.domain.genre import Genre
 from app.movies.domain.repositories.genre_repository import GenreRepository
 
 

@@ -1,6 +1,6 @@
 import uuid
 
-from app.users.domain.entities import User
+from app.users.domain.user import User
 
 
 class UserFactory:

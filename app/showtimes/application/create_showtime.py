@@ -2,14 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from app.showtimes.domain.entities import Showtime
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
+from app.showtimes.domain.showtime import Showtime
 
 
 @dataclass
 class CreateShowtimeParams:
     movie_id: UUID
+    room_id: UUID
     show_datetime: datetime
 
 
@@ -18,8 +19,13 @@ class CreateShowtime:
         self._repository = repository
 
     def execute(self, params: CreateShowtimeParams) -> None:
-        if self._repository.exists(params.movie_id, params.show_datetime):
+        showtime = Showtime.create(
+            movie_id=params.movie_id,
+            show_datetime=params.show_datetime,
+            room_id=params.room_id,
+        )
+
+        if self._repository.exists(showtime=showtime):
             raise ShowtimeAlreadyExists()
 
-        showtime = Showtime.create(movie_id=params.movie_id, show_datetime=params.show_datetime)
         self._repository.create(showtime=showtime)

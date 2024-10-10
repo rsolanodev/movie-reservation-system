@@ -7,8 +7,12 @@ import pytest
 from freezegun import freeze_time
 
 from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
-from app.movies.domain.entities import Genre, Movie, MovieShowtime
+from app.movies.domain.collections.movie_genres import MovieGenres
+from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.genre import Genre
+from app.movies.domain.movie import Movie
+from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.movies.tests.domain.factories.movie_showtime_factory import (
@@ -61,18 +65,15 @@ class TestRetrieveMovie:
             title="The Super Mario Bros. Movie",
             description="An animated adaptation of the video game.",
             poster_image="super_mario_bros.jpg",
-            genres=[
-                Genre(
-                    id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
-                )
-            ],
-            showtimes=[
-                MovieShowtime(
-                    id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-                )
-            ],
+            genres=MovieGenres([Genre(id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"), name="Adventure")]),
+            showtimes=MovieShowtimes(
+                [
+                    MovieShowtime(
+                        id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    )
+                ],
+            ),
         )
 
     def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:

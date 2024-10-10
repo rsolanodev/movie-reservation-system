@@ -6,9 +6,9 @@ from uuid import UUID
 import pytest
 
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
-from app.showtimes.domain.entities import Showtime
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
+from app.showtimes.domain.showtime import Showtime
 
 
 class TestCreateShowtime:
@@ -22,18 +22,24 @@ class TestCreateShowtime:
         CreateShowtime(repository=mock_repository).execute(
             params=CreateShowtimeParams(
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
 
         mock_repository.exists.assert_called_once_with(
-            movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-            show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+            showtime=Showtime(
+                id=ANY,
+                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+            )
         )
         mock_repository.create.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
@@ -45,12 +51,17 @@ class TestCreateShowtime:
             CreateShowtime(repository=mock_repository).execute(
                 params=CreateShowtimeParams(
                     movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                    room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                     show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
                 )
             )
 
         mock_repository.exists.assert_called_once_with(
-            movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-            show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+            showtime=Showtime(
+                id=ANY,
+                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+            )
         )
         mock_repository.create.assert_not_called()

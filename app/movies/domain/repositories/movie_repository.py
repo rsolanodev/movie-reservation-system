@@ -2,7 +2,7 @@ from datetime import date
 from typing import Protocol
 from uuid import UUID
 
-from app.movies.domain.entities import Movie
+from app.movies.domain.movie import Movie
 
 
 class MovieRepository(Protocol):

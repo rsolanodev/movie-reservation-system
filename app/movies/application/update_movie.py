@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from app.core.domain.constants.unset import UnsetType
-from app.movies.domain.entities import Movie, PosterImage
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.movie import Movie
+from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 

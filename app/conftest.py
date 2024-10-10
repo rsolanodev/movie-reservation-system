@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 from sqlmodel import Session, SQLModel
 
-from app.auth.domain.entities import Token
+from app.auth.domain.token import Token
 from app.database import get_db
 from app.main import app
 from app.settings import settings

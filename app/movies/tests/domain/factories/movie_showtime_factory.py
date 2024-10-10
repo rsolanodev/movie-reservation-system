@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from uuid import UUID
 
-from app.movies.domain.entities import MovieShowtime
+from app.movies.domain.movie_showtime import MovieShowtime
 
 
 class MovieShowtimeFactory:

@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel
 
-from app.auth.domain.entities import TokenType
+from app.auth.domain.token import TokenType
 
 
 class TokenResponse(SQLModel):

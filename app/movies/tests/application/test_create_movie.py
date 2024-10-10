@@ -6,7 +6,7 @@ import pytest
 from fastapi import UploadFile
 
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
-from app.movies.domain.entities import PosterImage
+from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 

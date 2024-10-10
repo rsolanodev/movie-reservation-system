@@ -1,9 +1,9 @@
-from app.auth.domain.entities import Token
 from app.auth.domain.exceptions import (
     IncorrectPassword,
     UserDoesNotExist,
     UserInactive,
 )
+from app.auth.domain.token import Token
 from app.settings import settings
 from app.users.domain.repositories.user_repository import UserRepository
 

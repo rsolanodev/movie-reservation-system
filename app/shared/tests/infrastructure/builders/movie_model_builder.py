@@ -1,8 +1,10 @@
 import uuid
+from datetime import datetime
 
 from sqlmodel import Session
 
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.shared.tests.infrastructure.builders.showtime_model_builder import ShowtimeModelBuilder
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 
@@ -38,7 +40,17 @@ class MovieModelBuilder:
         self.genres.append(genre_model)
         return self
 
-    def with_showtime(self, showtime_model: ShowtimeModel) -> "MovieModelBuilder":
+    def with_showtime(
+        self, show_datetime: datetime, id: uuid.UUID | None = None, room_id: uuid.UUID | None = None
+    ) -> "MovieModelBuilder":
+        showtime_model = (
+            ShowtimeModelBuilder(session=self._session)
+            .with_id(id=id or uuid.uuid4())
+            .with_movie_id(movie_id=self.id)
+            .with_room_id(room_id=room_id or uuid.uuid4())
+            .with_show_datetime(show_datetime=show_datetime)
+            .build()
+        )
         self.showtimes.append(showtime_model)
         return self
 
@@ -48,13 +60,8 @@ class MovieModelBuilder:
             title=self.title,
             description=self.description,
             poster_image=self.poster_image,
+            genres=self.genres,
+            showtimes=self.showtimes,
         )
-
-        for genre in self.genres:
-            movie_model.genres.append(genre)
-
-        for showtime in self.showtimes:
-            movie_model.showtimes.append(showtime)
-
         self._session.add(movie_model)
         return movie_model

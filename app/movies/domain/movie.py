@@ -1,34 +1,11 @@
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 
 from app.core.domain.constants.unset import UnsetType
-
-
-@dataclass
-class PosterImage:
-    filename: str | None
-    content: bytes
-    content_type: str | None
-
-
-@dataclass
-class Genre:
-    id: uuid.UUID
-    name: str
-
-    @classmethod
-    def create(cls, name: str) -> "Genre":
-        return cls(id=uuid.uuid4(), name=name)
-
-
-@dataclass
-class MovieShowtime:
-    id: uuid.UUID
-    show_datetime: datetime
-
-    def is_future(self) -> bool:
-        return self.show_datetime >= datetime.now(tz=timezone.utc)
+from app.movies.domain.collections.movie_genres import MovieGenres
+from app.movies.domain.collections.movie_showtimes import MovieShowtimes
+from app.movies.domain.genre import Genre
+from app.movies.domain.movie_showtime import MovieShowtime
 
 
 @dataclass
@@ -38,8 +15,8 @@ class Movie:
     description: str | None
     poster_image: str | None
 
-    genres: list[Genre] = field(default_factory=list)
-    showtimes: list[MovieShowtime] = field(default_factory=list)
+    genres: MovieGenres = field(default_factory=MovieGenres)
+    showtimes: MovieShowtimes = field(default_factory=MovieShowtimes)
 
     @classmethod
     def create(cls, title: str, description: str | None, poster_image: str | None) -> "Movie":
@@ -72,4 +49,4 @@ class Movie:
         self.showtimes.append(showtime)
 
     def has_genre(self, genre_id: uuid.UUID) -> bool:
-        return any(genre.id == genre_id for genre in self.genres)
+        return self.genres.has_genre(genre_id=genre_id)
