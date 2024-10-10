@@ -1,7 +1,7 @@
 from starlette.datastructures import UploadFile
 
 from app.core.domain.constants.unset import UnsetType
-from app.movies.domain.entities import PosterImage
+from app.movies.domain.poster_image import PosterImage
 
 
 def build_poster_image(

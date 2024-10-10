@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from app.movies.domain.entities import Genre
+from app.movies.domain.genre import Genre
 from app.movies.infrastructure.models import GenreModel
 from app.movies.infrastructure.repositories.sql_model_genre_repository import (
     SqlModelGenreRepository,

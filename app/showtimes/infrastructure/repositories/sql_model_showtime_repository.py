@@ -1,21 +1,21 @@
 import uuid
-from datetime import datetime
 
 from sqlmodel import select
 
 from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
-from app.showtimes.domain.entities import Showtime
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
+from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 
 class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
-    def exists(self, movie_id: uuid.UUID, show_datetime: datetime) -> bool:
+    def exists(self, showtime: Showtime) -> bool:
         statement = select(ShowtimeModel).where(
-            ShowtimeModel.movie_id == movie_id,
-            ShowtimeModel.show_datetime == show_datetime,
+            ShowtimeModel.movie_id == showtime.movie_id,
+            ShowtimeModel.show_datetime == showtime.show_datetime,
+            ShowtimeModel.room_id == showtime.room_id,
         )
-        result = self._session.exec(statement).first()
+        result = self._session.exec(statement).one_or_none()
         return result is not None
 
     def create(self, showtime: Showtime) -> None:

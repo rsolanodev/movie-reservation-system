@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from app.movies.domain.entities import Movie
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.movie import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
 
 

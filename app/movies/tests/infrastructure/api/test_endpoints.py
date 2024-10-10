@@ -11,12 +11,13 @@ from app.movies.application.create_movie import CreateMovieParams
 from app.movies.application.retrieve_movie import RetrieveMovieParams
 from app.movies.application.retrieve_movies import RetrieveMoviesParams
 from app.movies.application.update_movie import UpdateMovieParams
-from app.movies.domain.entities import Genre, PosterImage
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
     GenreNotAssigned,
     MovieDoesNotExist,
 )
+from app.movies.domain.genre import Genre
+from app.movies.domain.poster_image import PosterImage
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.movies.tests.domain.factories.movie_showtime_factory import (
     MovieShowtimeFactory,

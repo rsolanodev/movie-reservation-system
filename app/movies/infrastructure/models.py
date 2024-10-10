@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.movies.domain.entities import Genre, Movie
+from app.movies.domain.genre import Genre
+from app.movies.domain.movie import Movie
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel

@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from app.movies.domain.entities import Genre
+from app.movies.domain.genre import Genre
 
 
 class GenreRepository(Protocol):

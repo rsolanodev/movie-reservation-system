@@ -1,7 +1,7 @@
 import uuid
 from uuid import UUID
 
-from app.movies.domain.entities import Genre
+from app.movies.domain.genre import Genre
 
 
 class GenreFactory:

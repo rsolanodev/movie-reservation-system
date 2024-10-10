@@ -21,12 +21,13 @@ from app.movies.application.retrieve_genres import RetrieveGenres
 from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.application.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
-from app.movies.domain.entities import Genre, Movie
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
     GenreNotAssigned,
     MovieDoesNotExist,
 )
+from app.movies.domain.genre import Genre
+from app.movies.domain.movie import Movie
 from app.movies.infrastructure.api.responses import (
     CreateMovieResponse,
     GenreResponse,

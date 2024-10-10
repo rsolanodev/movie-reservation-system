@@ -7,9 +7,7 @@ from app.showtimes.application.create_showtime import CreateShowtime, CreateShow
 from app.showtimes.application.delete_showtime import DeleteShowtime
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
-from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import (
-    SqlModelShowtimeRepository,
-)
+from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import SqlModelShowtimeRepository
 
 router = APIRouter()
 
@@ -26,6 +24,7 @@ def create_showtime(session: SessionDep, request_body: CreateShowtimePayload) ->
         ).execute(
             params=CreateShowtimeParams(
                 movie_id=request_body.movie_id,
+                room_id=request_body.room_id,
                 show_datetime=request_body.show_datetime,
             )
         )
