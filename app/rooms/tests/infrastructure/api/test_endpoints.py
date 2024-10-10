@@ -29,7 +29,7 @@ class TestCreateRoomEndpoint:
             "api/v1/rooms/",
             json={
                 "name": "Room 1",
-                "seat_configuration": [{"row": 1, "seat": 1}],
+                "seat_configuration": [{"row": 1, "number": 1}],
             },
             headers=superuser_token_headers,
         )
@@ -38,7 +38,7 @@ class TestCreateRoomEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=CreateRoomParams(
                 name="Room 1",
-                seat_configuration=[{"row": 1, "seat": 1}],
+                seat_configuration=[{"row": 1, "number": 1}],
             )
         )
 
@@ -54,7 +54,7 @@ class TestCreateRoomEndpoint:
             "api/v1/rooms/",
             json={
                 "name": "Room 1",
-                "seat_configuration": [{"row": 1, "seat": 1}],
+                "seat_configuration": [{"row": 1, "number": 1}],
             },
         )
 
@@ -75,7 +75,7 @@ class TestCreateRoomEndpoint:
             "api/v1/rooms/",
             json={
                 "name": "Room 1",
-                "seat_configuration": [{"row": 1, "seat": 1}],
+                "seat_configuration": [{"row": 1, "number": 1}],
             },
             headers=user_token_headers,
         )
