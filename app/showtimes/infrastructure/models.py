@@ -8,6 +8,7 @@ from app.showtimes.domain.showtime import Showtime
 
 if TYPE_CHECKING:
     from app.movies.infrastructure.models import MovieModel
+    from app.reservations.infrastructure.models import SeatModel
     from app.rooms.infrastructure.models import RoomModel
 
 
@@ -18,6 +19,7 @@ class ShowtimeModel(SQLModel, table=True):
     room_id: uuid.UUID = Field(foreign_key="roommodel.id")
     movie: "MovieModel" = Relationship(back_populates="showtimes")
     room: "RoomModel" = Relationship(back_populates="showtimes")
+    seats: list["SeatModel"] = Relationship(back_populates="showtime")
 
     @classmethod
     def from_domain(cls, showtime: Showtime) -> "ShowtimeModel":

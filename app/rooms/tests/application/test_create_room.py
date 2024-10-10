@@ -15,9 +15,9 @@ class TestCreateRoom:
 
     def test_creates_room(self, mock_repository: Mock) -> None:
         CreateRoom(repository=mock_repository).execute(
-            params=CreateRoomParams(name="Room 1", seat_configuration=[{"row": 1, "seat": 1}])
+            params=CreateRoomParams(name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
         )
 
         mock_repository.create.assert_called_once_with(
-            room=Room(id=ANY, name="Room 1", seat_configuration=[{"row": 1, "seat": 1}])
+            room=Room(id=ANY, name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
         )
