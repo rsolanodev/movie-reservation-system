@@ -64,7 +64,7 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run the Stack
-        run: docker compose --env-file .env.example up -d db
+        run: docker compose up -d db --env-file .env.example
 
       - name: Migrate Database
         run: docker compose exec backend alembic upgrade head
