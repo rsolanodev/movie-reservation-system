@@ -1,13 +1,17 @@
 from datetime import datetime, timezone
+from unittest.mock import ANY
 from uuid import UUID
 
 from sqlmodel import Session
 
 from app.reservations.infrastructure.models import SeatStatus
+from app.shared.tests.infrastructure.builders.movie_model_builder import MovieModelBuilder
 from app.shared.tests.infrastructure.factories.room_model_factory import RoomModelFactory
+from app.showtimes.domain.seat import Seat
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import SqlModelShowtimeRepository
+from app.showtimes.tests.infrastructure.factories.seat_model_factory import SeatModelFactory
 from app.showtimes.tests.infrastructure.factories.showtime_model_factory import ShowtimeModelFactory
 
 
@@ -82,3 +86,26 @@ class TestSqlModelShowtimeRepository:
 
         showtime_model = session.get(ShowtimeModel, UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
         assert showtime_model is None
+
+    def test_retrieves_seats_ordered_by_row_and_number(self, session: Session) -> None:
+        showtime_id = UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601")
+
+        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+            id=showtime_id,
+            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+        ).build()
+
+        seat_model_factory = SeatModelFactory(session=session)
+        seat_model_factory.create(showtime_id=showtime_id, row=2, number=1, status=SeatStatus.OCCUPIED)
+        seat_model_factory.create(showtime_id=showtime_id, row=1, number=1, status=SeatStatus.AVAILABLE)
+        seat_model_factory.create(showtime_id=showtime_id, row=1, number=2, status=SeatStatus.RESERVED)
+        seat_model_factory.create(row=1, number=1)
+
+        seats = SqlModelShowtimeRepository(session=session).retrive_seats(showtime_id=showtime_id)
+
+        assert seats == [
+            Seat(id=ANY, row=1, number=1, status=SeatStatus.AVAILABLE),
+            Seat(id=ANY, row=1, number=2, status=SeatStatus.RESERVED),
+            Seat(id=ANY, row=2, number=1, status=SeatStatus.OCCUPIED),
+        ]
