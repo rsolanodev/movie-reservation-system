@@ -71,7 +71,7 @@ jobs:
         run: docker compose exec backend alembic upgrade head
 
       - name: Run Pytest
-        run: poetry run pytest
+        run: docker compose exec backend poetry run pytest
 
       - name: Tear down the Stack
         run: docker compose down -v --remove-orphans
