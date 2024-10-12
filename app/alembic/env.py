@@ -5,17 +5,15 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.settings import settings
+from sqlmodel import SQLModel
+
 from app.users.infrastructure.models import UserModel
-from app.movies.infrastructure.models import MovieModel
+from app.movies.infrastructure.models import MovieModel, GenreModel, MovieGenreLink
 from app.showtimes.infrastructure.models import ShowtimeModel
 from app.rooms.infrastructure.models import RoomModel
-from app.reservations.infrastructure.models import SeatModel
+from app.reservations.infrastructure.models import SeatModel, ReservationModel
 
-target_metadata = UserModel.metadata
-target_metadata = MovieModel.metadata
-target_metadata = ShowtimeModel.metadata
-target_metadata = RoomModel.metadata
-target_metadata = SeatModel.metadata
+target_metadata = SQLModel.metadata
 
 config = context.config
 
