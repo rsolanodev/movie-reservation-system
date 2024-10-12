@@ -26,11 +26,28 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
+      - name: Check mypy
+        run: poetry run mypy app
+
+      - name: Check Ruff
+        run: poetry run ruff check app
+
+      - name: Check Ruff format
+        run: poetry run ruff format app --check
 
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
