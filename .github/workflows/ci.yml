@@ -64,5 +64,14 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Run tests
+      - name: Run the Stack
+        run: docker compose up -d db
+
+      - name: Migrate Database
+        run: docker compose exec backend alembic upgrade head
+
+      - name: Run Pytest
         run: poetry run pytest
+
+      - name: Tear down the Stack
+        run: docker compose down -v --remove-orphans
