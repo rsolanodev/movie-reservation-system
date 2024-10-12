@@ -45,6 +45,7 @@ jobs:
       POSTGRES_PASSWORD: testpass
       POSTGRES_DB: testdb
       SECRET_KEY: testkey
+      STACK_NAME: movie-system-reservation
 
     steps:
       - name: Checkout repository
