@@ -37,9 +37,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    env:
-      COMPOSE_ENVFILE: .env.example
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,6 +52,9 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-interaction
+
+      - name: Copy .env.example to .env
+        run: cp .env.example .env
 
       - name: Run the Stack
         run: docker compose up -d db
