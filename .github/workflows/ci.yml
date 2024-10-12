@@ -38,9 +38,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
+      DOMAIN: localhost
+      ENVIRONMENT: local
+      BACKEND_CORS_ORIGINS: localhost
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpass
       POSTGRES_DB: testdb
+      SECRET_KEY: testkey
 
     steps:
       - name: Checkout repository
