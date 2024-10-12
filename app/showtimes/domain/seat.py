@@ -1,7 +1,12 @@
 from dataclasses import dataclass
+from enum import StrEnum
 from uuid import UUID
 
-from app.reservations.infrastructure.models import SeatStatus
+
+class SeatStatus(StrEnum):
+    AVAILABLE = "available"
+    RESERVED = "reserved"
+    OCCUPIED = "occupied"
 
 
 @dataclass

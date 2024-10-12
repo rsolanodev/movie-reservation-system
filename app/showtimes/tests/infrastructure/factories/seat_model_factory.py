@@ -2,7 +2,8 @@ import uuid
 
 from sqlmodel import Session
 
-from app.reservations.infrastructure.models import SeatModel, SeatStatus
+from app.reservations.infrastructure.models import SeatModel
+from app.showtimes.domain.seat import SeatStatus
 
 
 class SeatModelFactory:

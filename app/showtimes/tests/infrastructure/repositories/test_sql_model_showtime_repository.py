@@ -4,10 +4,9 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from app.reservations.infrastructure.models import SeatStatus
 from app.shared.tests.infrastructure.builders.movie_model_builder import MovieModelBuilder
 from app.shared.tests.infrastructure.factories.room_model_factory import RoomModelFactory
-from app.showtimes.domain.seat import Seat
+from app.showtimes.domain.seat import Seat, SeatStatus
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import SqlModelShowtimeRepository
