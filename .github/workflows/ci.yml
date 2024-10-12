@@ -37,6 +37,26 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      DOMAIN: localhost
+      ENVIRONMENT: local
+      PROJECT_NAME: "Movie Reservation System"
+      STACK_NAME: movie-system-reservation
+      BACKEND_CORS_ORIGINS: localhost
+      SECRET_KEY: secretkey
+      SMTP_HOST:
+      SMTP_USER:
+      SMTP_PASSWORD:
+      EMAILS_FROM_EMAIL: info@example.com
+      SMTP_TLS: True
+      SMTP_SSL: False
+      SMTP_PORT: 587
+      POSTGRES_SERVER: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: passw0rd
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,9 +72,6 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --no-interaction
-
-      - name: Copy .env.example to .env
-        run: cp .env.example .env
 
       - name: Run the Stack
         run: docker compose up -d db
