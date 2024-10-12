@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from app.showtimes.application.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
+from app.showtimes.domain.seat import Seat, SeatStatus
 
 
 class TestCreateShowtimeEndpoint:
@@ -190,3 +191,36 @@ class TestDeleteShowtimeEndpoint:
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
+
+
+class TestRetrieveSeatsEndpoint:
+    @pytest.fixture
+    def mock_action(self) -> Generator[Mock, None, None]:
+        with patch("app.showtimes.infrastructure.api.endpoints.RetrieveSeats") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_repository(self) -> Generator[Mock, None, None]:
+        with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
+            yield mock.return_value
+
+    def test_returns_200_and_calls_action(self, client: TestClient, mock_action: Mock, mock_repository: Mock) -> None:
+        mock_action.return_value.execute.return_value = [
+            Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=1, status=SeatStatus.AVAILABLE),
+            Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"), row=1, number=2, status=SeatStatus.RESERVED),
+            Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e602"), row=2, number=1, status=SeatStatus.OCCUPIED),
+        ]
+
+        response = client.get("api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/seats/")
+
+        mock_action.assert_called_once_with(repository=mock_repository)
+        mock_action.return_value.execute.assert_called_once_with(
+            showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"id": "cbdd7b54-c561-4cbb-a55f-15853c60e600", "row": 1, "number": 1, "status": "available"},
+            {"id": "cbdd7b54-c561-4cbb-a55f-15853c60e601", "row": 1, "number": 2, "status": "reserved"},
+            {"id": "cbdd7b54-c561-4cbb-a55f-15853c60e602", "row": 2, "number": 1, "status": "occupied"},
+        ]
