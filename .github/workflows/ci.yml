@@ -74,6 +74,7 @@ jobs:
           POSTGRES_DB=app
           POSTGRES_USER=postgres
           POSTGRES_PASSWORD=passw0rd
+          SENTRY_DSN=
           EOF
 
       - name: Run the Stack
