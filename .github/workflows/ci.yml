@@ -10,6 +10,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DOMAIN: example.com
+      STACK_NAME: myapp
+      POSTGRES_PASSWORD: passw0rd
+      POSTGRES_USER: postgres
+      POSTGRES_DB: app
+      SECRET_KEY: secretkey
+      ENVIRONMENT: local
+      BACKEND_CORS_ORIGINS: localhost
+      SMTP_HOST:
+      SMTP_USER:
+      SMTP_PASSWORD:
+      EMAILS_FROM_EMAIL: noreply@example.com
+      POSTGRES_PORT: 5432
+      SENTRY_DSN:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,14 +50,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Create .env file
+        run: |
+          echo "DOMAIN=${{ env.DOMAIN }}" >> .env
+          echo "STACK_NAME=${{ env.STACK_NAME }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> .env
+          echo "SECRET_KEY=${{ env.SECRET_KEY }}" >> .env
+          echo "ENVIRONMENT=${{ env.ENVIRONMENT }}" >> .env
+          echo "BACKEND_CORS_ORIGINS=${{ env.BACKEND_CORS_ORIGINS }}" >> .env
+          echo "SMTP_HOST=${{ env.SMTP_HOST }}" >> .env
+          echo "SMTP_USER=${{ env.SMTP_USER }}" >> .env
+          echo "SMTP_PASSWORD=${{ env.SMTP_PASSWORD }}" >> .env
+          echo "EMAILS_FROM_EMAIL=${{ env.EMAILS_FROM_EMAIL }}" >> .env
+          echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
+          echo "SENTRY_DSN=${{ env.SENTRY_DSN }}" >> .env
+
       - name: Build and test Docker image
-        env:
-          DOMAIN: example.com
-          STACK_NAME: movie-system-reservation
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_USER: testuser
-          POSTGRES_DB: testdb
-          SECRET_KEY: testsecretkey
         run: |
           docker compose build
           docker compose up -d db
