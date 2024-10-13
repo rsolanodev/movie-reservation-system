@@ -67,16 +67,17 @@ jobs:
           echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
           echo "SENTRY_DSN=${{ env.SENTRY_DSN }}" >> .env
 
-      - name: Build and test Docker image
+      - name: Run the Stack
         run: |
           docker compose build
           docker compose up -d db
           docker compose up -d backend
-          docker compose run backend pytest
-          docker compose down -v
+
+      - name: Migrate database
+        run: docker compose run backend alembic upgrade head
 
       - name: Run tests
-        run: poetry run pytest
+        run: docker compose run backend pytest
 
-      - name: Check for database migrations
-        run: poetry run alembic check
+      - name: Tear down the Stack
+        run: docker compose down -v --remove-orphans
