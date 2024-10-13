@@ -29,24 +29,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "poetry"
-
-      - name: Install dependencies
-        run: poetry install --no-interaction
-
-      - name: Check code quality
-        run: |
-          poetry run mypy app
-          poetry run ruff check app
-          poetry run ruff format app --check
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -67,11 +49,16 @@ jobs:
           echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
           echo "SENTRY_DSN=${{ env.SENTRY_DSN }}" >> .env
 
-      - name: Run the Stack
+      - name: Build and start services
         run: |
           docker compose build
-          docker compose up -d db
-          docker compose up -d backend
+          docker compose up -d db backend
+
+      - name: Check code quality
+        run: |
+          docker compose run backend mypy app
+          docker compose run backend ruff check app
+          docker compose run backend ruff format app --check
 
       - name: Migrate database
         run: docker compose run backend alembic upgrade head
