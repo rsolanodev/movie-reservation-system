@@ -1,9 +1,13 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 from app.users.domain.user import User
+
+if TYPE_CHECKING:
+    from app.reservations.infrastructure.models import ReservationModel
 
 
 class UserModel(SQLModel, table=True):
@@ -13,6 +17,7 @@ class UserModel(SQLModel, table=True):
     is_active: bool = True
     is_superuser: bool = False
     hashed_password: str
+    reservations: list["ReservationModel"] = Relationship(back_populates="user")
 
     @classmethod
     def from_domain(cls, user: User) -> "UserModel":
