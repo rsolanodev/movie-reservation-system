@@ -6,11 +6,11 @@ from sqlalchemy import func
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
-from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.shared.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 

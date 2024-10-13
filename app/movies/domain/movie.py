@@ -1,7 +1,6 @@
 import uuid
 from dataclasses import dataclass, field
 
-from app.core.domain.constants.unset import UnsetType
 from app.movies.domain.collections.movie_genres import MovieGenres
 from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.genre import Genre
@@ -27,19 +26,14 @@ class Movie:
             poster_image=poster_image,
         )
 
-    def update(
-        self,
-        title: str | UnsetType,
-        description: str | None | UnsetType,
-        poster_image: str | None | UnsetType,
-    ) -> None:
-        if not isinstance(title, UnsetType):
+    def update(self, title: str | None, description: str | None, poster_image: str | None) -> None:
+        if title is not None:
             self.title = title
 
-        if not isinstance(description, UnsetType):
+        if description is not None:
             self.description = description
 
-        if not isinstance(poster_image, UnsetType):
+        if poster_image is not None:
             self.poster_image = poster_image
 
     def add_genre(self, genre: Genre) -> None:

@@ -1,9 +1,9 @@
 from sqlmodel import select
 
-from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.movies.domain.genre import Genre
 from app.movies.domain.repositories.genre_repository import GenreRepository
 from app.movies.infrastructure.models import GenreModel
+from app.shared.infrastructure.repositories.sql_model_repository import SqlModelRepository
 
 
 class SqlModelGenreRepository(GenreRepository, SqlModelRepository):

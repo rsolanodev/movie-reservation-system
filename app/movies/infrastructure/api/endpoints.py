@@ -12,7 +12,6 @@ from fastapi import (
 )
 
 from app.api.deps import SessionDep, get_current_active_superuser
-from app.core.domain.constants.unset import UNSET
 from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.delete_movie import DeleteMovie
@@ -83,7 +82,7 @@ def create_movie(
         params=CreateMovieParams(
             title=title,
             description=description,
-            poster_image=build_poster_image(uploaded_file=poster_image),  # type: ignore
+            poster_image=build_poster_image(uploaded_file=poster_image),
         )
     )
 
@@ -111,10 +110,10 @@ def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> 
 def update_movie(
     session: SessionDep,
     movie_id: UUID,
-    title: str = Form(min_length=1, max_length=100, default=UNSET),
-    description: str | None = Form(default=UNSET),
-    poster_image: UploadFile | None = File(default=UNSET),
-) -> Movie:
+    title: str = Form(min_length=1, max_length=100, default=None),
+    description: str | None = Form(default=None),
+    poster_image: UploadFile | None = None,
+) -> UpdateMovieResponse:
     try:
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
@@ -128,7 +127,7 @@ def update_movie(
         )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
-    return movie
+    return UpdateMovieResponse.from_domain(movie=movie)
 
 
 @router.delete(

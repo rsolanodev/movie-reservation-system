@@ -2,8 +2,8 @@ import uuid
 
 from sqlmodel import select
 
-from app.core.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.reservations.infrastructure.models import SeatModel
+from app.shared.infrastructure.repositories.sql_model_repository import SqlModelRepository
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 from app.showtimes.domain.seat import Seat, SeatStatus
 from app.showtimes.domain.showtime import Showtime
