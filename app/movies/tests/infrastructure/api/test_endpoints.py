@@ -6,7 +6,6 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 
-from app.core.domain.constants.unset import UNSET
 from app.movies.application.create_movie import CreateMovieParams
 from app.movies.application.retrieve_movie import RetrieveMovieParams
 from app.movies.application.retrieve_movies import RetrieveMoviesParams
@@ -17,6 +16,7 @@ from app.movies.domain.exceptions import (
     MovieDoesNotExist,
 )
 from app.movies.domain.genre import Genre
+from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.tests.domain.factories.genre_factory import GenreFactory
 from app.movies.tests.domain.factories.movie_showtime_factory import (
@@ -169,16 +169,26 @@ class TestUpdateMovieEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def movie(self) -> Movie:
+        return (
+            MovieBuilder()
+            .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_title(title="Deadpool & Wolverine")
+            .with_description(description="Deadpool and a variant of Wolverine.")
+            .with_poster_image(poster_image="deadpool_and_wolverine.jpg")
+            .build()
+        )
+
     def test_returns_200_and_calls_action(
         self,
         client: TestClient,
         mock_action: Mock,
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
+        movie: Movie,
     ) -> None:
-        mock_action.return_value.execute.return_value = (
-            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
-        )
+        mock_action.return_value.execute.return_value = movie
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -218,10 +228,9 @@ class TestUpdateMovieEndpoint:
         mock_action: Mock,
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
+        movie: Movie,
     ) -> None:
-        mock_action.return_value.execute.return_value = (
-            MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
-        )
+        mock_action.return_value.execute.return_value = movie
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -232,9 +241,9 @@ class TestUpdateMovieEndpoint:
         mock_action.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                title=UNSET,
-                description=UNSET,
-                poster_image=UNSET,
+                title=None,
+                description=None,
+                poster_image=None,
             )
         )
 
@@ -270,7 +279,7 @@ class TestUpdateMovieEndpoint:
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
-                poster_image=UNSET,
+                poster_image=None,
             )
         )
 
@@ -278,10 +287,7 @@ class TestUpdateMovieEndpoint:
         assert response.json() == {"detail": "The movie does not exist"}
 
     def test_returns_401_when_user_is_not_authenticated(
-        self,
-        client: TestClient,
-        mock_action: Mock,
-        mock_repository: Mock,
+        self, client: TestClient, mock_action: Mock, mock_repository: Mock
     ) -> None:
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",

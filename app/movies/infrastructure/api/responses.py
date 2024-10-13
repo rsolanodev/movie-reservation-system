@@ -3,6 +3,8 @@ from uuid import UUID
 
 from sqlmodel import SQLModel
 
+from app.movies.domain.movie import Movie
+
 
 class GenreResponse(SQLModel):
     id: UUID
@@ -24,7 +26,15 @@ class MovieShowtimeResponse(SQLModel):
 class CreateMovieResponse(MovieResponse): ...
 
 
-class UpdateMovieResponse(MovieResponse): ...
+class UpdateMovieResponse(MovieResponse):
+    @classmethod
+    def from_domain(cls, movie: Movie) -> "UpdateMovieResponse":
+        return cls(
+            id=movie.id,
+            title=movie.title,
+            description=movie.description,
+            poster_image=movie.poster_image,
+        )
 
 
 class RetrieveMovieResponse(MovieResponse):
