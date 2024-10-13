@@ -8,41 +8,12 @@ on:
     branches: ["master"]
 
 jobs:
-  linter:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "poetry"
-
-      - name: Install dependencies
-        run: poetry install --no-interaction
-
-      - name: Check mypy
-        run: poetry run mypy app
-
-      - name: Check Ruff
-        run: poetry run ruff check app
-
-      - name: Check Ruff format
-        run: poetry run ruff format app --check
-
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python -
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -50,47 +21,38 @@ jobs:
           python-version: "3.11"
           cache: "poetry"
 
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python -
+
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Create .env file
+      - name: Check code quality
         run: |
-          cat << EOF > .env
-          DOMAIN=localhost
-          ENVIRONMENT=ci
-          PROJECT_NAME="Movie Reservation System"
-          STACK_NAME=movie-system-reservation
-          BACKEND_CORS_ORIGINS=localhost
-          SECRET_KEY=secretkey
-          SMTP_HOST=
-          SMTP_USER=
-          SMTP_PASSWORD=
-          EMAILS_FROM_EMAIL=info@example.com
-          SMTP_TLS=True
-          SMTP_SSL=False
-          SMTP_PORT=587
-          POSTGRES_SERVER=localhost
-          POSTGRES_PORT=5432
-          POSTGRES_DB=app
-          POSTGRES_USER=postgres
-          POSTGRES_PASSWORD=passw0rd
-          SENTRY_DSN=
-          EOF
+          poetry run mypy app
+          poetry run ruff check app
+          poetry run ruff format app --check
 
-      - name: Run the Stack
-        run: docker compose up -d backend db
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Migrate Database
-        run: docker compose exec backend alembic upgrade head
-
-      - name: Run Pytest
-        run: docker compose exec backend poetry run pytest
+      - name: Build and test Docker image
         env:
-          POSTGRES_SERVER: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_DB: app
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: passw0rd
+          DOMAIN: example.com
+          STACK_NAME: movie-system-reservation
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: testdb
+          SECRET_KEY: testsecretkey
+        run: |
+          docker compose build
+          docker compose up -d db
+          docker compose up -d backend
+          docker compose run backend pytest
+          docker compose down -v
 
-      - name: Tear down the Stack
-        run: docker compose down -v --remove-orphans
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Check for database migrations
+        run: poetry run alembic check
