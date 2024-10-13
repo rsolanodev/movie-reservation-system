@@ -18,7 +18,7 @@ jobs:
       POSTGRES_DB: app
       SECRET_KEY: secretkey
       ENVIRONMENT: local
-      BACKEND_CORS_ORIGINS: localhost
+      BACKEND_CORS_ORIGINS: "http://localhost,https://localhost"
       SMTP_HOST:
       SMTP_USER:
       SMTP_PASSWORD:
