@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
@@ -26,3 +27,4 @@ class ReservationModel(SQLModel, table=True):
     showtime: "ShowtimeModel" = Relationship(back_populates="reservations")
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
+    created_at: datetime = Field(default_factory=datetime.now)
