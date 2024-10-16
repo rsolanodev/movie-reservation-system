@@ -7,7 +7,7 @@ from sqlmodel import Session
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 
-class ShowtimeModelFactory:
+class SqlModelShowtimeFactoryTest:
     def __init__(self, session: Session) -> None:
         self._session = session
 

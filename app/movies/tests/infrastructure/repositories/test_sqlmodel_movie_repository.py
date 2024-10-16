@@ -9,10 +9,10 @@ from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.infrastructure.models import MovieModel
-from app.movies.infrastructure.repositories.sql_model_movie_repository import SqlModelMovieRepository
-from app.movies.tests.infrastructure.factories.genre_model_factory import GenreModelFactory
+from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
+from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
-from app.shared.tests.infrastructure.builders.movie_model_builder import MovieModelBuilder
 
 
 class TestSqlModelMovieRepository:
@@ -27,7 +27,7 @@ class TestSqlModelMovieRepository:
         assert movie_model.poster_image == "deadpool_and_wolverine.jpg"
 
     def test_updates_movie(self, session: Session) -> None:
-        movie_model = MovieModelBuilder(session=session).build()
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
 
         movie = movie_model.to_domain()
         movie.title = "The Super Mario Bros. Movie"
@@ -42,9 +42,9 @@ class TestSqlModelMovieRepository:
         assert movie_model.poster_image == "super_mario_bros.jpg"
 
     def test_get_movie(self, session: Session) -> None:
-        genre_model_factory = GenreModelFactory(session=session)
+        genre_model_factory = SqlModelGenreFactoryTest(session=session)
         movie_model = (
-            MovieModelBuilder(session=session)
+            SqlModelMovieBuilderTest(session=session)
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_genre(
                 genre_model=genre_model_factory.create(
@@ -77,18 +77,18 @@ class TestSqlModelMovieRepository:
         )
 
     def test_delete_movie(self, session: Session) -> None:
-        movie_model = MovieModelBuilder(session=session).build()
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
 
         SqlModelMovieRepository(session=session).delete(id=movie_model.id)
 
         assert session.get(MovieModel, movie_model.id) is None
 
     def test_add_genre_to_movie(self, session: Session) -> None:
-        genre_model = GenreModelFactory(session=session).create(
+        genre_model = SqlModelGenreFactoryTest(session=session).create(
             id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
             name="Action",
         )
-        movie_model = MovieModelBuilder(session=session).build()
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
 
         SqlModelMovieRepository(session=session).add_genre(movie_id=movie_model.id, genre_id=genre_model.id)
 
@@ -98,9 +98,9 @@ class TestSqlModelMovieRepository:
 
     def test_remove_genre_from_movie(self, session: Session) -> None:
         movie_model = (
-            MovieModelBuilder(session=session)
+            SqlModelMovieBuilderTest(session=session)
             .with_genre(
-                genre_model=GenreModelFactory(session=session).create(
+                genre_model=SqlModelGenreFactoryTest(session=session).create(
                     id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
                     name="Action",
                 )
@@ -117,12 +117,16 @@ class TestSqlModelMovieRepository:
         assert movie_model.genres == []
 
     def test_get_available_movies_for_date(self, session: Session) -> None:
-        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
         ).build()
 
-        MovieModelBuilder(session=session).with_id(id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
@@ -148,12 +152,16 @@ class TestSqlModelMovieRepository:
         ]
 
     def test_get_available_movies_for_date_with_showtimes_on_date(self, session: Session) -> None:
-        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
         ).build()
 
-        MovieModelBuilder(session=session).with_id(id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
@@ -179,7 +187,9 @@ class TestSqlModelMovieRepository:
         ]
 
     def test_get_available_movies_for_date_with_showtimes_ordered(self, session: Session) -> None:
-        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).with_showtime(
@@ -212,7 +222,9 @@ class TestSqlModelMovieRepository:
         ]
 
     def test_get_movie_for_date(self, session: Session) -> None:
-        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).with_showtime(

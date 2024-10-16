@@ -6,7 +6,7 @@ from app.reservations.infrastructure.models import SeatModel
 from app.showtimes.domain.seat import SeatStatus
 
 
-class SeatModelFactory:
+class SqlModelSeatFactoryTest:
     def __init__(self, session: Session) -> None:
         self._session = session
 

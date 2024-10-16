@@ -13,8 +13,8 @@ from app.auth.domain.exceptions import (
     UserInactive,
 )
 from app.settings import settings
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.domain.repositories.user_repository import UserRepository
-from app.users.tests.factories.user_factory import UserFactory
 
 
 class TestAuthenticate:
@@ -24,7 +24,7 @@ class TestAuthenticate:
 
     @freeze_time("2021-08-01T12:00:00Z")
     def test_authenticate_user(self, mock_repository: Mock) -> None:
-        mock_repository.find_by_email.return_value = UserFactory().create()
+        mock_repository.find_by_email.return_value = UserFactoryTest().create()
 
         token = Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
@@ -35,7 +35,7 @@ class TestAuthenticate:
         assert decoded_token["exp"] == datetime(2021, 8, 9, 12, 0, 0, tzinfo=timezone.utc).timestamp()
 
     def test_does_not_authenticate_user_when_password_is_incorrect(self, mock_repository: Mock) -> None:
-        mock_repository.find_by_email.return_value = UserFactory().create()
+        mock_repository.find_by_email.return_value = UserFactoryTest().create()
 
         with pytest.raises(IncorrectPassword):
             Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Password!")
@@ -47,7 +47,7 @@ class TestAuthenticate:
             Authenticate(repository=mock_repository).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
     def test_raises_exception_when_user_is_inactive(self, mock_repository: Mock) -> None:
-        user = UserFactory().create()
+        user = UserFactoryTest().create()
         user.mark_as_inactive()
         mock_repository.find_by_email.return_value = user
 

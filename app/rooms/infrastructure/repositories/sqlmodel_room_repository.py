@@ -1,7 +1,7 @@
 from app.rooms.domain.repositories.room_repository import RoomRepository
 from app.rooms.domain.room import Room
 from app.rooms.infrastructure.models import RoomModel
-from app.shared.infrastructure.repositories.sql_model_repository import SqlModelRepository
+from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 
 
 class SqlModelRoomRepository(RoomRepository, SqlModelRepository):

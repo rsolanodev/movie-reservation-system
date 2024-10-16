@@ -3,12 +3,12 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.application.create_user import CreateUser, CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExists
 from app.users.domain.repositories.user_repository import (
     UserRepository,
 )
-from app.users.tests.factories.user_factory import UserFactory
 
 
 class TestCreateUser:
@@ -33,7 +33,7 @@ class TestCreateUser:
         assert user.verify_password("Passw0rd!")
 
     def test_raises_exception_when_user_already_exists(self, mock_repository: Mock) -> None:
-        mock_repository.find_by_email.return_value = UserFactory().create()
+        mock_repository.find_by_email.return_value = UserFactoryTest().create()
 
         with pytest.raises(UserAlreadyExists):
             CreateUser(repository=mock_repository).execute(

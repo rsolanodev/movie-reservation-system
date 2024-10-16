@@ -12,7 +12,7 @@ from app.auth.domain.exceptions import (
 )
 from app.auth.domain.token import Token
 from app.auth.infrastructure.responses import TokenResponse
-from app.users.infrastructure.repositories.sql_model_user_repository import (
+from app.users.infrastructure.repositories.sqlmodel_user_repository import (
     SqlModelUserRepository,
 )
 

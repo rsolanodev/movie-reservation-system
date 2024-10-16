@@ -7,7 +7,7 @@ import pytest
 from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.domain.exceptions import GenreAlreadyAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.movies.tests.domain.factories.genre_factory import GenreFactory
+from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -18,7 +18,7 @@ class TestAddMovieGenre:
 
     def test_adds_genre_to_movie(self, mock_repository: Mock) -> None:
         movie = MovieBuilder().build()
-        genre = GenreFactory().create(name="Action")
+        genre = GenreFactoryTest().create(name="Action")
 
         mock_repository.get.return_value = movie
 
@@ -31,7 +31,7 @@ class TestAddMovieGenre:
         movie = (
             MovieBuilder()
             .with_genre(
-                genre=GenreFactory().create(
+                genre=GenreFactoryTest().create(
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
                     name="Action",
                 )

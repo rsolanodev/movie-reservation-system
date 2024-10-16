@@ -18,9 +18,9 @@ from app.movies.domain.exceptions import (
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
-from app.movies.tests.domain.factories.genre_factory import GenreFactory
-from app.movies.tests.domain.factories.movie_showtime_factory import (
-    MovieShowtimeFactory,
+from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
+from app.movies.tests.factories.movie_showtime_factory_test import (
+    MovieShowtimeFactoryTest,
 )
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -592,19 +592,19 @@ class TestRetrieveMovieEndpoint:
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
-                genre=GenreFactory().create(
+                genre=GenreFactoryTest().create(
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
                     name="Action",
                 )
             )
             .with_genre(
-                genre=GenreFactory().create(
+                genre=GenreFactoryTest().create(
                     id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"),
                     name="Comedy",
                 )
             )
             .with_showtime(
-                showtime=MovieShowtimeFactory().create(
+                showtime=MovieShowtimeFactoryTest().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
@@ -680,9 +680,9 @@ class TestRetrieveMoviesEndpoint:
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
+            .with_genre(genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
             .with_showtime(
-                showtime=MovieShowtimeFactory().create(
+                showtime=MovieShowtimeFactoryTest().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
@@ -693,9 +693,11 @@ class TestRetrieveMoviesEndpoint:
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
-            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure"))
+            .with_genre(
+                genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
+            )
             .with_showtime(
-                showtime=MovieShowtimeFactory().create(
+                showtime=MovieShowtimeFactoryTest().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
                     show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                 )
@@ -746,9 +748,9 @@ class TestRetrieveMoviesEndpoint:
         mock_action.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_genre(genre=GenreFactory().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
+            .with_genre(genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
             .with_showtime(
-                showtime=MovieShowtimeFactory().create(
+                showtime=MovieShowtimeFactoryTest().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )

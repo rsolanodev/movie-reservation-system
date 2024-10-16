@@ -14,9 +14,9 @@ from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.movies.tests.domain.factories.genre_factory import GenreFactory
-from app.movies.tests.domain.factories.movie_showtime_factory import (
-    MovieShowtimeFactory,
+from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
+from app.movies.tests.factories.movie_showtime_factory_test import (
+    MovieShowtimeFactoryTest,
 )
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -35,13 +35,13 @@ class TestRetrieveMovie:
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
             .with_genre(
-                genre=GenreFactory().create(
+                genre=GenreFactoryTest().create(
                     id=UUID("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
                     name="Adventure",
                 )
             )
             .with_showtime(
-                showtime=MovieShowtimeFactory().create(
+                showtime=MovieShowtimeFactoryTest().create(
                     id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )

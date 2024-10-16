@@ -11,8 +11,8 @@ from app.auth.domain.token import Token
 from app.database import get_db
 from app.main import app
 from app.settings import settings
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.infrastructure.models import UserModel
-from app.users.tests.factories.user_factory import UserFactory
 
 
 @pytest.fixture(scope="session")
@@ -65,7 +65,7 @@ def client(session: Session) -> Generator[TestClient, None, None]:
 
 @pytest.fixture
 def user(session: Session) -> UserModel:
-    user = UserFactory().create()
+    user = UserFactoryTest().create()
     user_model = UserModel.from_domain(user)
     session.add(user_model)
     session.commit()
@@ -74,7 +74,7 @@ def user(session: Session) -> UserModel:
 
 @pytest.fixture
 def superuser(session: Session) -> UserModel:
-    user = UserFactory().create(is_superuser=True)
+    user = UserFactoryTest().create(is_superuser=True)
     user_model = UserModel.from_domain(user)
     session.add(user_model)
     session.commit()

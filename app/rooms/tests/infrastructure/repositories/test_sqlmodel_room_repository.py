@@ -2,7 +2,7 @@ from sqlmodel import Session
 
 from app.rooms.domain.room import Room
 from app.rooms.infrastructure.models import RoomModel
-from app.rooms.infrastructure.repositories.sql_model_room_repository import SqlModelRoomRepository
+from app.rooms.infrastructure.repositories.sqlmodel_room_repository import SqlModelRoomRepository
 
 
 class TestSqlModelRoomRepository:
