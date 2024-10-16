@@ -7,7 +7,7 @@ import pytest
 from app.movies.application.remove_movie_genre import RemoveMovieGenre
 from app.movies.domain.exceptions import GenreNotAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.movies.tests.domain.factories.genre_factory import GenreFactory
+from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -20,7 +20,7 @@ class TestRemoveMovieGenre:
         mock_repository.get.return_value = (
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_genre(genre=GenreFactory().create(id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"), name="Action"))
+            .with_genre(genre=GenreFactoryTest().create(id=UUID("3b74494d-0a95-49b1-91ef-bb211f802961"), name="Action"))
             .build()
         )
 

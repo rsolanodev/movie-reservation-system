@@ -34,10 +34,10 @@ from app.movies.infrastructure.api.responses import (
     UpdateMovieResponse,
 )
 from app.movies.infrastructure.api.utils import build_poster_image
-from app.movies.infrastructure.repositories.sql_model_genre_repository import (
+from app.movies.infrastructure.repositories.sqlmodel_genre_repository import (
     SqlModelGenreRepository,
 )
-from app.movies.infrastructure.repositories.sql_model_movie_repository import (
+from app.movies.infrastructure.repositories.sqlmodel_movie_repository import (
     SqlModelMovieRepository,
 )
 

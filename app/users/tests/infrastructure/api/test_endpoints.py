@@ -4,9 +4,9 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.application.create_user import CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExists
-from app.users.tests.factories.user_factory import UserFactory
 
 
 class TestCreateUserEndpoint:
@@ -23,7 +23,7 @@ class TestCreateUserEndpoint:
     def test_returns_201_and_calls_action_and_returns_result(
         self, client: TestClient, mock_action: Mock, mock_repository: Mock
     ) -> None:
-        mock_action.return_value.execute.return_value = UserFactory().create()
+        mock_action.return_value.execute.return_value = UserFactoryTest().create()
 
         response = client.post(
             "api/v1/users/",

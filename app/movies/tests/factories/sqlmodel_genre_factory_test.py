@@ -6,7 +6,7 @@ from sqlmodel import Session
 from app.movies.infrastructure.models import GenreModel
 
 
-class GenreModelFactory:
+class SqlModelGenreFactoryTest:
     def __init__(self, session: Session) -> None:
         self._session = session
 

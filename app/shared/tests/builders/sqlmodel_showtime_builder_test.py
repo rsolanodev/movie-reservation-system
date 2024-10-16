@@ -6,7 +6,7 @@ from sqlmodel import Session
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 
-class ShowtimeModelBuilder:
+class SqlModelShowtimeBuilderTest:
     def __init__(self, session: Session) -> None:
         self._session = session
 
@@ -15,19 +15,19 @@ class ShowtimeModelBuilder:
         self.room_id: uuid.UUID = uuid.uuid4()
         self.show_datetime: datetime = datetime.now()
 
-    def with_id(self, id: uuid.UUID) -> "ShowtimeModelBuilder":
+    def with_id(self, id: uuid.UUID) -> "SqlModelShowtimeBuilderTest":
         self.id = id
         return self
 
-    def with_movie_id(self, movie_id: uuid.UUID) -> "ShowtimeModelBuilder":
+    def with_movie_id(self, movie_id: uuid.UUID) -> "SqlModelShowtimeBuilderTest":
         self.movie_id = movie_id
         return self
 
-    def with_room_id(self, room_id: uuid.UUID) -> "ShowtimeModelBuilder":
+    def with_room_id(self, room_id: uuid.UUID) -> "SqlModelShowtimeBuilderTest":
         self.room_id = room_id
         return self
 
-    def with_show_datetime(self, show_datetime: datetime) -> "ShowtimeModelBuilder":
+    def with_show_datetime(self, show_datetime: datetime) -> "SqlModelShowtimeBuilderTest":
         self.show_datetime = show_datetime
         return self
 

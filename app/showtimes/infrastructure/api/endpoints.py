@@ -9,7 +9,7 @@ from app.showtimes.application.retrieve_seats import RetrieveSeats
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
 from app.showtimes.infrastructure.api.responses import SeatResponse
-from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import SqlModelShowtimeRepository
+from app.showtimes.infrastructure.repositories.sqlmodel_showtime_repository import SqlModelShowtimeRepository
 
 router = APIRouter()
 

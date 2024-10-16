@@ -3,7 +3,7 @@ import uuid
 from app.users.domain.user import User
 
 
-class UserFactory:
+class UserFactoryTest:
     def create(self, is_superuser: bool = False) -> User:
         return User(
             id=uuid.UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),

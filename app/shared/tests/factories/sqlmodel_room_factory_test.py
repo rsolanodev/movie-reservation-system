@@ -6,7 +6,7 @@ from sqlmodel import Session
 from app.rooms.infrastructure.models import RoomModel
 
 
-class RoomModelFactory:
+class SqlModelRoomFactoryTest:
     def __init__(self, session: Session) -> None:
         self._session = session
 

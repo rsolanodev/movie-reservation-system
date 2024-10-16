@@ -2,7 +2,7 @@ from sqlmodel import Session
 
 from app.movies.domain.genre import Genre
 from app.movies.infrastructure.models import GenreModel
-from app.movies.infrastructure.repositories.sql_model_genre_repository import (
+from app.movies.infrastructure.repositories.sqlmodel_genre_repository import (
     SqlModelGenreRepository,
 )
 

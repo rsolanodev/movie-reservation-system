@@ -7,7 +7,7 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
-from app.shared.infrastructure.repositories.sql_model_repository import SqlModelRepository
+from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 
 
 class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):

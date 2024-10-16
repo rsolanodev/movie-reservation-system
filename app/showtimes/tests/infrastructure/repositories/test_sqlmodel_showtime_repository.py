@@ -4,19 +4,19 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from app.shared.tests.infrastructure.builders.movie_model_builder import MovieModelBuilder
-from app.shared.tests.infrastructure.factories.room_model_factory import RoomModelFactory
+from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
+from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
 from app.showtimes.domain.seat import Seat, SeatStatus
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
-from app.showtimes.infrastructure.repositories.sql_model_showtime_repository import SqlModelShowtimeRepository
-from app.showtimes.tests.infrastructure.factories.seat_model_factory import SeatModelFactory
-from app.showtimes.tests.infrastructure.factories.showtime_model_factory import ShowtimeModelFactory
+from app.showtimes.infrastructure.repositories.sqlmodel_showtime_repository import SqlModelShowtimeRepository
+from app.showtimes.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.showtimes.tests.factories.sqlmodel_showtime_factory_test import SqlModelShowtimeFactoryTest
 
 
 class TestSqlModelShowtimeRepository:
     def test_exists_showtime(self, session: Session) -> None:
-        ShowtimeModelFactory(session=session).create(
+        SqlModelShowtimeFactoryTest(session=session).create(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
             movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
             room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -33,7 +33,7 @@ class TestSqlModelShowtimeRepository:
         )
 
     def test_does_not_exist_showtime(self, session: Session) -> None:
-        ShowtimeModelFactory(session=session).create(
+        SqlModelShowtimeFactoryTest(session=session).create(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
             movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
             room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -50,7 +50,7 @@ class TestSqlModelShowtimeRepository:
         )
 
     def test_creates_showtime_and_seats_to_reserve(self, session: Session) -> None:
-        room = RoomModelFactory(session=session).create(
+        room = SqlModelRoomFactoryTest(session=session).create(
             id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
             name="Room 1",
             seat_configuration=[{"row": 1, "number": 2}, {"row": 3, "number": 4}],
@@ -76,7 +76,7 @@ class TestSqlModelShowtimeRepository:
         assert showtime_model.seats[1].status == SeatStatus.AVAILABLE
 
     def test_deletes_showtime(self, session: Session) -> None:
-        ShowtimeModelFactory(session=session).create(
+        SqlModelShowtimeFactoryTest(session=session).create(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
             show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
         )
@@ -89,13 +89,15 @@ class TestSqlModelShowtimeRepository:
     def test_retrieves_seats_ordered_by_row_and_number(self, session: Session) -> None:
         showtime_id = UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601")
 
-        MovieModelBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
+        SqlModelMovieBuilderTest(session=session).with_id(
+            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
+        ).with_showtime(
             id=showtime_id,
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
             room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
         ).build()
 
-        seat_model_factory = SeatModelFactory(session=session)
+        seat_model_factory = SqlModelSeatFactoryTest(session=session)
         seat_model_factory.create(showtime_id=showtime_id, row=2, number=1, status=SeatStatus.OCCUPIED)
         seat_model_factory.create(showtime_id=showtime_id, row=1, number=1, status=SeatStatus.AVAILABLE)
         seat_model_factory.create(showtime_id=showtime_id, row=1, number=2, status=SeatStatus.RESERVED)

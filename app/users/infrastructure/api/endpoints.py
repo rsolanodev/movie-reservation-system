@@ -6,7 +6,7 @@ from app.users.domain.exceptions import UserAlreadyExists
 from app.users.domain.user import User
 from app.users.infrastructure.api.payloads import CreateUserPayload
 from app.users.infrastructure.api.responses import UserResponse
-from app.users.infrastructure.repositories.sql_model_user_repository import (
+from app.users.infrastructure.repositories.sqlmodel_user_repository import (
     SqlModelUserRepository,
 )
 

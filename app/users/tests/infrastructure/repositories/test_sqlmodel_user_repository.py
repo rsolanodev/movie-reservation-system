@@ -1,15 +1,15 @@
 from sqlmodel import Session
 
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.infrastructure.models import UserModel
-from app.users.infrastructure.repositories.sql_model_user_repository import (
+from app.users.infrastructure.repositories.sqlmodel_user_repository import (
     SqlModelUserRepository,
 )
-from app.users.tests.factories.user_factory import UserFactory
 
 
 class TestSqlModelUserRepository:
     def test_create_user(self, session: Session) -> None:
-        user = UserFactory().create()
+        user = UserFactoryTest().create()
         SqlModelUserRepository(session=session).create(user=user)
 
         user_model = session.get_one(UserModel, user.id)
