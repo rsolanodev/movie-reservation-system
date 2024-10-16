@@ -36,7 +36,7 @@ class TestCreateReservation:
         mock_repository.find_seats.assert_called_once_with(
             seat_ids=[UUID("c555276e-0be4-48ea-9e27-fe1500384380"), UUID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
-        mock_repository.save.assert_called_once_with(
+        mock_repository.create.assert_called_once_with(
             reservation=Reservation(
                 id=ANY,
                 user_id=UUID("1553d340-89eb-433b-a101-981bdaa740ed"),
@@ -86,4 +86,4 @@ class TestCreateReservation:
         mock_repository.find_seats.assert_called_once_with(
             seat_ids=[UUID("c555276e-0be4-48ea-9e27-fe1500384380"), UUID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
-        mock_repository.save.assert_not_called()
+        mock_repository.create.assert_not_called()

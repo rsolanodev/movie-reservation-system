@@ -25,5 +25,5 @@ class CreateReservation:
 
         reservation = Reservation.create(user_id=params.user_id, showtime_id=params.showtime_id)
         reservation.add_seats(seats)
-        self._repository.save(reservation=reservation)
+        self._repository.create(reservation=reservation)
         return reservation
