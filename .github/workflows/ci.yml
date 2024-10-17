@@ -26,6 +26,7 @@ jobs:
       POSTGRES_PORT: 5432
       REDIS_URL: redis://localhost:6379/0
       SENTRY_DSN:
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
