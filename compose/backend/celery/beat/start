@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -u -e
+
+
+rm -f './celerybeat.pid'
+celery -A app.celery beat -l INFO

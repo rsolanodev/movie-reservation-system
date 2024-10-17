@@ -59,6 +59,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - SENTRY_DSN=${SENTRY_DSN}
+      - REDIS_URL=${REDIS_URL}
 
     build:
       context: .
@@ -88,6 +89,11 @@ services:
       # Enable www redirection for HTTP and HTTPS
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.middlewares=https-redirect,${STACK_NAME?Variable not set}-www-redirect
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.middlewares=${STACK_NAME?Variable not set}-www-redirect
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
 volumes:
   app-db-data:
