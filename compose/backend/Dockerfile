@@ -19,3 +19,11 @@ ENV PYTHONPATH=/app
 
 COPY ./alembic.ini /app/
 COPY ./app /app/app
+
+COPY ./compose/backend/entrypoint /entrypoint
+RUN sed -i 's/\r//' /entrypoint
+RUN chmod +x /entrypoint
+
+COPY ./compose/backend/start /start
+RUN sed -i 's/\r//' /start
+RUN chmod +x /start
