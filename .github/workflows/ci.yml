@@ -60,9 +60,6 @@ jobs:
           docker compose run backend ruff check app
           docker compose run backend ruff format app --check
 
-      - name: Migrate database
-        run: docker compose run backend alembic upgrade head
-
       - name: Run tests
         run: docker compose run backend pytest
 
