@@ -37,6 +37,7 @@ services:
 
   backend:
     restart: always
+    command: /start
     networks:
       - traefik-public
       - default

@@ -39,3 +39,5 @@ RUN sed -i 's/\r//' /start-celerybeat
 RUN chmod +x /start-celerybeat
 
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+
+ENTRYPOINT ["/entrypoint"]
