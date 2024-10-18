@@ -37,6 +37,7 @@ services:
 
   backend:
     restart: always
+    command: /start
     networks:
       - traefik-public
       - default
@@ -59,6 +60,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - SENTRY_DSN=${SENTRY_DSN}
+      - REDIS_URL=${REDIS_URL}
 
     build:
       context: .
@@ -88,6 +90,43 @@ services:
       # Enable www redirection for HTTP and HTTPS
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.middlewares=https-redirect,${STACK_NAME?Variable not set}-www-redirect
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-https.middlewares=${STACK_NAME?Variable not set}-www-redirect
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - default
+
+  worker:
+    build:
+      context: .
+      dockerfile: compose/backend/Dockerfile
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+    networks:
+      - default
+
+  beat:
+    build:
+      context: .
+      dockerfile: compose/backend/Dockerfile
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+    networks:
+      - default
 
 volumes:
   app-db-data:

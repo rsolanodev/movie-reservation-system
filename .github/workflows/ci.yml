@@ -24,7 +24,9 @@ jobs:
       SMTP_PASSWORD:
       EMAILS_FROM_EMAIL: noreply@example.com
       POSTGRES_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
       SENTRY_DSN:
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,6 +49,7 @@ jobs:
           echo "SMTP_PASSWORD=${{ env.SMTP_PASSWORD }}" >> .env
           echo "EMAILS_FROM_EMAIL=${{ env.EMAILS_FROM_EMAIL }}" >> .env
           echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
+          echo "REDIS_URL=${{ env.REDIS_URL }}" >> .env
           echo "SENTRY_DSN=${{ env.SENTRY_DSN }}" >> .env
 
       - name: Build and start services
