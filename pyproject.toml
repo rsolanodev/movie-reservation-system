@@ -5,7 +5,6 @@ description = "System that allows users to reserve movie tickets"
 authors = [
     {name = "rsolanodev", email = "rubensoljim@gmail.com"},
 ]
-readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "alembic>=1.13.3",
