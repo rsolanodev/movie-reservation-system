@@ -24,7 +24,7 @@ jobs:
       SMTP_PASSWORD:
       EMAILS_FROM_EMAIL: noreply@example.com
       POSTGRES_PORT: 5432
-      REDIS_URL: redis://localhost:6379/0
+      REDIS_URL: redis://redis:6379/0
       SENTRY_DSN:
 
     steps:

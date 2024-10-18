@@ -1,4 +1,6 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.11
+FROM python:3.11
+
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app/
 
@@ -35,3 +37,5 @@ RUN chmod +x /start-celeryworker
 COPY ./compose/backend/celery/beat/start /start-celerybeat
 RUN sed -i 's/\r//' /start-celerybeat
 RUN chmod +x /start-celerybeat
+
+CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
