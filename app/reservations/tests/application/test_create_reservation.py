@@ -49,6 +49,7 @@ class TestCreateReservation:
                 id=reservation.id,
                 user_id=UUID("1553d340-89eb-433b-a101-981bdaa740ed"),
                 showtime_id=UUID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
+                has_paid=False,
                 seats=Seats(
                     [
                         Seat(

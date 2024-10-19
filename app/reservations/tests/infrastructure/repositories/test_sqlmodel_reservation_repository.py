@@ -1,13 +1,16 @@
 from uuid import UUID
 
+import pytest
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
+from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat, SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
 from app.reservations.tests.builders.seat_builder_test import SeatBuilderTest
+from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
 
@@ -80,3 +83,37 @@ class TestSqlModelReservationRepository:
             Seat(id=seat_available.id, row=1, number=1, status=SeatStatus.AVAILABLE),
             Seat(id=seat_reserved.id, row=2, number=2, status=SeatStatus.RESERVED),
         ]
+
+    @pytest.mark.parametrize("has_paid", [False, True])
+    def test_get_reservation(self, session: Session, has_paid: bool) -> None:
+        reservation_model = (
+            SqlModelReservationBuilderTest(session)
+            .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
+            .with_user_id(UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
+            .with_showtime_id(UUID("ffa502e6-8869-490c-8799-5bea26c7146d"))
+            .with_has_paid(has_paid)
+            .build()
+        )
+
+        reservation = SqlModelReservationRepository(session).get(reservation_model.id)
+
+        assert reservation == Reservation(
+            id=UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
+            user_id=UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
+            showtime_id=UUID("ffa502e6-8869-490c-8799-5bea26c7146d"),
+            has_paid=has_paid,
+        )
+
+    def test_release_reservation(self, session: Session) -> None:
+        reservation_model = SqlModelReservationBuilderTest(session).build()
+        seat_model = (
+            SqlModelSeatBuilderTest(session)
+            .with_status(SeatStatus.RESERVED)
+            .with_reservation_id(reservation_model.id)
+            .build()
+        )
+
+        SqlModelReservationRepository(session).release(reservation_model.id)
+
+        assert seat_model.status == SeatStatus.AVAILABLE
+        assert seat_model.reservation_id is None

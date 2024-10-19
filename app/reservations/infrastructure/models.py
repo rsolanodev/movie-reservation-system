@@ -43,3 +43,6 @@ class ReservationModel(SQLModel, table=True):
     @classmethod
     def from_domain(cls, reservation: Reservation) -> "ReservationModel":
         return cls(id=reservation.id, user_id=reservation.user_id, showtime_id=reservation.showtime_id)
+
+    def to_domain(self) -> Reservation:
+        return Reservation(id=self.id, user_id=self.user_id, showtime_id=self.showtime_id, has_paid=self.has_paid)

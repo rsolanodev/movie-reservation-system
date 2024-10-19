@@ -8,7 +8,7 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlmodel import Session, SQLModel
 
 from app.auth.domain.token import Token
-from app.database import get_db
+from app.database import get_db_session
 from app.main import app
 from app.settings import settings
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
@@ -55,7 +55,7 @@ def client(session: Session) -> Generator[TestClient, None, None]:
     def override_get_session() -> Session:
         return session
 
-    app.dependency_overrides[get_db] = override_get_session
+    app.dependency_overrides[get_db_session] = override_get_session
 
     with TestClient(app) as client:
         yield client
