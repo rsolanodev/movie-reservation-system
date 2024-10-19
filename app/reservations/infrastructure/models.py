@@ -37,6 +37,7 @@ class ReservationModel(SQLModel, table=True):
     showtime: "ShowtimeModel" = Relationship(back_populates="reservations")
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
+    has_paid: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.now)
 
     @classmethod
