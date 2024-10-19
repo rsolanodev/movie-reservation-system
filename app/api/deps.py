@@ -6,11 +6,11 @@ from fastapi import Depends, HTTPException, security, status
 from jwt.exceptions import InvalidTokenError
 from sqlmodel import Session
 
-from app.database import get_db
+from app.database import get_db_session
 from app.settings import settings
 from app.users.infrastructure.models import UserModel
 
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Annotated[Session, Depends(get_db_session)]
 
 reusable_oauth2 = security.OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/access-token/")
 TokenDep = Annotated[str, Depends(reusable_oauth2)]

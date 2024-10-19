@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlmodel import select
+from sqlmodel import select, update
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
@@ -24,5 +24,19 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             seat_model.reservation_id = reservation.id
 
     def find_seats(self, seat_ids: list[UUID]) -> Seats:
-        seat_models = self._session.exec(select(SeatModel).filter(SeatModel.id.in_(seat_ids))).all()  # type: ignore
+        seat_models = self._session.exec(
+            select(SeatModel).filter(SeatModel.id.in_(seat_ids)),  # type: ignore
+        ).all()
         return Seats([seat_model.to_domain() for seat_model in seat_models])
+
+    def get(self, reservation_id: UUID) -> Reservation:
+        reservation_model = self._session.get_one(ReservationModel, reservation_id)
+        return reservation_model.to_domain()
+
+    def release(self, reservation_id: UUID) -> None:
+        self._session.exec(
+            update(SeatModel)
+            .where(SeatModel.reservation_id == reservation_id)  # type: ignore
+            .values(status=SeatStatus.AVAILABLE, reservation_id=None)
+        )
+        self._session.commit()
