@@ -32,10 +32,6 @@ ENV PYTHONPATH=/app
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 COPY ./app /app/app
 
-COPY ./compose/backend/entrypoint /entrypoint
-RUN sed -i 's/\r//' /entrypoint
-RUN chmod +x /entrypoint
-
 COPY ./compose/backend/start /start
 RUN sed -i 's/\r//' /start
 RUN chmod +x /start
@@ -54,5 +50,3 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
-
-ENTRYPOINT ["/entrypoint"]
