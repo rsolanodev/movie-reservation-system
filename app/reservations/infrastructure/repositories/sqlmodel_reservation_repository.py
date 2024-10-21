@@ -52,8 +52,8 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
                 joinedload(ReservationModel.showtime).joinedload(ShowtimeModel.movie),  # type: ignore
                 selectinload(ReservationModel.seats),  # type: ignore
             )
-            .filter(
-                ReservationModel.user_id == user_id,  # type: ignore
+            .where(
+                ReservationModel.user_id == user_id,
                 ReservationModel.seats.any(SeatModel.status == SeatStatus.OCCUPIED),  # type: ignore
             )
         ).all()
