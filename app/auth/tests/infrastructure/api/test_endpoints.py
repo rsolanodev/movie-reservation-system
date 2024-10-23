@@ -14,7 +14,7 @@ from app.auth.domain.token import Token, TokenType
 
 class TestAuthenticateUserEndpoint:
     @pytest.fixture
-    def mock_action(self) -> Generator[Mock, None, None]:
+    def mock_application(self) -> Generator[Mock, None, None]:
         with patch("app.auth.infrastructure.api.endpoints.Authenticate") as mock:
             yield mock
 
@@ -26,10 +26,10 @@ class TestAuthenticateUserEndpoint:
     def test_calls_action_and_returns_access_token(
         self,
         client: TestClient,
-        mock_action: Mock,
+        mock_application: Mock,
         mock_repository: Mock,
     ) -> None:
-        mock_action.return_value.execute.return_value = Token(
+        mock_application.return_value.execute.return_value = Token(
             access_token="access_token",
             token_type=TokenType.BEARER,
             expires_in=86400,
@@ -41,8 +41,10 @@ class TestAuthenticateUserEndpoint:
                 "password": "Passw0rd!",
             },
         )
-        mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(email="rubensoljim@gmail.com", password="Passw0rd!")
+        mock_application.assert_called_once_with(repository=mock_repository)
+        mock_application.return_value.execute.assert_called_once_with(
+            email="rubensoljim@gmail.com", password="Passw0rd!"
+        )
         assert response.status_code == 200
         assert response.json() == {
             "token_type": "bearer",
@@ -52,9 +54,9 @@ class TestAuthenticateUserEndpoint:
 
     @pytest.mark.parametrize("expected_exception", [UserDoesNotExist, IncorrectPassword])
     def test_returns_400_when_is_incorrect_email_or_password(
-        self, client: TestClient, mock_action: Mock, expected_exception: Exception
+        self, client: TestClient, mock_application: Mock, expected_exception: Exception
     ) -> None:
-        mock_action.return_value.execute.side_effect = expected_exception
+        mock_application.return_value.execute.side_effect = expected_exception
 
         response = client.post(
             "api/v1/auth/access-token/",
@@ -67,8 +69,8 @@ class TestAuthenticateUserEndpoint:
         assert response.status_code == 400
         assert response.json()["detail"] == "Incorrect email or password"
 
-    def test_returns_400_when_user_is_inactive(self, client: TestClient, mock_action: Mock) -> None:
-        mock_action.return_value.execute.side_effect = UserInactive
+    def test_returns_400_when_user_is_inactive(self, client: TestClient, mock_application: Mock) -> None:
+        mock_application.return_value.execute.side_effect = UserInactive
 
         response = client.post(
             "api/v1/auth/access-token/",
