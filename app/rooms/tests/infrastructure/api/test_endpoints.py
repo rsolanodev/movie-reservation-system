@@ -9,7 +9,7 @@ from app.rooms.application.create_room import CreateRoomParams
 
 class TestCreateRoomEndpoint:
     @pytest.fixture
-    def mock_action(self) -> Generator[Mock, None, None]:
+    def mock_application(self) -> Generator[Mock, None, None]:
         with patch("app.rooms.infrastructure.api.endpoints.CreateRoom") as mock:
             yield mock
 
@@ -21,7 +21,7 @@ class TestCreateRoomEndpoint:
     def test_returns_201_and_calls_action(
         self,
         client: TestClient,
-        mock_action: Mock,
+        mock_application: Mock,
         mock_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
@@ -34,8 +34,8 @@ class TestCreateRoomEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_action.assert_called_once_with(repository=mock_repository)
-        mock_action.return_value.execute.assert_called_once_with(
+        mock_application.assert_called_once_with(repository=mock_repository)
+        mock_application.return_value.execute.assert_called_once_with(
             params=CreateRoomParams(
                 name="Room 1",
                 seat_configuration=[{"row": 1, "number": 1}],
@@ -47,7 +47,7 @@ class TestCreateRoomEndpoint:
     def test_returns_401_when_user_is_not_authenticated(
         self,
         client: TestClient,
-        mock_action: Mock,
+        mock_application: Mock,
         mock_repository: Mock,
     ) -> None:
         response = client.post(
@@ -58,7 +58,7 @@ class TestCreateRoomEndpoint:
             },
         )
 
-        mock_action.assert_not_called()
+        mock_application.assert_not_called()
         mock_repository.assert_not_called()
 
         assert response.status_code == 401
@@ -67,7 +67,7 @@ class TestCreateRoomEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_action: Mock,
+        mock_application: Mock,
         mock_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
@@ -80,7 +80,7 @@ class TestCreateRoomEndpoint:
             headers=user_token_headers,
         )
 
-        mock_action.assert_not_called()
+        mock_application.assert_not_called()
         mock_repository.assert_not_called()
 
         assert response.status_code == 403
