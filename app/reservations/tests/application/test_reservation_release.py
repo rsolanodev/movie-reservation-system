@@ -10,21 +10,21 @@ from app.reservations.tests.builders.reservation_builder_test import Reservation
 
 class TestReservationRelease:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(ReservationRepository, instance=True)
+    def mock_reservation_repository(self) -> Any:
+        return create_autospec(spec=ReservationRepository, instance=True, spec_set=True)
 
-    def test_releases_reservation_when_has_been_paid(self, mock_repository: Mock) -> None:
+    def test_releases_reservation_when_has_been_paid(self, mock_reservation_repository: Mock) -> None:
         expected_reservation = ReservationBuilderTest().with_has_paid(True).build()
-        mock_repository.get.return_value = expected_reservation
+        mock_reservation_repository.get.return_value = expected_reservation
 
-        ReservationRelease(repository=mock_repository).execute(reservation_id=expected_reservation.id)
+        ReservationRelease(repository=mock_reservation_repository).execute(reservation_id=expected_reservation.id)
 
-        mock_repository.release.assert_called_once_with(expected_reservation.id)
+        mock_reservation_repository.release.assert_called_once_with(expected_reservation.id)
 
-    def test_does_not_release_reservation_when_has_not_been_paid(self, mock_repository: Mock) -> None:
+    def test_does_not_release_reservation_when_has_not_been_paid(self, mock_reservation_repository: Mock) -> None:
         expected_reservation = ReservationBuilderTest().with_has_paid(False).build()
-        mock_repository.get.return_value = expected_reservation
+        mock_reservation_repository.get.return_value = expected_reservation
 
-        ReservationRelease(repository=mock_repository).execute(reservation_id=expected_reservation.id)
+        ReservationRelease(repository=mock_reservation_repository).execute(reservation_id=expected_reservation.id)
 
-        mock_repository.release.assert_not_called()
+        mock_reservation_repository.release.assert_not_called()

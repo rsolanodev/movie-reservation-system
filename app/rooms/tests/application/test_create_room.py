@@ -10,14 +10,14 @@ from app.rooms.domain.room import Room
 
 class TestCreateRoom:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(RoomRepository, instance=True)
+    def mock_room_repository(self) -> Any:
+        return create_autospec(spec=RoomRepository, instance=True, spec_set=True)
 
-    def test_creates_room(self, mock_repository: Mock) -> None:
-        CreateRoom(repository=mock_repository).execute(
+    def test_creates_room(self, mock_room_repository: Mock) -> None:
+        CreateRoom(repository=mock_room_repository).execute(
             params=CreateRoomParams(name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
         )
 
-        mock_repository.create.assert_called_once_with(
+        mock_room_repository.create.assert_called_once_with(
             room=Room(id=ANY, name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
         )

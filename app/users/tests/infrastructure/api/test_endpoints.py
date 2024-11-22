@@ -11,19 +11,19 @@ from app.users.domain.exceptions import UserAlreadyExists
 
 class TestCreateUserEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_create_user(self) -> Generator[Mock, None, None]:
         with patch("app.users.infrastructure.api.endpoints.CreateUser") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_user_repository(self) -> Generator[Mock, None, None]:
         with patch("app.users.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
             yield mock.return_value
 
-    def test_returns_201_and_calls_action_and_returns_result(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+    def test_returns_201_and_calls_create_user(
+        self, client: TestClient, mock_create_user: Mock, mock_user_repository: Mock
     ) -> None:
-        mock_application.return_value.execute.return_value = UserFactoryTest().create()
+        mock_create_user.return_value.execute.return_value = UserFactoryTest().create()
 
         response = client.post(
             "api/v1/users/",
@@ -34,8 +34,8 @@ class TestCreateUserEndpoint:
             },
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_create_user.assert_called_once_with(repository=mock_user_repository)
+        mock_create_user.return_value.execute.assert_called_once_with(
             params=CreateUserParams(
                 email="rubensoljim@gmail.com",
                 password="Passw0rd!",
@@ -52,8 +52,8 @@ class TestCreateUserEndpoint:
             "is_superuser": False,
         }
 
-    def test_returns_400_when_user_already_exists(self, client: TestClient, mock_application: Mock) -> None:
-        mock_application.return_value.execute.side_effect = UserAlreadyExists
+    def test_returns_400_when_user_already_exists(self, client: TestClient, mock_create_user: Mock) -> None:
+        mock_create_user.return_value.execute.side_effect = UserAlreadyExists
 
         response = client.post(
             "api/v1/users/",

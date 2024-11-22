@@ -12,24 +12,24 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 class TestDeleteMovie:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
-    def test_deletes_movie(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = (
+    def test_deletes_movie(self, mock_movie_repository: Mock) -> None:
+        mock_movie_repository.get.return_value = (
             MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
-        DeleteMovie(repository=mock_repository).execute(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        DeleteMovie(repository=mock_movie_repository).execute(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
-        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-        mock_repository.delete.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.delete.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
-    def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
-        mock_repository.get.return_value = None
+    def test_raise_exception_when_movie_does_not_exist(self, mock_movie_repository: Mock) -> None:
+        mock_movie_repository.get.return_value = None
 
         with pytest.raises(MovieDoesNotExist):
-            DeleteMovie(repository=mock_repository).execute(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            DeleteMovie(repository=mock_movie_repository).execute(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
-        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-        mock_repository.delete.assert_not_called()
+        mock_movie_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.delete.assert_not_called()

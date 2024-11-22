@@ -13,21 +13,21 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 class TestAddMovieGenre:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
-    def test_adds_genre_to_movie(self, mock_repository: Mock) -> None:
+    def test_adds_genre_to_movie(self, mock_movie_repository: Mock) -> None:
         movie = MovieBuilder().build()
         genre = GenreFactoryTest().create(name="Action")
 
-        mock_repository.get.return_value = movie
+        mock_movie_repository.get.return_value = movie
 
-        AddMovieGenre(repository=mock_repository).execute(movie_id=movie.id, genre_id=genre.id)
+        AddMovieGenre(repository=mock_movie_repository).execute(movie_id=movie.id, genre_id=genre.id)
 
-        mock_repository.get.assert_called_once_with(id=movie.id)
-        mock_repository.add_genre.assert_called_once_with(movie_id=movie.id, genre_id=genre.id)
+        mock_movie_repository.get.assert_called_once_with(id=movie.id)
+        mock_movie_repository.add_genre.assert_called_once_with(movie_id=movie.id, genre_id=genre.id)
 
-    def test_raise_exception_when_genre_is_already_assigned_in_movie(self, mock_repository: Mock) -> None:
+    def test_raise_exception_when_genre_is_already_assigned_in_movie(self, mock_movie_repository: Mock) -> None:
         movie = (
             MovieBuilder()
             .with_genre(
@@ -39,12 +39,12 @@ class TestAddMovieGenre:
             .build()
         )
 
-        mock_repository.get.return_value = movie
+        mock_movie_repository.get.return_value = movie
 
         with pytest.raises(GenreAlreadyAssigned):
-            AddMovieGenre(repository=mock_repository).execute(
+            AddMovieGenre(repository=mock_movie_repository).execute(
                 movie_id=movie.id, genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9")
             )
 
-        mock_repository.get.assert_called_once_with(id=movie.id)
-        mock_repository.add_genre.assert_not_called()
+        mock_movie_repository.get.assert_called_once_with(id=movie.id)
+        mock_movie_repository.add_genre.assert_not_called()

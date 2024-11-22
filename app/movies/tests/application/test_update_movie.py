@@ -14,8 +14,8 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 class TestUpdateMovie:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
     @pytest.fixture
     def movie(self) -> Movie:
@@ -36,10 +36,10 @@ class TestUpdateMovie:
             content_type="image/jpeg",
         )
 
-    def test_updates_movie(self, mock_repository: Mock, movie: Movie, poster_image: PosterImage) -> None:
-        mock_repository.get.return_value = movie
+    def test_updates_movie(self, mock_movie_repository: Mock, movie: Movie, poster_image: PosterImage) -> None:
+        mock_movie_repository.get.return_value = movie
 
-        movie = UpdateMovie(repository=mock_repository).execute(
+        movie = UpdateMovie(repository=mock_movie_repository).execute(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="The Super Mario Bros. Movie",
@@ -48,17 +48,17 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-        mock_repository.save.assert_called_once_with(movie=movie)
+        mock_movie_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "The Super Mario Bros. Movie"
         assert movie.description == "An animated adaptation of the video game."
         assert movie.poster_image == "super_mario_bros.jpg"
 
-    def test_does_not_update_movie_when_params_are_none(self, mock_repository: Mock, movie: Movie) -> None:
-        mock_repository.get.return_value = movie
+    def test_does_not_update_movie_when_params_are_none(self, mock_movie_repository: Mock, movie: Movie) -> None:
+        mock_movie_repository.get.return_value = movie
 
-        movie = UpdateMovie(repository=mock_repository).execute(
+        movie = UpdateMovie(repository=mock_movie_repository).execute(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title=None,
@@ -67,18 +67,20 @@ class TestUpdateMovie:
             )
         )
 
-        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-        mock_repository.save.assert_called_once_with(movie=movie)
+        mock_movie_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == "Deadpool and a variant of Wolverine."
         assert movie.poster_image == "deadpool_and_wolverine.jpg"
 
-    def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock, poster_image: PosterImage) -> None:
-        mock_repository.get.return_value = None
+    def test_raise_exception_when_movie_does_not_exist(
+        self, mock_movie_repository: Mock, poster_image: PosterImage
+    ) -> None:
+        mock_movie_repository.get.return_value = None
 
         with pytest.raises(MovieDoesNotExist):
-            UpdateMovie(repository=mock_repository).execute(
+            UpdateMovie(repository=mock_movie_repository).execute(
                 params=UpdateMovieParams(
                     id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                     title="The Super Mario Bros. Movie",
@@ -87,5 +89,5 @@ class TestUpdateMovie:
                 )
             )
 
-        mock_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-        mock_repository.save.assert_not_called()
+        mock_movie_repository.get.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_movie_repository.save.assert_not_called()

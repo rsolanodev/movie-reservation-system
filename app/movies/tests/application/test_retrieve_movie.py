@@ -24,11 +24,11 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 @freeze_time("2023-04-03T22:00:00Z")
 class TestRetrieveMovie:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
-    def test_retrieves_movie(self, mock_repository: Mock) -> None:
-        mock_repository.get_movie_for_date.return_value = (
+    def test_retrieves_movie(self, mock_movie_repository: Mock) -> None:
+        mock_movie_repository.get_movie_for_date.return_value = (
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_title("The Super Mario Bros. Movie")
@@ -49,14 +49,14 @@ class TestRetrieveMovie:
             .build()
         )
 
-        movie = RetrieveMovie(repository=mock_repository).execute(
+        movie = RetrieveMovie(repository=mock_movie_repository).execute(
             params=RetrieveMovieParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=date(2023, 4, 3),
             )
         )
 
-        mock_repository.get_movie_for_date.assert_called_once_with(
+        mock_movie_repository.get_movie_for_date.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             showtime_date=date(2023, 4, 3),
         )
@@ -76,18 +76,18 @@ class TestRetrieveMovie:
             ),
         )
 
-    def test_raise_exception_when_movie_does_not_exist(self, mock_repository: Mock) -> None:
-        mock_repository.get_movie_for_date.return_value = None
+    def test_raise_exception_when_movie_does_not_exist(self, mock_movie_repository: Mock) -> None:
+        mock_movie_repository.get_movie_for_date.return_value = None
 
         with pytest.raises(MovieDoesNotExist):
-            RetrieveMovie(repository=mock_repository).execute(
+            RetrieveMovie(repository=mock_movie_repository).execute(
                 params=RetrieveMovieParams(
                     movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                     showtime_date=date(2023, 4, 3),
                 )
             )
 
-        mock_repository.get_movie_for_date.assert_called_once_with(
+        mock_movie_repository.get_movie_for_date.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             showtime_date=date(2023, 4, 3),
         )

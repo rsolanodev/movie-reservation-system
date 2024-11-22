@@ -12,15 +12,15 @@ from app.movies.domain.repositories.movie_repository import MovieRepository
 
 class TestCreateMovie:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
-    def test_creates_movie(self, mock_repository: Mock) -> None:
+    def test_creates_movie(self, mock_movie_repository: Mock) -> None:
         poster_image = UploadFile(
             file=tempfile.NamedTemporaryFile(),  # type: ignore
             filename="poster_image.jpg",
         )
-        movie = CreateMovie(repository=mock_repository).execute(
+        movie = CreateMovie(repository=mock_movie_repository).execute(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description=(
@@ -36,7 +36,7 @@ class TestCreateMovie:
             )
         )
 
-        mock_repository.save.assert_called_once_with(movie=movie)
+        mock_movie_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == (
@@ -46,8 +46,8 @@ class TestCreateMovie:
         )
         assert movie.poster_image == "poster_image.jpg"
 
-    def test_creates_movie_without_poster_image(self, mock_repository: Mock) -> None:
-        movie = CreateMovie(repository=mock_repository).execute(
+    def test_creates_movie_without_poster_image(self, mock_movie_repository: Mock) -> None:
+        movie = CreateMovie(repository=mock_movie_repository).execute(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description=(
@@ -59,7 +59,7 @@ class TestCreateMovie:
             )
         )
 
-        mock_repository.save.assert_called_once_with(movie=movie)
+        mock_movie_repository.save.assert_called_once_with(movie=movie)
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == (
