@@ -13,13 +13,13 @@ from app.showtimes.domain.showtime import Showtime
 
 class TestCreateShowtime:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(ShowtimeRepository, instance=True)
+    def mock_showtime_repository(self) -> Any:
+        return create_autospec(spec=ShowtimeRepository, instance=True, spec_set=True)
 
-    def test_creates_showtime(self, mock_repository: Mock) -> None:
-        mock_repository.exists.return_value = False
+    def test_creates_showtime(self, mock_showtime_repository: Mock) -> None:
+        mock_showtime_repository.exists.return_value = False
 
-        CreateShowtime(repository=mock_repository).execute(
+        CreateShowtime(repository=mock_showtime_repository).execute(
             params=CreateShowtimeParams(
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -27,7 +27,7 @@ class TestCreateShowtime:
             )
         )
 
-        mock_repository.exists.assert_called_once_with(
+        mock_showtime_repository.exists.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -35,7 +35,7 @@ class TestCreateShowtime:
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
-        mock_repository.create.assert_called_once_with(
+        mock_showtime_repository.create.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -44,11 +44,11 @@ class TestCreateShowtime:
             )
         )
 
-    def test_does_not_create_showtime_when_exists(self, mock_repository: Mock) -> None:
-        mock_repository.exists.return_value = True
+    def test_does_not_create_showtime_when_exists(self, mock_showtime_repository: Mock) -> None:
+        mock_showtime_repository.exists.return_value = True
 
         with pytest.raises(ShowtimeAlreadyExists):
-            CreateShowtime(repository=mock_repository).execute(
+            CreateShowtime(repository=mock_showtime_repository).execute(
                 params=CreateShowtimeParams(
                     movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                     room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -56,7 +56,7 @@ class TestCreateShowtime:
                 )
             )
 
-        mock_repository.exists.assert_called_once_with(
+        mock_showtime_repository.exists.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
                 movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -64,4 +64,4 @@ class TestCreateShowtime:
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
-        mock_repository.create.assert_not_called()
+        mock_showtime_repository.create.assert_not_called()

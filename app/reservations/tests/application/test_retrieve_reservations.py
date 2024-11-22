@@ -12,10 +12,10 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 
 class TestRetrieveReservations:
     @pytest.fixture
-    def mock_repostory(self) -> Any:
-        return create_autospec(ReservationRepository, spec_set=True)
+    def mock_reservation_repository(self) -> Any:
+        return create_autospec(spec=ReservationRepository, instance=True, spec_set=True)
 
-    def test_retrieve_reservations(self, mock_repostory: Mock) -> None:
+    def test_retrieve_reservations(self, mock_reservation_repository: Mock) -> None:
         expected_movie_reservation = [
             MovieReservation(
                 reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
@@ -38,12 +38,14 @@ class TestRetrieveReservations:
                 seats=[ReservedSeat(row=3, number=4)],
             ),
         ]
-        mock_repostory.find_by_user_id.return_value = expected_movie_reservation
+        mock_reservation_repository.find_by_user_id.return_value = expected_movie_reservation
 
-        movie_reservations = RetrieveReservations(repository=mock_repostory).execute(
+        movie_reservations = RetrieveReservations(repository=mock_reservation_repository).execute(
             user_id=UUID("123e4567-e89b-12d3-a456-426614174000")
         )
 
-        mock_repostory.find_by_user_id.assert_called_once_with(user_id=UUID("123e4567-e89b-12d3-a456-426614174000"))
+        mock_reservation_repository.find_by_user_id.assert_called_once_with(
+            user_id=UUID("123e4567-e89b-12d3-a456-426614174000")
+        )
 
         assert movie_reservations == expected_movie_reservation

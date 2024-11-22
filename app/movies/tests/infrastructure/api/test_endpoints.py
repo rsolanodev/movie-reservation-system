@@ -27,23 +27,23 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 class TestCreateMovieEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_create_movie(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.CreateMovie") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_201_and_calls_action(
+    def test_returns_201_and_calls_create_movie(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = (
+        mock_create_movie.return_value.execute.return_value = (
             MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
@@ -57,8 +57,8 @@ class TestCreateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_create_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_create_movie.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
@@ -78,14 +78,14 @@ class TestCreateMovieEndpoint:
             "poster_image": "deadpool_and_wolverine.jpg",
         }
 
-    def test_returns_201_and_calls_action_when_does_not_have_poster_image(
+    def test_returns_201_and_calls_create_movie_when_does_not_have_poster_image(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = (
+        mock_create_movie.return_value.execute.return_value = (
             MovieBuilder().with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).without_poster_image().build()
         )
 
@@ -98,8 +98,8 @@ class TestCreateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_create_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_create_movie.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
@@ -118,8 +118,8 @@ class TestCreateMovieEndpoint:
     def test_returns_401_when_user_is_not_authenticated(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_movie: Mock,
+        mock_movie_repository: Mock,
     ) -> None:
         response = client.post(
             "api/v1/movies/",
@@ -129,8 +129,8 @@ class TestCreateMovieEndpoint:
             },
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_create_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -138,8 +138,8 @@ class TestCreateMovieEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_movie: Mock,
+        mock_movie_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.post(
@@ -151,8 +151,8 @@ class TestCreateMovieEndpoint:
             headers=user_token_headers,
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_create_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -160,12 +160,12 @@ class TestCreateMovieEndpoint:
 
 class TestUpdateMovieEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_update_movie(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.UpdateMovie") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
@@ -180,15 +180,15 @@ class TestUpdateMovieEndpoint:
             .build()
         )
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_update_movie(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_update_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
-        mock_application.return_value.execute.return_value = movie
+        mock_update_movie.return_value.execute.return_value = movie
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -200,8 +200,8 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
@@ -222,23 +222,23 @@ class TestUpdateMovieEndpoint:
             "poster_image": "deadpool_and_wolverine.jpg",
         }
 
-    def test_returns_200_and_calls_action_when_data_is_not_sent(
+    def test_returns_200_and_calls_update_movie_when_data_is_not_sent(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_update_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
-        mock_application.return_value.execute.return_value = movie
+        mock_update_movie.return_value.execute.return_value = movie
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title=None,
@@ -258,11 +258,11 @@ class TestUpdateMovieEndpoint:
     def test_returns_404_when_movie_does_not_exist(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_update_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.side_effect = MovieDoesNotExist
+        mock_update_movie.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -273,8 +273,8 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
@@ -287,7 +287,7 @@ class TestUpdateMovieEndpoint:
         assert response.json() == {"detail": "The movie does not exist"}
 
     def test_returns_401_when_user_is_not_authenticated(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+        self, client: TestClient, mock_update_movie: Mock, mock_movie_repository: Mock
     ) -> None:
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -297,8 +297,8 @@ class TestUpdateMovieEndpoint:
             },
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_update_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -306,8 +306,8 @@ class TestUpdateMovieEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_update_movie: Mock,
+        mock_movie_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.patch(
@@ -319,8 +319,8 @@ class TestUpdateMovieEndpoint:
             headers=user_token_headers,
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_update_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -328,50 +328,50 @@ class TestUpdateMovieEndpoint:
 
 class TestDeleteMovieEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_delete_movie(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.DeleteMovie") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_delete_movie(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = None
+        mock_delete_movie.return_value.execute.return_value = None
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_delete_movie.return_value.execute.assert_called_once_with(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
         assert response.status_code == 200
 
     def test_returns_404_when_movie_does_not_exist(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_movie: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.side_effect = MovieDoesNotExist
+        mock_delete_movie.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_delete_movie.return_value.execute.assert_called_once_with(
             id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
         )
 
@@ -381,15 +381,15 @@ class TestDeleteMovieEndpoint:
     def test_returns_401_when_user_is_not_authenticated(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_movie: Mock,
+        mock_movie_repository: Mock,
     ) -> None:
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_delete_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -397,8 +397,8 @@ class TestDeleteMovieEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_movie: Mock,
+        mock_movie_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.delete(
@@ -406,8 +406,8 @@ class TestDeleteMovieEndpoint:
             headers=user_token_headers,
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_delete_movie.assert_not_called()
+        mock_movie_repository.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -415,26 +415,26 @@ class TestDeleteMovieEndpoint:
 
 class TestRetrieveGenresEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_retrieve_genres(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.RetrieveGenres") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_genre_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelGenreRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_retrieve_genres(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_retrieve_genres: Mock,
+        mock_genre_repository: Mock,
     ) -> None:
         action_genre = Genre.create(name="Action")
         adventure_genre = Genre.create(name="Adventure")
         comedy_genre = Genre.create(name="Comedy")
 
-        mock_application.return_value.execute.return_value = [
+        mock_retrieve_genres.return_value.execute.return_value = [
             action_genre,
             adventure_genre,
             comedy_genre,
@@ -442,8 +442,8 @@ class TestRetrieveGenresEndpoint:
 
         response = client.get("api/v1/movies/genres/")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once()
+        mock_retrieve_genres.assert_called_once_with(repository=mock_genre_repository)
+        mock_retrieve_genres.return_value.execute.assert_called_once()
 
         assert response.status_code == 200
         assert response.json() == [
@@ -455,23 +455,23 @@ class TestRetrieveGenresEndpoint:
 
 class TestAddMovieGenreEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_add_movie_genre(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.AddMovieGenre") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_add_movie_genre(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_add_movie_genre: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = None
+        mock_add_movie_genre.return_value.execute.return_value = None
 
         response = client.post(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
@@ -480,22 +480,22 @@ class TestAddMovieGenreEndpoint:
         )
         assert response.status_code == 200
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_add_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 200
 
-    def test_returns_400_and_calls_action_when_genre_already_assigned(
+    def test_returns_400_and_calls_add_movie_genre_when_genre_already_assigned(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_add_movie_genre: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.side_effect = GenreAlreadyAssigned
+        mock_add_movie_genre.return_value.execute.side_effect = GenreAlreadyAssigned
 
         response = client.post(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/",
@@ -503,8 +503,8 @@ class TestAddMovieGenreEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_add_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
@@ -515,23 +515,23 @@ class TestAddMovieGenreEndpoint:
 
 class TestRemoveMovieGenreEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_remove_movie_genre(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.RemoveMovieGenre") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_remove_movie_genre(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_remove_movie_genre: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = None
+        mock_remove_movie_genre.return_value.execute.return_value = None
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e/",
@@ -539,30 +539,30 @@ class TestRemoveMovieGenreEndpoint:
         )
         assert response.status_code == 200
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_remove_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 200
 
-    def test_returns_400_and_calls_action_when_genre_not_assigned(
+    def test_returns_400_and_calls_remove_movie_genre_when_genre_not_assigned(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_remove_movie_genre: Mock,
+        mock_movie_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.side_effect = GenreNotAssigned
+        mock_remove_movie_genre.return_value.execute.side_effect = GenreNotAssigned
 
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/genres/2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e/",
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_remove_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=UUID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
@@ -573,22 +573,22 @@ class TestRemoveMovieGenreEndpoint:
 
 class TestRetrieveMovieEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_retrieve_movie(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.RetrieveMovie") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_retrieve_movie(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_retrieve_movie: Mock,
+        mock_movie_repository: Mock,
     ) -> None:
-        mock_application.return_value.execute.return_value = (
+        mock_retrieve_movie.return_value.execute.return_value = (
             MovieBuilder()
             .with_id(id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
@@ -614,8 +614,8 @@ class TestRetrieveMovieEndpoint:
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=date(2023, 4, 3),
@@ -643,15 +643,15 @@ class TestRetrieveMovieEndpoint:
     def test_returns_404_when_movie_does_not_exist(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_retrieve_movie: Mock,
+        mock_movie_repository: Mock,
     ) -> None:
-        mock_application.return_value.execute.side_effect = MovieDoesNotExist
+        mock_retrieve_movie.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=date(2023, 4, 3),
@@ -664,19 +664,19 @@ class TestRetrieveMovieEndpoint:
 
 class TestRetrieveMoviesEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_retrieve_movies(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.RetrieveMovies") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+    def test_returns_200_and_calls_retrieve_movies(
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
     ) -> None:
-        mock_application.return_value.execute.return_value = [
+        mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_title("Deadpool & Wolverine")
@@ -709,8 +709,8 @@ class TestRetrieveMoviesEndpoint:
 
         response = client.get("api/v1/movies/?available_date=2023-04-03")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.return_value.execute.assert_called_once_with(
             params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
         )
 
@@ -744,10 +744,10 @@ class TestRetrieveMoviesEndpoint:
             },
         ]
 
-    def test_returns_200_and_calls_action_with_genre_filter(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+    def test_returns_200_and_calls_retrieve_movies_with_genre_filter(
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
     ) -> None:
-        mock_application.return_value.execute.return_value = [
+        mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_genre(genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
@@ -762,8 +762,8 @@ class TestRetrieveMoviesEndpoint:
 
         response = client.get("api/v1/movies/?available_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.return_value.execute.assert_called_once_with(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
                 genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
@@ -788,14 +788,14 @@ class TestRetrieveMoviesEndpoint:
         ]
 
     def test_returns_empty_list_when_no_movies(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
     ) -> None:
-        mock_application.return_value.execute.return_value = []
+        mock_retrieve_movies.return_value.execute.return_value = []
 
         response = client.get("api/v1/movies/?available_date=2023-04-03")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.return_value.execute.assert_called_once_with(
             params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
         )
 

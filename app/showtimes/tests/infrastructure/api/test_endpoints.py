@@ -13,20 +13,20 @@ from app.showtimes.domain.seat import Seat, SeatStatus
 
 class TestCreateShowtimeEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_create_showtime(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.CreateShowtime") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_showtime_repository(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
             yield mock.return_value
 
-    def test_returns_201_and_calls_action(
+    def test_returns_201_and_calls_create_showtime(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_showtime: Mock,
+        mock_showtime_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         response = client.post(
@@ -39,8 +39,8 @@ class TestCreateShowtimeEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_create_showtime.assert_called_once_with(repository=mock_showtime_repository)
+        mock_create_showtime.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -53,11 +53,11 @@ class TestCreateShowtimeEndpoint:
     def test_returns_400_when_showtime_already_exists(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_showtime: Mock,
+        mock_showtime_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.side_effect = ShowtimeAlreadyExists
+        mock_create_showtime.return_value.execute.side_effect = ShowtimeAlreadyExists
 
         response = client.post(
             "api/v1/showtimes/",
@@ -69,8 +69,8 @@ class TestCreateShowtimeEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_create_showtime.assert_called_once_with(repository=mock_showtime_repository)
+        mock_create_showtime.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
                 movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
@@ -84,8 +84,8 @@ class TestCreateShowtimeEndpoint:
     def test_returns_401_when_user_is_not_authenticated(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_showtime: Mock,
+        mock_showtime_repository: Mock,
     ) -> None:
         response = client.post(
             "api/v1/showtimes/",
@@ -96,8 +96,8 @@ class TestCreateShowtimeEndpoint:
             },
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_create_showtime.assert_not_called()
+        mock_showtime_repository.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -105,8 +105,8 @@ class TestCreateShowtimeEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_create_showtime: Mock,
+        mock_showtime_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.post(
@@ -119,8 +119,8 @@ class TestCreateShowtimeEndpoint:
             headers=user_token_headers,
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_create_showtime.assert_not_called()
+        mock_showtime_repository.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -128,31 +128,31 @@ class TestCreateShowtimeEndpoint:
 
 class TestDeleteShowtimeEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_delete_showtime(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.DeleteShowtime") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_showtime_repository(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
+    def test_returns_200_and_calls_delete_showtime(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_showtime: Mock,
+        mock_showtime_repository: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
-        mock_application.return_value.execute.return_value = None
+        mock_delete_showtime.return_value.execute.return_value = None
 
         response = client.delete(
             "api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
             headers=superuser_token_headers,
         )
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_delete_showtime.assert_called_once_with(repository=mock_showtime_repository)
+        mock_delete_showtime.return_value.execute.assert_called_once_with(
             showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
 
@@ -161,15 +161,15 @@ class TestDeleteShowtimeEndpoint:
     def test_returns_401_when_user_is_not_authenticated(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_showtime: Mock,
+        mock_showtime_repository: Mock,
     ) -> None:
         response = client.delete(
             "api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_delete_showtime.assert_not_called()
+        mock_showtime_repository.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -177,8 +177,8 @@ class TestDeleteShowtimeEndpoint:
     def test_returns_403_when_user_is_not_superuser(
         self,
         client: TestClient,
-        mock_application: Mock,
-        mock_repository: Mock,
+        mock_delete_showtime: Mock,
+        mock_showtime_repository: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.delete(
@@ -186,8 +186,8 @@ class TestDeleteShowtimeEndpoint:
             headers=user_token_headers,
         )
 
-        mock_application.assert_not_called()
-        mock_repository.assert_not_called()
+        mock_delete_showtime.assert_not_called()
+        mock_showtime_repository.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -195,19 +195,19 @@ class TestDeleteShowtimeEndpoint:
 
 class TestRetrieveSeatsEndpoint:
     @pytest.fixture
-    def mock_application(self) -> Generator[Mock, None, None]:
+    def mock_retrieve_seats(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.RetrieveSeats") as mock:
             yield mock
 
     @pytest.fixture
-    def mock_repository(self) -> Generator[Mock, None, None]:
+    def mock_showtime_repository(self) -> Generator[Mock, None, None]:
         with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_action(
-        self, client: TestClient, mock_application: Mock, mock_repository: Mock
+    def test_returns_200_and_calls_retrieve_seats(
+        self, client: TestClient, mock_retrieve_seats: Mock, mock_showtime_repository: Mock
     ) -> None:
-        mock_application.return_value.execute.return_value = [
+        mock_retrieve_seats.return_value.execute.return_value = [
             Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=1, status=SeatStatus.AVAILABLE),
             Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"), row=1, number=2, status=SeatStatus.RESERVED),
             Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e602"), row=2, number=1, status=SeatStatus.OCCUPIED),
@@ -215,8 +215,8 @@ class TestRetrieveSeatsEndpoint:
 
         response = client.get("api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/seats/")
 
-        mock_application.assert_called_once_with(repository=mock_repository)
-        mock_application.return_value.execute.assert_called_once_with(
+        mock_retrieve_seats.assert_called_once_with(repository=mock_showtime_repository)
+        mock_retrieve_seats.return_value.execute.assert_called_once_with(
             showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
 

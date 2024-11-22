@@ -21,8 +21,8 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 @freeze_time("2023-04-03T22:00:00Z")
 class TestRetrieveMovies:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(MovieRepository, instance=True)
+    def mock_movie_repository(self) -> Any:
+        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
     @pytest.fixture
     def movies(self) -> list[Movie]:
@@ -57,14 +57,14 @@ class TestRetrieveMovies:
             .build(),
         ]
 
-    def test_retrieves_available_movies_for_date(self, mock_repository: Mock, movies: list[Movie]) -> None:
-        mock_repository.get_available_movies_for_date.return_value = movies
+    def test_retrieves_available_movies_for_date(self, mock_movie_repository: Mock, movies: list[Movie]) -> None:
+        mock_movie_repository.get_available_movies_for_date.return_value = movies
 
-        data = RetrieveMovies(repository=mock_repository).execute(
+        data = RetrieveMovies(repository=mock_movie_repository).execute(
             params=RetrieveMoviesParams(available_date=date(2023, 4, 3))
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
+        mock_movie_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == [
             Movie(
@@ -107,18 +107,18 @@ class TestRetrieveMovies:
         ]
 
     def test_retrieves_available_movies_for_date_filtered_by_genre(
-        self, mock_repository: Mock, movies: list[Movie]
+        self, mock_movie_repository: Mock, movies: list[Movie]
     ) -> None:
-        mock_repository.get_available_movies_for_date.return_value = movies
+        mock_movie_repository.get_available_movies_for_date.return_value = movies
 
-        data = RetrieveMovies(repository=mock_repository).execute(
+        data = RetrieveMovies(repository=mock_movie_repository).execute(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
                 genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
+        mock_movie_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == [
             Movie(
@@ -139,17 +139,17 @@ class TestRetrieveMovies:
         ]
 
     def test_retrieves_available_movies_for_date_filtered_by_genre_that_does_not_exist(
-        self, mock_repository: Mock, movies: list[Movie]
+        self, mock_movie_repository: Mock, movies: list[Movie]
     ) -> None:
-        mock_repository.get_available_movies_for_date.return_value = movies
+        mock_movie_repository.get_available_movies_for_date.return_value = movies
 
-        data = RetrieveMovies(repository=mock_repository).execute(
+        data = RetrieveMovies(repository=mock_movie_repository).execute(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
                 genre_id=UUID("b108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
 
-        mock_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
+        mock_movie_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == []

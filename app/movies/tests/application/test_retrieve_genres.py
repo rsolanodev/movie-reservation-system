@@ -10,17 +10,17 @@ from app.movies.domain.repositories.genre_repository import GenreRepository
 
 class TestRetrieveGenres:
     @pytest.fixture
-    def mock_repository(self) -> Any:
-        return create_autospec(GenreRepository, instance=True)
+    def mock_genre_repository(self) -> Any:
+        return create_autospec(spec=GenreRepository, instance=True, spec_set=True)
 
-    def test_returns_all_genres(self, mock_repository: Mock) -> None:
+    def test_returns_all_genres(self, mock_genre_repository: Mock) -> None:
         expected_genres: list[Genre] = [
             Genre.create(name="Action"),
             Genre.create(name="Adventure"),
             Genre.create(name="Comedy"),
         ]
-        mock_repository.get_all.return_value = expected_genres
+        mock_genre_repository.get_all.return_value = expected_genres
 
-        genres = RetrieveGenres(repository=mock_repository).execute()
+        genres = RetrieveGenres(repository=mock_genre_repository).execute()
 
         assert genres == expected_genres
