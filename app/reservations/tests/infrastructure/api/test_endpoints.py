@@ -5,10 +5,16 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session
 
 from app.reservations.application.create_reservation import CreateReservationParams
 from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
+from app.reservations.domain.seat import SeatStatus
+from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
+from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
+from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.users.infrastructure.models import UserModel
 
 
@@ -23,10 +29,29 @@ class TestCreateReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationRepository") as mock:
             yield mock.return_value
 
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def mock_reservation_release_scheduler(self) -> Generator[Mock, None, None]:
         with patch("app.reservations.infrastructure.api.endpoints.CeleryReservationReleaseScheduler") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(
+        self, session: Session, client: TestClient, user_token_headers: dict[str, str], user: UserModel
+    ) -> None:
+        seat = SqlModelSeatFactoryTest(session).create_available()
+
+        response = client.post(
+            "api/v1/reservations/",
+            json={"showtime_id": str(seat.showtime_id), "seat_ids": [str(seat.id)]},
+            headers=user_token_headers,
+        )
+
+        assert response.status_code == 201
+
+        session.refresh(seat)
+        assert seat.status == SeatStatus.RESERVED
+        assert seat.reservation_id is not None
+        assert seat.reservation.user_id == user.id
 
     def test_returns_201_and_calls_create_reservation(
         self,
@@ -123,6 +148,58 @@ class TestRetrieveReservationsEndpoint:
     def mock_reservation_repository(self) -> Generator[Mock, None, None]:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(
+        self,
+        session: Session,
+        client: TestClient,
+        user_token_headers: dict[str, str],
+        user: UserModel,
+    ) -> None:
+        (
+            SqlModelMovieBuilderTest(session=session)
+            .with_id(UUID("8c8ec976-9692-4c86-921d-28cf1302550c"))
+            .with_title("Robot Salvaje")
+            .with_poster_image("robot_salvaje.jpg")
+            .with_showtime(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+            .build()
+        )
+        (
+            SqlModelReservationBuilderTest(session)
+            .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
+            .with_user_id(user.id)
+            .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
+            .with_has_paid(True)
+            .build()
+        )
+        (
+            SqlModelSeatBuilderTest(session)
+            .with_row(1)
+            .with_number(2)
+            .with_status(SeatStatus.OCCUPIED)
+            .with_reservation_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
+            .build()
+        )
+
+        response = client.get("api/v1/reservations/", headers=user_token_headers)
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                "reservation_id": "a41707bd-ae9c-43b8-bba5-8c4844e73e77",
+                "show_datetime": "2023-04-03T22:00:00Z",
+                "movie": {
+                    "id": "8c8ec976-9692-4c86-921d-28cf1302550c",
+                    "title": "Robot Salvaje",
+                    "poster_image": "robot_salvaje.jpg",
+                },
+                "seats": [{"row": 1, "number": 2}],
+            }
+        ]
 
     def test_returns_200_and_calls_retrieve_reservations(
         self,

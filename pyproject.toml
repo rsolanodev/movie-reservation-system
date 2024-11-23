@@ -82,3 +82,6 @@ keep-runtime-typing = true
 filterwarnings = [
     "ignore::DeprecationWarning:passlib.utils"
 ]
+markers = [
+    "integration: mark test as integration"
+]
