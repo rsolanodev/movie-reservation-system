@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -22,6 +22,20 @@ class TestAuthenticateUserEndpoint:
     def mock_user_repository(self) -> Generator[Mock, None, None]:
         with patch("app.auth.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    @pytest.mark.usefixtures("user")
+    def test_integration(self, client: TestClient) -> None:
+        response = client.post(
+            "api/v1/auth/access-token/",
+            data={
+                "username": "rubensoljim@gmail.com",
+                "password": "Passw0rd!",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"token_type": "bearer", "access_token": ANY, "expires_in": 11520}
 
     def test_calls_authenticate_and_returns_access_token(
         self, client: TestClient, mock_authenticate: Mock, mock_user_repository: Mock
