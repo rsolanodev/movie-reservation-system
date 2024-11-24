@@ -5,6 +5,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session, select
 
 from app.movies.application.create_movie import CreateMovieParams
 from app.movies.application.retrieve_movie import RetrieveMovieParams
@@ -18,10 +19,13 @@ from app.movies.domain.exceptions import (
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
+from app.movies.infrastructure.models import MovieModel
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
+from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -35,6 +39,26 @@ class TestCreateMovieEndpoint:
     def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        response = client.post(
+            "api/v1/movies/",
+            data={
+                "title": "Deadpool & Wolverine",
+                "description": "Deadpool and a variant of Wolverine.",
+            },
+            files={"poster_image": ("deadpool_and_wolverine.jpg", b"image")},
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 201
+
+        movie_model = session.exec(select(MovieModel)).first()
+        assert movie_model is not None
+        assert movie_model.title == "Deadpool & Wolverine"
+        assert movie_model.description == "Deadpool and a variant of Wolverine."
+        assert movie_model.poster_image == "deadpool_and_wolverine.jpg"
 
     def test_returns_201_and_calls_create_movie(
         self,
@@ -179,6 +203,27 @@ class TestUpdateMovieEndpoint:
             .with_poster_image(poster_image="deadpool_and_wolverine.jpg")
             .build()
         )
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
+
+        response = client.patch(
+            f"api/v1/movies/{movie_model.id}/",
+            data={
+                "title": "New Title",
+                "description": "New description",
+            },
+            files={"poster_image": ("new_poster.jpg", b"new_image")},
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 200
+
+        session.refresh(movie_model)
+        assert movie_model.title == "New Title"
+        assert movie_model.description == "New description"
+        assert movie_model.poster_image == "new_poster.jpg"
 
     def test_returns_200_and_calls_update_movie(
         self,
@@ -337,6 +382,18 @@ class TestDeleteMovieEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
+
+        response = client.delete(
+            f"api/v1/movies/{movie_model.id}/",
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 200
+        assert session.get(MovieModel, movie_model.id) is None
+
     def test_returns_200_and_calls_delete_movie(
         self,
         client: TestClient,
@@ -424,6 +481,20 @@ class TestRetrieveGenresEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelGenreRepository") as mock:
             yield mock.return_value
 
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient) -> None:
+        genre_factory = SqlModelGenreFactoryTest(session=session)
+        genre_action = genre_factory.create(name="Action")
+        genre_comedy = genre_factory.create(name="Comedy")
+
+        response = client.get("api/v1/movies/genres/")
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"id": str(genre_action.id), "name": "Action"},
+            {"id": str(genre_comedy.id), "name": "Comedy"},
+        ]
+
     def test_returns_200_and_calls_retrieve_genres(
         self,
         client: TestClient,
@@ -463,6 +534,21 @@ class TestAddMovieGenreEndpoint:
     def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        movie_model = SqlModelMovieBuilderTest(session=session).build()
+        genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
+
+        response = client.post(
+            f"api/v1/movies/{movie_model.id}/genres/",
+            data={"genre_id": str(genre_model.id)},
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 200
+        assert movie_model.genres[0].id == genre_model.id
+        assert movie_model.genres[0].name == "Action"
 
     def test_returns_200_and_calls_add_movie_genre(
         self,
@@ -524,6 +610,19 @@ class TestRemoveMovieGenreEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
+        movie_model = SqlModelMovieBuilderTest(session=session).with_genre(genre_model=genre_model).build()
+
+        response = client.delete(
+            f"api/v1/movies/{movie_model.id}/genres/{genre_model.id}/",
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 200
+        assert len(movie_model.genres) == 0
+
     def test_returns_200_and_calls_remove_movie_genre(
         self,
         client: TestClient,
@@ -581,6 +680,45 @@ class TestRetrieveMovieEndpoint:
     def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient) -> None:
+        movie_model = (
+            SqlModelMovieBuilderTest(session=session)
+            .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_genre(
+                SqlModelGenreFactoryTest(session=session).create(
+                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
+                )
+            )
+            .with_showtime(
+                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+            .build()
+        )
+
+        response = client.get(f"api/v1/movies/{movie_model.id}/?showtime_date=2023-04-03")
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+            "title": "Deadpool & Wolverine",
+            "description": "Deadpool and a variant of Wolverine.",
+            "poster_image": "deadpool_and_wolverine.jpg",
+            "genres": [
+                {
+                    "id": "d108f84b-3568-446b-896c-3ba2bc74cda9",
+                    "name": "Action",
+                },
+            ],
+            "showtimes": [
+                {
+                    "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
+                    "show_datetime": "2023-04-03T22:00:00Z",
+                },
+            ],
+        }
 
     def test_returns_200_and_calls_retrieve_movie(
         self,
@@ -672,6 +810,53 @@ class TestRetrieveMoviesEndpoint:
     def mock_movie_repository(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient) -> None:
+        action_genre = SqlModelGenreFactoryTest(session=session).create(
+            id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
+        )
+        comedy_genre = SqlModelGenreFactoryTest(session=session).create(name="Comedy")
+        (
+            SqlModelMovieBuilderTest(session=session)
+            .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_genre(genre_model=action_genre)
+            .with_showtime(
+                id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+            )
+            .build()
+        )
+        SqlModelMovieBuilderTest(session=session).with_genre(genre_model=comedy_genre).with_showtime(
+            show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+        ).build()
+        SqlModelMovieBuilderTest(session=session).with_genre(genre_model=action_genre).with_showtime(
+            show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
+        ).build()
+
+        response = client.get(f"api/v1/movies/?available_date=2023-04-03&genre_id={action_genre.id}")
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                "id": "913822a0-750b-4cb6-b7b9-e01869d7d62d",
+                "title": "Deadpool & Wolverine",
+                "description": "Deadpool and a variant of Wolverine.",
+                "poster_image": "deadpool_and_wolverine.jpg",
+                "genres": [
+                    {
+                        "id": "d108f84b-3568-446b-896c-3ba2bc74cda9",
+                        "name": "Action",
+                    },
+                ],
+                "showtimes": [
+                    {
+                        "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",
+                        "show_datetime": "2023-04-03T22:00:00Z",
+                    },
+                ],
+            }
+        ]
 
     def test_returns_200_and_calls_retrieve_movies(
         self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
