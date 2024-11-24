@@ -271,7 +271,7 @@ class TestRetrieveSeatsEndpoint:
         assert response.status_code == 200
         assert response.json() == [
             {
-                "id": seat_model_expected.id,
+                "id": str(seat_model_expected.id),
                 "row": seat_model_expected.row,
                 "number": seat_model_expected.number,
                 "status": seat_model_expected.status,
