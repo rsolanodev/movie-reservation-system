@@ -3,8 +3,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session, select
 
 from app.rooms.application.create_room import CreateRoomParams
+from app.rooms.infrastructure.models import RoomModel
 
 
 class TestCreateRoomEndpoint:
@@ -17,6 +19,24 @@ class TestCreateRoomEndpoint:
     def mock_room_repository(self) -> Generator[Mock, None, None]:
         with patch("app.rooms.infrastructure.api.endpoints.SqlModelRoomRepository") as mock:
             yield mock.return_value
+
+    @pytest.mark.integration
+    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+        response = client.post(
+            "api/v1/rooms/",
+            json={
+                "name": "Room 1",
+                "seat_configuration": [{"row": 1, "number": 1}],
+            },
+            headers=superuser_token_headers,
+        )
+
+        assert response.status_code == 201
+
+        room_model = session.exec(select(RoomModel)).first()
+        assert room_model is not None
+        assert room_model.name == "Room 1"
+        assert room_model.seat_configuration == [{"row": 1, "number": 1}]
 
     def test_returns_201_and_calls_create_room(
         self,
