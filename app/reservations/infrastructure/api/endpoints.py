@@ -1,9 +1,17 @@
+from uuid import UUID
+
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import CurrentUser, SessionDep
+from app.reservations.application.cancel_reservation import CancelReservation, CancelReservationParams
 from app.reservations.application.create_reservation import CreateReservation, CreateReservationParams
 from app.reservations.application.retrieve_reservations import RetrieveReservations
-from app.reservations.domain.exceptions import SeatsNotAvailable
+from app.reservations.domain.exceptions import (
+    ReservationDoesNotBelongToUser,
+    ReservationDoesNotExist,
+    SeatsNotAvailable,
+    ShowtimeHasStarted,
+)
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
 from app.reservations.infrastructure.api.responses import MovieReservationResponse
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
@@ -37,3 +45,19 @@ def retrieve_reservations(session: SessionDep, current_user: CurrentUser) -> lis
         repository=SqlModelReservationRepository(session=session),
     ).execute(user_id=current_user.id)
     return [MovieReservationResponse.from_domain(reservation) for reservation in movie_reservations]
+
+
+@router.delete("/{reservation_id}/", status_code=status.HTTP_204_NO_CONTENT)
+def cancel_reservation(session: SessionDep, reservation_id: UUID, current_user: CurrentUser) -> None:
+    try:
+        CancelReservation(
+            repository=SqlModelReservationRepository(session=session),
+        ).execute(
+            params=CancelReservationParams(reservation_id=reservation_id, user_id=current_user.id),
+        )
+    except ReservationDoesNotExist:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found")
+    except ReservationDoesNotBelongToUser:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reservation does not belong to user")
+    except ShowtimeHasStarted:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Showtime has started")
