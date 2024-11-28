@@ -1,7 +1,6 @@
 from datetime import timedelta
 from typing import Any
 from unittest.mock import Mock, create_autospec
-from uuid import UUID
 
 import pytest
 
@@ -12,6 +11,7 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
 from app.reservations.domain.seat import Seat, SeatStatus
+from app.reservations.domain.value_objects.id import ID
 
 
 class TestCreateReservation:
@@ -28,8 +28,8 @@ class TestCreateReservation:
     ) -> None:
         mock_reservation_repository.find_seats.return_value = Seats(
             [
-                Seat(id=UUID("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
-                Seat(id=UUID("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=SeatStatus.AVAILABLE),
+                Seat(id=ID("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
+                Seat(id=ID("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=SeatStatus.AVAILABLE),
             ]
         )
 
@@ -37,31 +37,31 @@ class TestCreateReservation:
             repository=mock_reservation_repository, reservation_release_scheduler=mock_reservation_release_scheduler
         ).execute(
             params=CreateReservationParams(
-                showtime_id=UUID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
-                seat_ids=[UUID("c555276e-0be4-48ea-9e27-fe1500384380"), UUID("bb07c2f1-33f4-4987-ad02-8a420104f810")],
-                user_id=UUID("1553d340-89eb-433b-a101-981bdaa740ed"),
+                showtime_id=ID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
+                seat_ids=[ID("c555276e-0be4-48ea-9e27-fe1500384380"), ID("bb07c2f1-33f4-4987-ad02-8a420104f810")],
+                user_id=ID("1553d340-89eb-433b-a101-981bdaa740ed"),
             )
         )
 
         mock_reservation_repository.find_seats.assert_called_once_with(
-            seat_ids=[UUID("c555276e-0be4-48ea-9e27-fe1500384380"), UUID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
+            seat_ids=[ID("c555276e-0be4-48ea-9e27-fe1500384380"), ID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
         mock_reservation_repository.create.assert_called_once_with(
             reservation=Reservation(
                 id=reservation.id,
-                user_id=UUID("1553d340-89eb-433b-a101-981bdaa740ed"),
-                showtime_id=UUID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
+                user_id=ID("1553d340-89eb-433b-a101-981bdaa740ed"),
+                showtime_id=ID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
                 has_paid=False,
                 seats=Seats(
                     [
                         Seat(
-                            id=UUID("c555276e-0be4-48ea-9e27-fe1500384380"),
+                            id=ID("c555276e-0be4-48ea-9e27-fe1500384380"),
                             row=1,
                             number=1,
                             status=SeatStatus.AVAILABLE,
                         ),
                         Seat(
-                            id=UUID("bb07c2f1-33f4-4987-ad02-8a420104f810"),
+                            id=ID("bb07c2f1-33f4-4987-ad02-8a420104f810"),
                             row=1,
                             number=2,
                             status=SeatStatus.AVAILABLE,
@@ -80,8 +80,8 @@ class TestCreateReservation:
     ) -> None:
         mock_reservation_repository.find_seats.return_value = Seats(
             [
-                Seat(id=UUID("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
-                Seat(id=UUID("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=seat_status),
+                Seat(id=ID("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
+                Seat(id=ID("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=seat_status),
             ]
         )
 
@@ -90,17 +90,17 @@ class TestCreateReservation:
                 repository=mock_reservation_repository, reservation_release_scheduler=mock_reservation_release_scheduler
             ).execute(
                 params=CreateReservationParams(
-                    showtime_id=UUID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
+                    showtime_id=ID("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
                     seat_ids=[
-                        UUID("c555276e-0be4-48ea-9e27-fe1500384380"),
-                        UUID("bb07c2f1-33f4-4987-ad02-8a420104f810"),
+                        ID("c555276e-0be4-48ea-9e27-fe1500384380"),
+                        ID("bb07c2f1-33f4-4987-ad02-8a420104f810"),
                     ],
-                    user_id=UUID("1553d340-89eb-433b-a101-981bdaa740ed"),
+                    user_id=ID("1553d340-89eb-433b-a101-981bdaa740ed"),
                 )
             )
 
         mock_reservation_repository.find_seats.assert_called_once_with(
-            seat_ids=[UUID("c555276e-0be4-48ea-9e27-fe1500384380"), UUID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
+            seat_ids=[ID("c555276e-0be4-48ea-9e27-fe1500384380"), ID("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
         mock_reservation_repository.create.assert_not_called()
         mock_reservation_release_scheduler.schedule.assert_not_called()

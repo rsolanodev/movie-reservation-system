@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import CurrentUser, SessionDep
@@ -12,6 +10,7 @@ from app.reservations.domain.exceptions import (
     SeatsNotAvailable,
     ShowtimeHasStarted,
 )
+from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
 from app.reservations.infrastructure.api.responses import MovieReservationResponse
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
@@ -29,10 +28,10 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
             repository=SqlModelReservationRepository(session=session),
             reservation_release_scheduler=CeleryReservationReleaseScheduler(),
         ).execute(
-            params=CreateReservationParams(
+            params=CreateReservationParams.from_primitives(
                 showtime_id=request_body.showtime_id,
                 seat_ids=request_body.seat_ids,
-                user_id=current_user.id,
+                user_id=str(current_user.id),
             )
         )
     except SeatsNotAvailable:
@@ -43,17 +42,20 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
 def retrieve_reservations(session: SessionDep, current_user: CurrentUser) -> list[MovieReservationResponse]:
     movie_reservations = RetrieveReservations(
         repository=SqlModelReservationRepository(session=session),
-    ).execute(user_id=current_user.id)
+    ).execute(user_id=ID.from_uuid(current_user.id))
     return [MovieReservationResponse.from_domain(reservation) for reservation in movie_reservations]
 
 
 @router.delete("/{reservation_id}/", status_code=status.HTTP_204_NO_CONTENT)
-def cancel_reservation(session: SessionDep, reservation_id: UUID, current_user: CurrentUser) -> None:
+def cancel_reservation(session: SessionDep, reservation_id: str, current_user: CurrentUser) -> None:
     try:
         CancelReservation(
             repository=SqlModelReservationRepository(session=session),
         ).execute(
-            params=CancelReservationParams(reservation_id=reservation_id, user_id=current_user.id),
+            params=CancelReservationParams.from_primitives(
+                reservation_id=reservation_id,
+                user_id=str(current_user.id),
+            )
         )
     except ReservationDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found")

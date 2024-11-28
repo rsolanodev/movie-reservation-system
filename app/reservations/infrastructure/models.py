@@ -6,6 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
+from app.reservations.domain.value_objects.id import ID
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel
@@ -24,10 +25,10 @@ class SeatModel(SQLModel, table=True):
 
     @classmethod
     def from_domain(cls, seat: Seat) -> "SeatModel":
-        return cls(id=seat.id, row=seat.row, number=seat.number, status=seat.status)
+        return cls(id=seat.id.to_uuid(), row=seat.row, number=seat.number, status=seat.status)
 
     def to_domain(self) -> Seat:
-        return Seat(id=self.id, row=self.row, number=self.number, status=self.status)
+        return Seat(id=ID.from_uuid(self.id), row=self.row, number=self.number, status=self.status)
 
 
 class ReservationModel(SQLModel, table=True):
@@ -42,7 +43,16 @@ class ReservationModel(SQLModel, table=True):
 
     @classmethod
     def from_domain(cls, reservation: Reservation) -> "ReservationModel":
-        return cls(id=reservation.id, user_id=reservation.user_id, showtime_id=reservation.showtime_id)
+        return cls(
+            id=reservation.id.to_uuid(),
+            user_id=reservation.user_id.to_uuid(),
+            showtime_id=reservation.showtime_id.to_uuid(),
+        )
 
     def to_domain(self) -> Reservation:
-        return Reservation(id=self.id, user_id=self.user_id, showtime_id=self.showtime_id, has_paid=self.has_paid)
+        return Reservation(
+            id=ID.from_uuid(self.id),
+            user_id=ID.from_uuid(self.user_id),
+            showtime_id=ID.from_uuid(self.showtime_id),
+            has_paid=self.has_paid,
+        )

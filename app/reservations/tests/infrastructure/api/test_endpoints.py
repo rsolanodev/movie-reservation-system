@@ -17,6 +17,7 @@ from app.reservations.domain.exceptions import (
 )
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
 from app.reservations.domain.seat import SeatStatus
+from app.reservations.domain.value_objects.id import ID
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
@@ -83,9 +84,9 @@ class TestCreateReservationEndpoint:
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
-                showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                seat_ids=[UUID("b0ed1c31-9877-4d05-bb1c-0c1385ae4fd1")],
-                user_id=user.id,
+                showtime_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                seat_ids=[ID("b0ed1c31-9877-4d05-bb1c-0c1385ae4fd1")],
+                user_id=ID.from_uuid(user.id),
             )
         )
 
@@ -117,9 +118,9 @@ class TestCreateReservationEndpoint:
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
-                showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                seat_ids=[UUID("b0ed1c31-9877-4d05-bb1c-0c1385ae4fd1")],
-                user_id=user.id,
+                showtime_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                seat_ids=[ID("b0ed1c31-9877-4d05-bb1c-0c1385ae4fd1")],
+                user_id=ID.from_uuid(user.id),
             )
         )
 
@@ -217,20 +218,20 @@ class TestRetrieveReservationsEndpoint:
     ) -> None:
         mock_retrieve_reservations.return_value.execute.return_value = [
             MovieReservation(
-                reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
+                reservation_id=ID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
                 show_datetime=datetime(2024, 1, 2, 22, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=UUID("d64a9a87-4484-46f9-8ec1-f1e1c9fe2880"),
+                    id=ID("d64a9a87-4484-46f9-8ec1-f1e1c9fe2880"),
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
                 seats=[ReservedSeat(row=1, number=2)],
             ),
             MovieReservation(
-                reservation_id=UUID("ffd7e9f4-bec7-4487-8f2f-d84b49d0bcee"),
+                reservation_id=ID("ffd7e9f4-bec7-4487-8f2f-d84b49d0bcee"),
                 show_datetime=datetime(2024, 1, 1, 20, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=UUID("6c42605f-ac4a-405d-94f2-1f0ea3de5ddb"),
+                    id=ID("6c42605f-ac4a-405d-94f2-1f0ea3de5ddb"),
                     title="La Sustancia",
                     poster_image="la_sustancia.jpg",
                 ),
@@ -241,7 +242,7 @@ class TestRetrieveReservationsEndpoint:
         response = client.get("api/v1/reservations/", headers=user_token_headers)
 
         mock_retrieve_reservations.assert_called_once_with(repository=mock_reservation_repository)
-        mock_retrieve_reservations.return_value.execute.assert_called_once_with(user_id=user.id)
+        mock_retrieve_reservations.return_value.execute.assert_called_once_with(user_id=ID.from_uuid(user.id))
 
         assert response.status_code == 200
         assert response.json() == [
@@ -304,7 +305,9 @@ class TestCancelReservationEndpoint:
 
         mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=user.id)
+            params=CancelReservationParams(
+                reservation_id=ID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=ID.from_uuid(user.id)
+            )
         )
 
         assert response.status_code == 204
@@ -335,7 +338,9 @@ class TestCancelReservationEndpoint:
 
         mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=user.id)
+            params=CancelReservationParams(
+                reservation_id=ID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=ID.from_uuid(user.id)
+            )
         )
 
         assert response.status_code == 404
@@ -357,7 +362,9 @@ class TestCancelReservationEndpoint:
 
         mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=user.id)
+            params=CancelReservationParams(
+                reservation_id=ID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=ID.from_uuid(user.id)
+            )
         )
 
         assert response.status_code == 400
@@ -379,7 +386,9 @@ class TestCancelReservationEndpoint:
 
         mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(reservation_id=UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=user.id)
+            params=CancelReservationParams(
+                reservation_id=ID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=ID.from_uuid(user.id)
+            )
         )
 
         assert response.status_code == 400
