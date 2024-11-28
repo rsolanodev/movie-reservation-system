@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel

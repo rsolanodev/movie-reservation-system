@@ -11,7 +11,7 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
 from app.reservations.domain.seat import Seat, SeatStatus
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 class TestCreateReservation:

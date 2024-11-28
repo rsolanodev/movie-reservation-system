@@ -1,6 +1,6 @@
 from app.reservations.domain.movie_reservation import MovieReservation
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 class RetrieveReservations:

@@ -1,8 +1,8 @@
 from app.celery import app
 from app.database import get_db_session
 from app.reservations.application.reservation_release import ReservationRelease
-from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
+from app.shared.domain.value_objects.id import ID
 
 
 @app.task

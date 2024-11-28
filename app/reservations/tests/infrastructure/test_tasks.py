@@ -3,8 +3,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.tasks import reservation_release_task
+from app.shared.domain.value_objects.id import ID
 
 
 class TestReleaseReservationTask:

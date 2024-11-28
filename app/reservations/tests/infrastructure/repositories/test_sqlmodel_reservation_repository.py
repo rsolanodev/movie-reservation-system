@@ -8,7 +8,6 @@ from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat, SeatStatus
-from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
@@ -16,6 +15,7 @@ from app.reservations.tests.builders.seat_builder_test import SeatBuilderTest
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.shared.domain.value_objects.id import ID
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 
 
