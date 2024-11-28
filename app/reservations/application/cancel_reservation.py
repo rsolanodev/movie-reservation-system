@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass(frozen=True)

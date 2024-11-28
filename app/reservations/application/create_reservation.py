@@ -5,7 +5,7 @@ from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass(frozen=True)

@@ -1,8 +1,8 @@
 from datetime import timedelta
 
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
-from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.tasks import reservation_release_task
+from app.shared.domain.value_objects.id import ID
 
 
 class CeleryReservationReleaseScheduler(ReservationReleaseScheduler):

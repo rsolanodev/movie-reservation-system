@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass

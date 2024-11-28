@@ -1,7 +1,7 @@
 import uuid
 
 from app.reservations.domain.seat import Seat, SeatStatus
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 class SeatBuilderTest:

@@ -2,7 +2,7 @@ import uuid
 from dataclasses import dataclass
 from enum import StrEnum
 
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 class SeatStatus(StrEnum):

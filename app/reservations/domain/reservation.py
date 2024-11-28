@@ -2,7 +2,7 @@ import uuid
 from dataclasses import dataclass, field
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass

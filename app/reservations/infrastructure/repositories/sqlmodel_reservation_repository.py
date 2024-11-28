@@ -8,8 +8,8 @@ from app.reservations.domain.movie_reservation import Movie, MovieReservation, R
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
-from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
+from app.shared.domain.value_objects.id import ID
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
 
