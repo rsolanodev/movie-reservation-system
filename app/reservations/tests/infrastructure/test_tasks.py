@@ -1,9 +1,9 @@
 from collections.abc import Generator
 from unittest.mock import Mock, patch
-from uuid import UUID
 
 import pytest
 
+from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.tasks import reservation_release_task
 
 
@@ -23,5 +23,5 @@ class TestReleaseReservationTask:
 
         mock_reservation_release.assert_called_once_with(repository=mock_reservation_repository)
         mock_reservation_release.return_value.execute.assert_called_once_with(
-            reservation_id=UUID("a116a257-a179-4d8f-9df9-a4e368475ed9")
+            reservation_id=ID("a116a257-a179-4d8f-9df9-a4e368475ed9")
         )

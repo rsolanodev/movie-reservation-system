@@ -1,6 +1,7 @@
 from datetime import timedelta
-from uuid import UUID
+
+from app.reservations.domain.value_objects.id import ID
 
 
 class ReservationReleaseScheduler:
-    def schedule(self, reservation_id: UUID, delay: timedelta) -> None: ...
+    def schedule(self, reservation_id: ID, delay: timedelta) -> None: ...

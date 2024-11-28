@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from uuid import UUID
 
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import select, update
@@ -9,6 +8,7 @@ from app.reservations.domain.movie_reservation import Movie, MovieReservation, R
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
+from app.reservations.domain.value_objects.id import ID
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
@@ -23,29 +23,29 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
 
     def _reserve_seats(self, reservation: Reservation) -> None:
         for seat in reservation.seats:
-            seat_model = self._session.get_one(SeatModel, seat.id)
+            seat_model = self._session.get_one(SeatModel, seat.id.to_uuid())
             seat_model.status = SeatStatus.RESERVED
-            seat_model.reservation_id = reservation.id
+            seat_model.reservation_id = reservation.id.to_uuid()
 
-    def find_seats(self, seat_ids: list[UUID]) -> Seats:
+    def find_seats(self, seat_ids: list[ID]) -> Seats:
         seat_models = self._session.exec(
-            select(SeatModel).filter(SeatModel.id.in_(seat_ids)),  # type: ignore
+            select(SeatModel).filter(SeatModel.id.in_([seat_id.to_uuid() for seat_id in seat_ids])),  # type: ignore
         ).all()
         return Seats([seat_model.to_domain() for seat_model in seat_models])
 
-    def get(self, reservation_id: UUID) -> Reservation:
-        reservation_model = self._session.get_one(ReservationModel, reservation_id)
+    def get(self, reservation_id: ID) -> Reservation:
+        reservation_model = self._session.get_one(ReservationModel, reservation_id.to_uuid())
         return reservation_model.to_domain()
 
-    def release(self, reservation_id: UUID) -> None:
+    def release(self, reservation_id: ID) -> None:
         self._session.exec(
             update(SeatModel)
-            .where(SeatModel.reservation_id == reservation_id)  # type: ignore
+            .where(SeatModel.reservation_id == reservation_id.to_uuid())  # type: ignore
             .values(status=SeatStatus.AVAILABLE, reservation_id=None)
         )
         self._session.commit()
 
-    def find_by_user_id(self, user_id: UUID) -> list[MovieReservation]:
+    def find_by_user_id(self, user_id: ID) -> list[MovieReservation]:
         reservation_models = self._session.exec(
             select(ReservationModel)
             .options(
@@ -53,7 +53,7 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
                 selectinload(ReservationModel.seats),  # type: ignore
             )
             .where(
-                ReservationModel.user_id == user_id,
+                ReservationModel.user_id == user_id.to_uuid(),
                 ReservationModel.seats.any(SeatModel.status == SeatStatus.OCCUPIED),  # type: ignore
             )
         ).all()
@@ -63,10 +63,10 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
 
     def _build_movie_reservation(self, reservation_model: ReservationModel) -> MovieReservation:
         return MovieReservation(
-            reservation_id=reservation_model.id,
+            reservation_id=ID(reservation_model.id),
             show_datetime=self._ensure_utc_timezone(reservation_model.showtime.show_datetime),
             movie=Movie(
-                id=reservation_model.showtime.movie_id,
+                id=ID(reservation_model.showtime.movie_id),
                 title=reservation_model.showtime.movie.title,
                 poster_image=reservation_model.showtime.movie.poster_image,
             ),

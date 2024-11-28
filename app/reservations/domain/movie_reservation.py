@@ -1,6 +1,7 @@
-import uuid
 from dataclasses import dataclass
 from datetime import datetime
+
+from app.reservations.domain.value_objects.id import ID
 
 
 @dataclass
@@ -11,14 +12,14 @@ class ReservedSeat:
 
 @dataclass
 class Movie:
-    id: uuid.UUID
+    id: ID
     title: str
     poster_image: str | None
 
 
 @dataclass
 class MovieReservation:
-    reservation_id: uuid.UUID
+    reservation_id: ID
     show_datetime: datetime
     movie: Movie
     seats: list[ReservedSeat]

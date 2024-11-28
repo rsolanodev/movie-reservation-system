@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 
 from sqlmodel import SQLModel
 
@@ -7,7 +6,7 @@ from app.reservations.domain.movie_reservation import Movie, MovieReservation, R
 
 
 class MovieResponse(SQLModel):
-    id: UUID
+    id: str
     title: str
     poster_image: str | None
 
@@ -26,7 +25,7 @@ class ReservedSeatResponse(SQLModel):
 
 
 class MovieReservationResponse(SQLModel):
-    reservation_id: UUID
+    reservation_id: str
     show_datetime: datetime
     movie: MovieResponse
     seats: list[ReservedSeatResponse]

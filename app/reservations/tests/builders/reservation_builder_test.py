@@ -2,25 +2,26 @@ import uuid
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.reservation import Reservation
+from app.reservations.domain.value_objects.id import ID
 
 
 class ReservationBuilderTest:
     def __init__(self) -> None:
-        self.id: uuid.UUID = uuid.uuid4()
-        self.user_id: uuid.UUID = uuid.uuid4()
-        self.showtime_id: uuid.UUID = uuid.uuid4()
+        self.id: ID = ID.from_uuid(uuid.uuid4())
+        self.user_id: ID = ID.from_uuid(uuid.uuid4())
+        self.showtime_id: ID = ID.from_uuid(uuid.uuid4())
         self.has_paid: bool = False
         self.seats: Seats = Seats([])
 
-    def with_id(self, id: uuid.UUID) -> "ReservationBuilderTest":
+    def with_id(self, id: ID) -> "ReservationBuilderTest":
         self.id = id
         return self
 
-    def with_user_id(self, user_id: uuid.UUID) -> "ReservationBuilderTest":
+    def with_user_id(self, user_id: ID) -> "ReservationBuilderTest":
         self.user_id = user_id
         return self
 
-    def with_showtime_id(self, showtime_id: uuid.UUID) -> "ReservationBuilderTest":
+    def with_showtime_id(self, showtime_id: ID) -> "ReservationBuilderTest":
         self.showtime_id = showtime_id
         return self
 
