@@ -10,6 +10,6 @@ class TestSqlModelRoomRepository:
         room = Room.create(name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
         SqlModelRoomRepository(session=session).create(room)
 
-        room_model = session.get_one(RoomModel, room.id)
+        room_model = session.get_one(RoomModel, room.id.to_uuid())
         assert room_model.name == "Room 1"
         assert room_model.seat_configuration == [{"row": 1, "number": 1}]
