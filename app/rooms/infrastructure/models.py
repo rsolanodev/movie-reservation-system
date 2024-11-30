@@ -17,4 +17,4 @@ class RoomModel(SQLModel, table=True):
 
     @classmethod
     def from_domain(cls, room: Room) -> "RoomModel":
-        return cls(id=room.id, name=room.name, seat_configuration=room.seat_configuration)
+        return cls(id=room.id.to_uuid(), name=room.name, seat_configuration=room.seat_configuration)
