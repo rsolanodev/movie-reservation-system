@@ -1,16 +1,20 @@
 from dataclasses import dataclass
 from datetime import date
-from uuid import UUID
 
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.movie import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass
 class RetrieveMovieParams:
-    movie_id: UUID
+    movie_id: ID
     showtime_date: date
+
+    @classmethod
+    def from_primitives(cls, movie_id: str, showtime_date: date) -> "RetrieveMovieParams":
+        return cls(movie_id=ID(movie_id), showtime_date=showtime_date)
 
 
 class RetrieveMovie:

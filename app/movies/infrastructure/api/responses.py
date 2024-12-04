@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 
 from sqlmodel import SQLModel
 
@@ -7,19 +6,19 @@ from app.movies.domain.movie import Movie
 
 
 class GenreResponse(SQLModel):
-    id: UUID
+    id: str
     name: str
 
 
 class MovieResponse(SQLModel):
-    id: UUID
+    id: str
     title: str
     description: str | None
     poster_image: str | None
 
 
 class MovieShowtimeResponse(SQLModel):
-    id: UUID
+    id: str
     show_datetime: datetime
 
 

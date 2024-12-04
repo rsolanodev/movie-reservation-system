@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from uuid import UUID
 
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass(frozen=True)
 class UpdateMovieParams:
-    id: UUID
+    id: ID
     title: str | None
     description: str | None
     poster_image: PosterImage | None
@@ -29,7 +29,7 @@ class UpdateMovie:
         self._repository.save(movie=movie)
         return movie
 
-    def _get_or_raise_exception(self, id: UUID) -> Movie:
+    def _get_or_raise_exception(self, id: ID) -> Movie:
         movie = self._repository.get(id=id)
         if movie is None:
             raise MovieDoesNotExist()

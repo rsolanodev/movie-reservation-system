@@ -10,6 +10,7 @@ from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.shared.domain.value_objects.id import ID
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
 
@@ -20,8 +21,8 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
         self._session.merge(movie_model)
         self._session.commit()
 
-    def get(self, id: UUID) -> Movie | None:
-        movie_model = self._session.get(MovieModel, id)
+    def get(self, id: ID) -> Movie | None:
+        movie_model = self._session.get(MovieModel, id.to_uuid())
 
         if movie_model is None:
             return None
@@ -31,23 +32,23 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             movie.add_genre(genre.to_domain())
         return movie
 
-    def delete(self, id: UUID) -> None:
-        movie_model = self._session.get(MovieModel, id)
+    def delete(self, id: ID) -> None:
+        movie_model = self._session.get(MovieModel, id.to_uuid())
         self._session.delete(movie_model)
         self._session.commit()
 
-    def add_genre(self, movie_id: UUID, genre_id: UUID) -> None:
-        movie_model = self._session.get_one(MovieModel, movie_id)
-        genre_model = self._session.get_one(GenreModel, genre_id)
+    def add_genre(self, movie_id: ID, genre_id: ID) -> None:
+        movie_model = self._session.get_one(MovieModel, movie_id.to_uuid())
+        genre_model = self._session.get_one(GenreModel, genre_id.to_uuid())
 
         if genre_model not in movie_model.genres:
             movie_model.genres.append(genre_model)
             self._session.add(movie_model)
             self._session.commit()
 
-    def remove_genre(self, movie_id: UUID, genre_id: UUID) -> None:
-        movie_model = self._session.get_one(MovieModel, movie_id)
-        genre_model = self._session.get_one(GenreModel, genre_id)
+    def remove_genre(self, movie_id: ID, genre_id: ID) -> None:
+        movie_model = self._session.get_one(MovieModel, movie_id.to_uuid())
+        genre_model = self._session.get_one(GenreModel, genre_id.to_uuid())
 
         if genre_model in movie_model.genres:
             movie_model.genres.remove(genre_model)
@@ -80,14 +81,14 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
 
         return list(movies.values())
 
-    def get_movie_for_date(self, movie_id: UUID, showtime_date: date) -> Movie | None:
+    def get_movie_for_date(self, movie_id: ID, showtime_date: date) -> Movie | None:
         movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
             select(MovieModel, ShowtimeModel)
             .options(selectinload(MovieModel.genres))  # type: ignore
             .join(ShowtimeModel)
             .where(
                 func.date(ShowtimeModel.show_datetime) == showtime_date,
-                MovieModel.id == movie_id,
+                MovieModel.id == movie_id.to_uuid(),
             )
             .order_by(ShowtimeModel.show_datetime)  # type: ignore
         ).all()
@@ -115,6 +116,6 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             show_datetime = show_datetime.replace(tzinfo=timezone.utc)
 
         return MovieShowtime(
-            id=showtime_model.id,
+            id=ID.from_uuid(showtime_model.id),
             show_datetime=show_datetime,
         )
