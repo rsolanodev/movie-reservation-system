@@ -1,7 +1,6 @@
 from datetime import date, datetime, timezone
 from typing import Any
 from unittest.mock import Mock, create_autospec
-from uuid import UUID
 
 import pytest
 from freezegun import freeze_time
@@ -15,6 +14,7 @@ from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import MovieShowtimeFactoryTest
+from app.shared.domain.value_objects.id import ID
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -28,29 +28,29 @@ class TestRetrieveMovies:
     def movies(self) -> list[Movie]:
         return [
             MovieBuilder()
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_id(id=ID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
+            .with_genre(genre=GenreFactoryTest().create(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
             .with_showtime(
                 MovieShowtimeFactoryTest().create(
-                    id=UUID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
+                    id=ID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build(),
             MovieBuilder()
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_id(id=ID("ec725625-f502-4d39-9401-a415d8c1f965"))
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
             .with_genre(
-                genre=GenreFactoryTest().create(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
+                genre=GenreFactoryTest().create(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
             )
             .with_showtime(
                 MovieShowtimeFactoryTest().create(
-                    id=UUID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
+                    id=ID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
@@ -61,36 +61,36 @@ class TestRetrieveMovies:
         mock_movie_repository.get_available_movies_for_date.return_value = movies
 
         data = RetrieveMovies(repository=mock_movie_repository).execute(
-            params=RetrieveMoviesParams(available_date=date(2023, 4, 3))
+            params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
         )
 
         mock_movie_repository.get_available_movies_for_date.assert_called_once_with(available_date=date(2023, 4, 3))
 
         assert data == [
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
-                genres=MovieGenres([Genre(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy")]),
+                genres=MovieGenres([Genre(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy")]),
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
+                            id=ID("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         )
                     ]
                 ),
             ),
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f965"),
                 title="The Super Mario Bros. Movie",
                 description="An animated adaptation of the video game.",
                 poster_image="super_mario_bros.jpg",
                 genres=MovieGenres(
                     [
                         Genre(
-                            id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                            id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
                             name="Adventure",
                         )
                     ]
@@ -98,7 +98,7 @@ class TestRetrieveMovies:
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
+                            id=ID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         )
                     ]
@@ -114,7 +114,7 @@ class TestRetrieveMovies:
         data = RetrieveMovies(repository=mock_movie_repository).execute(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
-                genre_id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                genre_id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
 
@@ -122,15 +122,15 @@ class TestRetrieveMovies:
 
         assert data == [
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f965"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f965"),
                 title="The Super Mario Bros. Movie",
                 description="An animated adaptation of the video game.",
                 poster_image="super_mario_bros.jpg",
-                genres=MovieGenres([Genre(id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")]),
+                genres=MovieGenres([Genre(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")]),
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
+                            id=ID("f48c4dae-b0e2-43f6-a659-599f5e254270"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         )
                     ]
@@ -146,7 +146,7 @@ class TestRetrieveMovies:
         data = RetrieveMovies(repository=mock_movie_repository).execute(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
-                genre_id=UUID("b108f84b-3568-446b-896c-3ba2bc74cda9"),
+                genre_id=ID("b108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
 

@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from datetime import date
-from uuid import UUID
 
 from app.movies.domain.movie import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass(frozen=True)
 class RetrieveMoviesParams:
     available_date: date
-    genre_id: UUID | None = None
+    genre_id: ID | None
 
 
 class RetrieveMovies:

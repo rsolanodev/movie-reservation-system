@@ -11,6 +11,7 @@ from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.domain.value_objects.id import ID
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -21,7 +22,7 @@ class TestSqlModelMovieRepository:
 
         SqlModelMovieRepository(session=session).save(movie=movie)
 
-        movie_model = session.get_one(MovieModel, movie.id)
+        movie_model = session.get_one(MovieModel, movie.id.to_uuid())
         assert movie_model.title == "Deadpool & Wolverine"
         assert movie_model.description == "Deadpool and a variant of Wolverine."
         assert movie_model.poster_image == "deadpool_and_wolverine.jpg"
@@ -61,17 +62,17 @@ class TestSqlModelMovieRepository:
             .build()
         )
 
-        movie = SqlModelMovieRepository(session=session).get(id=movie_model.id)
+        movie = SqlModelMovieRepository(session=session).get(id=ID.from_uuid(movie_model.id))
 
         assert movie == Movie(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+            id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
             title="Deadpool & Wolverine",
             description="Deadpool and a variant of Wolverine.",
             poster_image="deadpool_and_wolverine.jpg",
             genres=MovieGenres(
                 [
-                    Genre(id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"),
-                    Genre(id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77b"), name="Comedy"),
+                    Genre(id=ID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"),
+                    Genre(id=ID("393210d5-80ce-4d03-b896-5d89f15aa77b"), name="Comedy"),
                 ]
             ),
         )
@@ -79,18 +80,19 @@ class TestSqlModelMovieRepository:
     def test_delete_movie(self, session: Session) -> None:
         movie_model = SqlModelMovieBuilderTest(session=session).build()
 
-        SqlModelMovieRepository(session=session).delete(id=movie_model.id)
+        SqlModelMovieRepository(session=session).delete(id=ID.from_uuid(movie_model.id))
 
         assert session.get(MovieModel, movie_model.id) is None
 
     def test_add_genre_to_movie(self, session: Session) -> None:
         genre_model = SqlModelGenreFactoryTest(session=session).create(
-            id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
-            name="Action",
+            id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"
         )
         movie_model = SqlModelMovieBuilderTest(session=session).build()
 
-        SqlModelMovieRepository(session=session).add_genre(movie_id=movie_model.id, genre_id=genre_model.id)
+        SqlModelMovieRepository(session=session).add_genre(
+            movie_id=ID.from_uuid(movie_model.id), genre_id=ID.from_uuid(genre_model.id)
+        )
 
         session.refresh(movie_model)
         assert movie_model.genres[0].id == UUID("393210d5-80ce-4d03-b896-5d89f15aa77a")
@@ -109,8 +111,8 @@ class TestSqlModelMovieRepository:
         )
 
         SqlModelMovieRepository(session=session).remove_genre(
-            movie_id=movie_model.id,
-            genre_id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
+            movie_id=ID.from_uuid(movie_model.id),
+            genre_id=ID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
         )
 
         session.refresh(movie_model)
@@ -135,7 +137,7 @@ class TestSqlModelMovieRepository:
 
         assert movies == [
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
@@ -143,7 +145,7 @@ class TestSqlModelMovieRepository:
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                            id=ID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         ),
                     ],
@@ -170,7 +172,7 @@ class TestSqlModelMovieRepository:
 
         assert movies == [
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
@@ -178,7 +180,7 @@ class TestSqlModelMovieRepository:
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                            id=ID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         ),
                     ],
@@ -201,7 +203,7 @@ class TestSqlModelMovieRepository:
 
         assert movies == [
             Movie(
-                id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+                id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image="deadpool_and_wolverine.jpg",
@@ -209,11 +211,11 @@ class TestSqlModelMovieRepository:
                 showtimes=MovieShowtimes(
                     [
                         MovieShowtime(
-                            id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                            id=ID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                         ),
                         MovieShowtime(
-                            id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
+                            id=ID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
                             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                         ),
                     ],
@@ -236,12 +238,12 @@ class TestSqlModelMovieRepository:
         ).build()
 
         movie = SqlModelMovieRepository(session=session).get_movie_for_date(
-            movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+            movie_id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
             showtime_date=date(2023, 4, 3),
         )
 
         assert movie == Movie(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+            id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
             title="Deadpool & Wolverine",
             description="Deadpool and a variant of Wolverine.",
             poster_image="deadpool_and_wolverine.jpg",
@@ -249,11 +251,11 @@ class TestSqlModelMovieRepository:
             showtimes=MovieShowtimes(
                 [
                     MovieShowtime(
-                        id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        id=ID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                         show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                     ),
                     MovieShowtime(
-                        id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
+                        id=ID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
                         show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                     ),
                 ]
@@ -262,7 +264,7 @@ class TestSqlModelMovieRepository:
 
     def test_get_movie_for_date_that_does_not_exist(self, session: Session) -> None:
         movie = SqlModelMovieRepository(session=session).get_movie_for_date(
-            movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+            movie_id=ID("ec725625-f502-4d39-9401-a415d8c1f964"),
             showtime_date=date(2023, 4, 3),
         )
 

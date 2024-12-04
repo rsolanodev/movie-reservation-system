@@ -1,5 +1,4 @@
 from datetime import date
-from uuid import UUID
 
 from fastapi import (
     APIRouter,
@@ -40,6 +39,7 @@ from app.movies.infrastructure.repositories.sqlmodel_genre_repository import (
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import (
     SqlModelMovieRepository,
 )
+from app.shared.domain.value_objects.id import ID
 
 router = APIRouter()
 
@@ -58,10 +58,10 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     response_model=list[RetrieveMovieResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movies(session: SessionDep, available_date: date, genre_id: UUID | None = None) -> list[Movie]:
-    return RetrieveMovies(
-        repository=SqlModelMovieRepository(session=session),
-    ).execute(params=RetrieveMoviesParams(available_date=available_date, genre_id=genre_id))
+def retrieve_movies(session: SessionDep, available_date: date, genre_id: str | None = None) -> list[Movie]:
+    return RetrieveMovies(repository=SqlModelMovieRepository(session=session)).execute(
+        params=RetrieveMoviesParams(available_date=available_date, genre_id=ID(genre_id) if genre_id else None),
+    )
 
 
 @router.post(
@@ -92,11 +92,11 @@ def create_movie(
     response_model=RetrieveMovieResponse,
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> Movie:
+def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: date) -> Movie:
     try:
         return RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
-        ).execute(params=RetrieveMovieParams(movie_id=movie_id, showtime_date=showtime_date))
+        ).execute(params=RetrieveMovieParams(movie_id=ID(movie_id), showtime_date=showtime_date))
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
@@ -109,7 +109,7 @@ def retrieve_movie(session: SessionDep, movie_id: UUID, showtime_date: date) -> 
 )
 def update_movie(
     session: SessionDep,
-    movie_id: UUID,
+    movie_id: str,
     title: str = Form(min_length=1, max_length=100, default=None),
     description: str | None = Form(default=None),
     poster_image: UploadFile | None = None,
@@ -119,7 +119,7 @@ def update_movie(
             repository=SqlModelMovieRepository(session=session),
         ).execute(
             params=UpdateMovieParams(
-                id=movie_id,
+                id=ID(movie_id),
                 title=title,
                 description=description,
                 poster_image=build_poster_image(uploaded_file=poster_image),
@@ -135,11 +135,9 @@ def update_movie(
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
-def delete_movie(session: SessionDep, movie_id: UUID) -> None:
+def delete_movie(session: SessionDep, movie_id: str) -> None:
     try:
-        DeleteMovie(
-            repository=SqlModelMovieRepository(session=session),
-        ).execute(id=movie_id)
+        DeleteMovie(repository=SqlModelMovieRepository(session=session)).execute(id=ID(movie_id))
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
@@ -149,9 +147,11 @@ def delete_movie(session: SessionDep, movie_id: UUID) -> None:
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
-def add_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID = Form(...)) -> None:
+def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...)) -> None:
     try:
-        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(movie_id=movie_id, genre_id=genre_id)
+        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
+            movie_id=ID(movie_id), genre_id=ID(genre_id)
+        )
     except GenreAlreadyAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -164,10 +164,10 @@ def add_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID = Form(.
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
-def remove_movie_genre(session: SessionDep, movie_id: UUID, genre_id: UUID) -> None:
+def remove_movie_genre(session: SessionDep, movie_id: str, genre_id: str) -> None:
     try:
         RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-            movie_id=movie_id, genre_id=genre_id
+            movie_id=ID(movie_id), genre_id=ID(genre_id)
         )
     except GenreNotAssigned:
         raise HTTPException(

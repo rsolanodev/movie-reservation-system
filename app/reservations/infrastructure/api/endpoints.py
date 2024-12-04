@@ -28,10 +28,10 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
             repository=SqlModelReservationRepository(session=session),
             reservation_release_scheduler=CeleryReservationReleaseScheduler(),
         ).execute(
-            params=CreateReservationParams.from_primitives(
-                showtime_id=request_body.showtime_id,
-                seat_ids=request_body.seat_ids,
-                user_id=str(current_user.id),
+            params=CreateReservationParams(
+                showtime_id=ID(request_body.showtime_id),
+                seat_ids=[ID(seat_id) for seat_id in request_body.seat_ids],
+                user_id=ID.from_uuid(current_user.id),
             )
         )
     except SeatsNotAvailable:
@@ -52,9 +52,9 @@ def cancel_reservation(session: SessionDep, reservation_id: str, current_user: C
         CancelReservation(
             repository=SqlModelReservationRepository(session=session),
         ).execute(
-            params=CancelReservationParams.from_primitives(
-                reservation_id=reservation_id,
-                user_id=str(current_user.id),
+            params=CancelReservationParams(
+                reservation_id=ID(reservation_id),
+                user_id=ID.from_uuid(current_user.id),
             )
         )
     except ReservationDoesNotExist:

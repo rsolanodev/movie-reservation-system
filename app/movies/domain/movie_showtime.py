@@ -1,11 +1,12 @@
-import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
+
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass
 class MovieShowtime:
-    id: uuid.UUID
+    id: ID
     show_datetime: datetime
 
     def is_future(self) -> bool:

@@ -5,11 +5,12 @@ from app.movies.domain.collections.movie_genres import MovieGenres
 from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie_showtime import MovieShowtime
+from app.shared.domain.value_objects.id import ID
 
 
 @dataclass
 class Movie:
-    id: uuid.UUID
+    id: ID
     title: str
     description: str | None
     poster_image: str | None
@@ -20,7 +21,7 @@ class Movie:
     @classmethod
     def create(cls, title: str, description: str | None, poster_image: str | None) -> "Movie":
         return cls(
-            id=uuid.uuid4(),
+            id=ID.from_uuid(uuid.uuid4()),
             title=title,
             description=description,
             poster_image=poster_image,
@@ -42,5 +43,5 @@ class Movie:
     def add_showtime(self, showtime: MovieShowtime) -> None:
         self.showtimes.append(showtime)
 
-    def has_genre(self, genre_id: uuid.UUID) -> bool:
+    def has_genre(self, genre_id: ID) -> bool:
         return self.genres.has_genre(genre_id=genre_id)
