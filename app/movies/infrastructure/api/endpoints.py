@@ -60,7 +60,7 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
 )
 def retrieve_movies(session: SessionDep, available_date: date, genre_id: str | None = None) -> list[Movie]:
     return RetrieveMovies(repository=SqlModelMovieRepository(session=session)).execute(
-        params=RetrieveMoviesParams.from_primitives(available_date, genre_id),
+        params=RetrieveMoviesParams(available_date=available_date, genre_id=ID(genre_id) if genre_id else None),
     )
 
 
@@ -96,7 +96,7 @@ def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: date) -> M
     try:
         return RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
-        ).execute(params=RetrieveMovieParams.from_primitives(movie_id, showtime_date))
+        ).execute(params=RetrieveMovieParams(movie_id=ID(movie_id), showtime_date=showtime_date))
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 

@@ -14,10 +14,6 @@ class CreateReservationParams:
     seat_ids: list[ID]
     user_id: ID
 
-    @classmethod
-    def from_primitives(cls, showtime_id: str, seat_ids: list[str], user_id: str) -> "CreateReservationParams":
-        return cls(showtime_id=ID(showtime_id), seat_ids=[ID(seat_id) for seat_id in seat_ids], user_id=ID(user_id))
-
 
 class CreateReservation:
     def __init__(

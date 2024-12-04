@@ -12,10 +12,6 @@ class RetrieveMovieParams:
     movie_id: ID
     showtime_date: date
 
-    @classmethod
-    def from_primitives(cls, movie_id: str, showtime_date: date) -> "RetrieveMovieParams":
-        return cls(movie_id=ID(movie_id), showtime_date=showtime_date)
-
 
 class RetrieveMovie:
     def __init__(self, repository: MovieRepository) -> None:
