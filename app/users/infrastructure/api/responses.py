@@ -1,12 +1,21 @@
-import uuid
-
-from pydantic import EmailStr
 from sqlmodel import SQLModel
+
+from app.users.domain.user import User
 
 
 class UserResponse(SQLModel):
-    id: uuid.UUID
-    email: EmailStr
+    id: str
+    email: str
     full_name: str | None
-    is_active: bool = True
-    is_superuser: bool = False
+    is_active: bool
+    is_superuser: bool
+
+    @classmethod
+    def from_domain(cls, user: User) -> "UserResponse":
+        return cls(
+            id=user.id,
+            email=user.email,
+            full_name=user.full_name,
+            is_active=user.is_active,
+            is_superuser=user.is_superuser,
+        )
