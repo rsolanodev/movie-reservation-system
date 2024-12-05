@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.shared.domain.user import User
 from app.shared.domain.value_objects.id import Id
-from app.users.domain.user import User
 
 if TYPE_CHECKING:
     from app.reservations.infrastructure.models import ReservationModel
