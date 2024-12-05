@@ -12,7 +12,7 @@ class TestSqlModelUserRepository:
         user = UserFactoryTest().create()
         SqlModelUserRepository(session=session).create(user=user)
 
-        user_model = session.get_one(UserModel, user.id)
+        user_model = session.get_one(UserModel, user.id.to_uuid())
         assert user_model.to_domain() == user
 
     def test_find_user_by_email(self, session: Session) -> None:

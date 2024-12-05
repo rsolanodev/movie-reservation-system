@@ -25,7 +25,7 @@ class Authenticate:
             raise UserInactive()
 
         return Token.create(
-            user_id=user.id,
+            user_id=user.id.to_uuid(),
             secret_key=settings.SECRET_KEY,
             expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
         )

@@ -1,12 +1,14 @@
-import uuid
 from dataclasses import dataclass
+from uuid import uuid4
 
 from passlib.context import CryptContext
+
+from app.shared.domain.value_objects.id import Id
 
 
 @dataclass
 class User:
-    id: uuid.UUID
+    id: Id
     email: str
     full_name: str | None
     hashed_password: str
@@ -16,7 +18,7 @@ class User:
     @classmethod
     def create(cls, email: str, full_name: str | None, password: str) -> "User":
         return cls(
-            id=uuid.uuid4(),
+            id=Id.from_uuid(uuid4()),
             email=email,
             full_name=full_name,
             hashed_password=cls._hash_password(password),

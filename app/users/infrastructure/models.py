@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.shared.domain.value_objects.id import Id
 from app.users.domain.user import User
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ class UserModel(SQLModel, table=True):
     @classmethod
     def from_domain(cls, user: User) -> "UserModel":
         return UserModel(
-            id=user.id,
+            id=user.id.to_uuid(),
             email=user.email,
             full_name=user.full_name,
             is_active=user.is_active,
@@ -32,7 +33,7 @@ class UserModel(SQLModel, table=True):
 
     def to_domain(self) -> User:
         return User(
-            id=self.id,
+            id=Id.from_uuid(self.id),
             email=self.email,
             full_name=self.full_name,
             is_active=self.is_active,
