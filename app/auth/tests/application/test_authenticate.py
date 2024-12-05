@@ -13,8 +13,8 @@ from app.auth.domain.exceptions import (
     UserInactive,
 )
 from app.settings import settings
+from app.shared.domain.repositories.user_repository import UserRepository
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
-from app.users.domain.repositories.user_repository import UserRepository
 
 
 class TestAuthenticate:

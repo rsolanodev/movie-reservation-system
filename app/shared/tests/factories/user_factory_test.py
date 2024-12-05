@@ -1,5 +1,5 @@
+from app.shared.domain.user import User
 from app.shared.domain.value_objects.id import Id
-from app.users.domain.user import User
 
 
 class UserFactoryTest:

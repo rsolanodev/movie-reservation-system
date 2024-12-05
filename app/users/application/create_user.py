@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from app.users.domain.exceptions import UserAlreadyExists
-from app.users.domain.repositories.user_repository import (
+from app.shared.domain.repositories.user_repository import (
     UserRepository,
 )
-from app.users.domain.user import User
+from app.shared.domain.user import User
+from app.users.domain.exceptions import UserAlreadyExists
 
 
 @dataclass

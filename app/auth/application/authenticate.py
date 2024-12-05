@@ -1,11 +1,7 @@
-from app.auth.domain.exceptions import (
-    IncorrectPassword,
-    UserDoesNotExist,
-    UserInactive,
-)
+from app.auth.domain.exceptions import IncorrectPassword, UserDoesNotExist, UserInactive
 from app.auth.domain.token import Token
 from app.settings import settings
-from app.users.domain.repositories.user_repository import UserRepository
+from app.shared.domain.repositories.user_repository import UserRepository
 
 
 class Authenticate:
@@ -25,7 +21,7 @@ class Authenticate:
             raise UserInactive()
 
         return Token.create(
-            user_id=user.id.to_uuid(),
+            user_id=user.id,
             secret_key=settings.SECRET_KEY,
             expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
         )

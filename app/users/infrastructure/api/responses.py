@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel
 
-from app.users.domain.user import User
+from app.shared.domain.user import User
 
 
 class UserResponse(SQLModel):

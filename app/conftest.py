@@ -11,6 +11,7 @@ from app.auth.domain.token import Token
 from app.database import get_db_session
 from app.main import app
 from app.settings import settings
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.infrastructure.models import UserModel
 
@@ -84,7 +85,7 @@ def superuser(session: Session) -> UserModel:
 @pytest.fixture
 def user_token_headers(user: UserModel) -> dict[str, str]:
     token = Token.create(
-        user_id=user.id,
+        user_id=Id.from_uuid(user.id),
         secret_key=settings.SECRET_KEY,
         expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
     )
@@ -94,7 +95,7 @@ def user_token_headers(user: UserModel) -> dict[str, str]:
 @pytest.fixture
 def superuser_token_headers(superuser: UserModel) -> dict[str, str]:
     token = Token.create(
-        user_id=superuser.id,
+        user_id=Id.from_uuid(superuser.id),
         secret_key=settings.SECRET_KEY,
         expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
     )
