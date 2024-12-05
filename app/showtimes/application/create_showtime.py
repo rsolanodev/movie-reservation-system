@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from uuid import UUID
 
+from app.shared.domain.value_objects.id import Id
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 from app.showtimes.domain.showtime import Showtime
@@ -9,8 +9,8 @@ from app.showtimes.domain.showtime import Showtime
 
 @dataclass
 class CreateShowtimeParams:
-    movie_id: UUID
-    room_id: UUID
+    movie_id: Id
+    room_id: Id
     show_datetime: datetime
 
 

@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from typing import Any
 from unittest.mock import ANY, Mock, create_autospec
-from uuid import UUID
 
 import pytest
 
+from app.shared.domain.value_objects.id import Id
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
@@ -21,8 +21,8 @@ class TestCreateShowtime:
 
         CreateShowtime(repository=mock_showtime_repository).execute(
             params=CreateShowtimeParams(
-                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
@@ -30,16 +30,16 @@ class TestCreateShowtime:
         mock_showtime_repository.exists.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
-                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
         mock_showtime_repository.create.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
-                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )
@@ -50,8 +50,8 @@ class TestCreateShowtime:
         with pytest.raises(ShowtimeAlreadyExists):
             CreateShowtime(repository=mock_showtime_repository).execute(
                 params=CreateShowtimeParams(
-                    movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                    room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                    movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                    room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                     show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
                 )
             )
@@ -59,8 +59,8 @@ class TestCreateShowtime:
         mock_showtime_repository.exists.assert_called_once_with(
             showtime=Showtime(
                 id=ANY,
-                movie_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
             )
         )

@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
 from app.showtimes.application.create_showtime import CreateShowtimeParams
@@ -72,8 +73,8 @@ class TestCreateShowtimeEndpoint:
         mock_create_showtime.assert_called_once_with(repository=mock_showtime_repository)
         mock_create_showtime.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
-                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
             )
         )
@@ -102,8 +103,8 @@ class TestCreateShowtimeEndpoint:
         mock_create_showtime.assert_called_once_with(repository=mock_showtime_repository)
         mock_create_showtime.return_value.execute.assert_called_once_with(
             params=CreateShowtimeParams(
-                movie_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
             )
         )
@@ -198,7 +199,7 @@ class TestDeleteShowtimeEndpoint:
 
         mock_delete_showtime.assert_called_once_with(repository=mock_showtime_repository)
         mock_delete_showtime.return_value.execute.assert_called_once_with(
-            showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+            showtime_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
 
         assert response.status_code == 200
@@ -283,14 +284,14 @@ class TestRetrieveSeatsEndpoint:
         self, client: TestClient, mock_retrieve_seats: Mock, mock_showtime_repository: Mock, status: SeatStatus
     ) -> None:
         mock_retrieve_seats.return_value.execute.return_value = [
-            Seat(id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=2, status=status),
+            Seat(id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=2, status=status),
         ]
 
         response = client.get("api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/seats/")
 
         mock_retrieve_seats.assert_called_once_with(repository=mock_showtime_repository)
         mock_retrieve_seats.return_value.execute.assert_called_once_with(
-            showtime_id=UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
+            showtime_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
 
         assert response.status_code == 200
