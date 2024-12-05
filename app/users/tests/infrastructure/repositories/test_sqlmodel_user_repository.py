@@ -1,10 +1,10 @@
 from sqlmodel import Session
 
-from app.shared.tests.factories.user_factory_test import UserFactoryTest
-from app.users.infrastructure.models import UserModel
-from app.users.infrastructure.repositories.sqlmodel_user_repository import (
+from app.shared.infrastructure.repositories.sqlmodel_user_repository import (
     SqlModelUserRepository,
 )
+from app.shared.tests.factories.user_factory_test import UserFactoryTest
+from app.users.infrastructure.models import UserModel
 
 
 class TestSqlModelUserRepository:

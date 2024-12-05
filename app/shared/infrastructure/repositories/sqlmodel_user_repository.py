@@ -1,7 +1,7 @@
 from sqlmodel import select
 
+from app.shared.domain.repositories.user_repository import UserRepository
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
-from app.users.domain.repositories.user_repository import UserRepository
 from app.users.domain.user import User
 from app.users.infrastructure.models import UserModel
 

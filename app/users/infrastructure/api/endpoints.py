@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import SessionDep
+from app.shared.infrastructure.repositories.sqlmodel_user_repository import (
+    SqlModelUserRepository,
+)
 from app.users.application.create_user import CreateUser, CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExists
 from app.users.infrastructure.api.payloads import CreateUserPayload
 from app.users.infrastructure.api.responses import UserResponse
-from app.users.infrastructure.repositories.sqlmodel_user_repository import (
-    SqlModelUserRepository,
-)
 
 router = APIRouter()
 

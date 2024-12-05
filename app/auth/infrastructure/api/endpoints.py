@@ -10,9 +10,8 @@ from app.auth.domain.exceptions import (
     UserDoesNotExist,
     UserInactive,
 )
-from app.auth.domain.token import Token
 from app.auth.infrastructure.responses import TokenResponse
-from app.users.infrastructure.repositories.sqlmodel_user_repository import (
+from app.shared.infrastructure.repositories.sqlmodel_user_repository import (
     SqlModelUserRepository,
 )
 
@@ -20,11 +19,10 @@ router = APIRouter()
 
 
 @router.post("/access-token/", response_model=TokenResponse)
-def authenticate_user(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+def authenticate_user(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> TokenResponse:
     try:
         token = Authenticate(repository=SqlModelUserRepository(session=session)).execute(
-            email=form_data.username,
-            password=form_data.password,
+            email=form_data.username, password=form_data.password
         )
     except (UserDoesNotExist, IncorrectPassword):
         raise HTTPException(
@@ -36,4 +34,4 @@ def authenticate_user(session: SessionDep, form_data: Annotated[OAuth2PasswordRe
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user",
         )
-    return token
+    return TokenResponse.from_domain(token)
