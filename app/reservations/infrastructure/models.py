@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel
@@ -28,7 +28,7 @@ class SeatModel(SQLModel, table=True):
         return cls(id=seat.id.to_uuid(), row=seat.row, number=seat.number, status=seat.status)
 
     def to_domain(self) -> Seat:
-        return Seat(id=ID.from_uuid(self.id), row=self.row, number=self.number, status=self.status)
+        return Seat(id=Id.from_uuid(self.id), row=self.row, number=self.number, status=self.status)
 
 
 class ReservationModel(SQLModel, table=True):
@@ -51,8 +51,8 @@ class ReservationModel(SQLModel, table=True):
 
     def to_domain(self) -> Reservation:
         return Reservation(
-            id=ID.from_uuid(self.id),
-            user_id=ID.from_uuid(self.user_id),
-            showtime_id=ID.from_uuid(self.showtime_id),
+            id=Id.from_uuid(self.id),
+            user_id=Id.from_uuid(self.user_id),
+            showtime_id=Id.from_uuid(self.showtime_id),
             has_paid=self.has_paid,
         )

@@ -16,7 +16,7 @@ from app.reservations.infrastructure.repositories.sqlmodel_reservation_repositor
 from app.reservations.infrastructure.schedulers.celery_reservation_release_scheduler import (
     CeleryReservationReleaseScheduler,
 )
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 router = APIRouter()
 
@@ -29,9 +29,9 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
             reservation_release_scheduler=CeleryReservationReleaseScheduler(),
         ).execute(
             params=CreateReservationParams(
-                showtime_id=ID(request_body.showtime_id),
-                seat_ids=[ID(seat_id) for seat_id in request_body.seat_ids],
-                user_id=ID.from_uuid(current_user.id),
+                showtime_id=Id(request_body.showtime_id),
+                seat_ids=[Id(seat_id) for seat_id in request_body.seat_ids],
+                user_id=Id.from_uuid(current_user.id),
             )
         )
     except SeatsNotAvailable:
@@ -42,7 +42,7 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
 def retrieve_reservations(session: SessionDep, current_user: CurrentUser) -> list[MovieReservationResponse]:
     movie_reservations = RetrieveReservations(
         repository=SqlModelReservationRepository(session=session),
-    ).execute(user_id=ID.from_uuid(current_user.id))
+    ).execute(user_id=Id.from_uuid(current_user.id))
     return [MovieReservationResponse.from_domain(reservation) for reservation in movie_reservations]
 
 
@@ -53,8 +53,8 @@ def cancel_reservation(session: SessionDep, reservation_id: str, current_user: C
             repository=SqlModelReservationRepository(session=session),
         ).execute(
             params=CancelReservationParams(
-                reservation_id=ID(reservation_id),
-                user_id=ID.from_uuid(current_user.id),
+                reservation_id=Id(reservation_id),
+                user_id=Id.from_uuid(current_user.id),
             )
         )
     except ReservationDoesNotExist:

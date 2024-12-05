@@ -3,13 +3,13 @@ from datetime import date
 
 from app.movies.domain.movie import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 @dataclass(frozen=True)
 class RetrieveMoviesParams:
     available_date: date
-    genre_id: ID | None
+    genre_id: Id | None
 
 
 class RetrieveMovies:

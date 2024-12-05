@@ -1,17 +1,17 @@
 import uuid
 
 from app.reservations.domain.seat import Seat, SeatStatus
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 class SeatBuilderTest:
     def __init__(self) -> None:
-        self.id: ID = ID.from_uuid(uuid.uuid4())
+        self.id: Id = Id.from_uuid(uuid.uuid4())
         self.row: int = 1
         self.number: int = 1
         self.status: SeatStatus = SeatStatus.AVAILABLE
 
-    def with_id(self, id: ID) -> "SeatBuilderTest":
+    def with_id(self, id: Id) -> "SeatBuilderTest":
         self.id = id
         return self
 

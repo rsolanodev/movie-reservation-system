@@ -25,7 +25,7 @@ from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -69,7 +69,7 @@ class TestCreateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_create_movie.return_value.execute.return_value = (
-            MovieBuilder().with_id(id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
+            MovieBuilder().with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")).build()
         )
 
         response = client.post(
@@ -111,7 +111,7 @@ class TestCreateMovieEndpoint:
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_create_movie.return_value.execute.return_value = (
-            MovieBuilder().with_id(id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d")).without_poster_image().build()
+            MovieBuilder().with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")).without_poster_image().build()
         )
 
         response = client.post(
@@ -198,7 +198,7 @@ class TestUpdateMovieEndpoint:
     def movie(self) -> Movie:
         return (
             MovieBuilder()
-            .with_id(id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_title(title="Deadpool & Wolverine")
             .with_description(description="Deadpool and a variant of Wolverine.")
             .with_poster_image(poster_image="deadpool_and_wolverine.jpg")
@@ -249,7 +249,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
-                id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image=PosterImage(
@@ -286,7 +286,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
-                id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title=None,
                 description=None,
                 poster_image=None,
@@ -322,7 +322,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
-                id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
                 poster_image=None,
@@ -410,7 +410,7 @@ class TestDeleteMovieEndpoint:
         )
 
         mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
-        mock_delete_movie.return_value.execute.assert_called_once_with(id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+        mock_delete_movie.return_value.execute.assert_called_once_with(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
         assert response.status_code == 200
 
@@ -430,7 +430,7 @@ class TestDeleteMovieEndpoint:
 
         mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_delete_movie.return_value.execute.assert_called_once_with(
-            id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
         )
 
         assert response.status_code == 404
@@ -568,8 +568,8 @@ class TestAddMovieGenreEndpoint:
 
         mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
         mock_add_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=ID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 200
@@ -591,8 +591,8 @@ class TestAddMovieGenreEndpoint:
 
         mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
         mock_add_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=ID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 400
@@ -640,8 +640,8 @@ class TestRemoveMovieGenreEndpoint:
 
         mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository)
         mock_remove_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=ID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 200
@@ -662,8 +662,8 @@ class TestRemoveMovieGenreEndpoint:
 
         mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository)
         mock_remove_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=ID("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
         )
 
         assert response.status_code == 400
@@ -728,22 +728,22 @@ class TestRetrieveMovieEndpoint:
     ) -> None:
         mock_retrieve_movie.return_value.execute.return_value = (
             MovieBuilder()
-            .with_id(id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
                 genre=GenreFactoryTest().create(
-                    id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                    id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
                     name="Action",
                 )
             )
             .with_genre(
                 genre=GenreFactoryTest().create(
-                    id=ID("d108f84b-3568-446b-896c-3ba2bc74cda8"),
+                    id=Id("d108f84b-3568-446b-896c-3ba2bc74cda8"),
                     name="Comedy",
                 )
             )
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
-                    id=ID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
@@ -755,7 +755,7 @@ class TestRetrieveMovieEndpoint:
         mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
-                movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=date(2023, 4, 3),
             )
         )
@@ -791,7 +791,7 @@ class TestRetrieveMovieEndpoint:
         mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
-                movie_id=ID("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=date(2023, 4, 3),
             )
         )
@@ -863,29 +863,29 @@ class TestRetrieveMoviesEndpoint:
     ) -> None:
         mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
-            .with_id(id=ID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre=GenreFactoryTest().create(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
+            .with_genre(genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
-                    id=ID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
             .build(),
             MovieBuilder()
-            .with_id(id=ID("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f965"))
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
             .with_genre(
-                genre=GenreFactoryTest().create(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
+                genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
             )
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
-                    id=ID("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
+                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
                     show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
                 )
             )
@@ -934,11 +934,11 @@ class TestRetrieveMoviesEndpoint:
     ) -> None:
         mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
-            .with_id(id=ID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_genre(genre=GenreFactoryTest().create(id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
+            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_genre(genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
-                    id=ID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
+                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                     show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 )
             )
@@ -951,7 +951,7 @@ class TestRetrieveMoviesEndpoint:
         mock_retrieve_movies.return_value.execute.assert_called_once_with(
             params=RetrieveMoviesParams(
                 available_date=date(2023, 4, 3),
-                genre_id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
 

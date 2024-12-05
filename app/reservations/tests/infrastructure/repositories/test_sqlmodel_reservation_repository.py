@@ -15,7 +15,7 @@ from app.reservations.tests.builders.seat_builder_test import SeatBuilderTest
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 
 
@@ -26,13 +26,13 @@ class TestSqlModelReservationRepository:
 
         reservation = (
             ReservationBuilderTest()
-            .with_user_id(ID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
-            .with_showtime_id(ID("ffa502e6-8869-490c-8799-5bea26c7146d"))
+            .with_user_id(Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
+            .with_showtime_id(Id("ffa502e6-8869-490c-8799-5bea26c7146d"))
             .with_seats(
                 Seats(
                     [
-                        SeatBuilderTest().with_id(ID.from_uuid(main_seat.id)).build(),
-                        SeatBuilderTest().with_id(ID.from_uuid(parent_seat.id)).build(),
+                        SeatBuilderTest().with_id(Id.from_uuid(main_seat.id)).build(),
+                        SeatBuilderTest().with_id(Id.from_uuid(parent_seat.id)).build(),
                     ]
                 ),
             )
@@ -80,12 +80,12 @@ class TestSqlModelReservationRepository:
         )
 
         seats = SqlModelReservationRepository(session).find_seats(
-            seat_ids=[ID.from_uuid(seat_available.id), ID.from_uuid(seat_reserved.id)],
+            seat_ids=[Id.from_uuid(seat_available.id), Id.from_uuid(seat_reserved.id)],
         )
 
         assert seats == [
-            Seat(id=ID.from_uuid(seat_available.id), row=1, number=1, status=SeatStatus.AVAILABLE),
-            Seat(id=ID.from_uuid(seat_reserved.id), row=2, number=2, status=SeatStatus.RESERVED),
+            Seat(id=Id.from_uuid(seat_available.id), row=1, number=1, status=SeatStatus.AVAILABLE),
+            Seat(id=Id.from_uuid(seat_reserved.id), row=2, number=2, status=SeatStatus.RESERVED),
         ]
 
     @pytest.mark.parametrize("has_paid", [False, True])
@@ -100,13 +100,13 @@ class TestSqlModelReservationRepository:
         )
 
         reservation = SqlModelReservationRepository(session).get(
-            reservation_id=ID.from_uuid(reservation_model.id),
+            reservation_id=Id.from_uuid(reservation_model.id),
         )
 
         assert reservation == Reservation(
-            id=ID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
-            user_id=ID("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
-            showtime_id=ID("ffa502e6-8869-490c-8799-5bea26c7146d"),
+            id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
+            user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
+            showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
             has_paid=has_paid,
         )
 
@@ -120,7 +120,7 @@ class TestSqlModelReservationRepository:
         )
 
         SqlModelReservationRepository(session).release(
-            reservation_id=ID.from_uuid(reservation_model.id),
+            reservation_id=Id.from_uuid(reservation_model.id),
         )
 
         assert seat_model.status == SeatStatus.AVAILABLE
@@ -156,15 +156,15 @@ class TestSqlModelReservationRepository:
         )
 
         reservations = SqlModelReservationRepository(session).find_by_user_id(
-            user_id=ID("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
+            user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
         )
 
         assert reservations == [
             MovieReservation(
-                reservation_id=ID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
+                reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=ID("8c8ec976-9692-4c86-921d-28cf1302550c"),
+                    id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
@@ -223,25 +223,25 @@ class TestSqlModelReservationRepository:
         )
 
         reservations = SqlModelReservationRepository(session).find_by_user_id(
-            user_id=ID("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
+            user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
         )
 
         assert reservations == [
             MovieReservation(
-                reservation_id=ID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
+                reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=ID("8c8ec976-9692-4c86-921d-28cf1302550c"),
+                    id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
                 seats=[ReservedSeat(row=1, number=2)],
             ),
             MovieReservation(
-                reservation_id=ID("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"),
+                reservation_id=Id("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"),
                 show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=ID("421d2efb-7523-43e1-ba97-f9057f08d468"),
+                    id=Id("421d2efb-7523-43e1-ba97-f9057f08d468"),
                     title="La Sustancia",
                     poster_image="la_sustancia.jpg",
                 ),
@@ -285,15 +285,15 @@ class TestSqlModelReservationRepository:
         )
 
         reservations = SqlModelReservationRepository(session).find_by_user_id(
-            user_id=ID("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
+            user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
         )
 
         assert reservations == [
             MovieReservation(
-                reservation_id=ID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
+                reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
                 movie=Movie(
-                    id=ID("8c8ec976-9692-4c86-921d-28cf1302550c"),
+                    id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
@@ -326,7 +326,7 @@ class TestSqlModelReservationRepository:
         )
 
         reservations = SqlModelReservationRepository(session).find_by_user_id(
-            user_id=ID("cee0a37c-67bc-4038-a8fc-39e68ea1453a")
+            user_id=Id("cee0a37c-67bc-4038-a8fc-39e68ea1453a")
         )
 
         assert reservations == []
@@ -356,7 +356,7 @@ class TestSqlModelReservationRepository:
         )
 
         reservations = SqlModelReservationRepository(session).find_by_user_id(
-            user_id=ID("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
+            user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a")
         )
 
         assert reservations == []

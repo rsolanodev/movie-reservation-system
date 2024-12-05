@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel
@@ -35,7 +35,7 @@ class MovieModel(SQLModel, table=True):
 
     def to_domain(self) -> Movie:
         return Movie(
-            id=ID.from_uuid(self.id),
+            id=Id.from_uuid(self.id),
             title=self.title,
             description=self.description,
             poster_image=self.poster_image,
@@ -52,4 +52,4 @@ class GenreModel(SQLModel, table=True):
         return GenreModel(id=genre.id.to_uuid(), name=genre.name)
 
     def to_domain(self) -> Genre:
-        return Genre(id=ID.from_uuid(self.id), name=self.name)
+        return Genre(id=Id.from_uuid(self.id), name=self.name)

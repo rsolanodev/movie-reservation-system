@@ -5,14 +5,14 @@ from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 @dataclass(frozen=True)
 class CreateReservationParams:
-    showtime_id: ID
-    seat_ids: list[ID]
-    user_id: ID
+    showtime_id: Id
+    seat_ids: list[Id]
+    user_id: Id
 
 
 class CreateReservation:
@@ -34,5 +34,5 @@ class CreateReservation:
         self._launch_reservation_release_task(reservation_id=reservation.id)
         return reservation
 
-    def _launch_reservation_release_task(self, reservation_id: ID) -> None:
+    def _launch_reservation_release_task(self, reservation_id: Id) -> None:
         self._reservation_release_scheduler.schedule(reservation_id=reservation_id, delay=timedelta(minutes=15))

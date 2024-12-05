@@ -5,12 +5,12 @@ from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 class MovieBuilder:
     def __init__(self) -> None:
-        self.id: ID = ID.from_uuid(uuid.uuid4())
+        self.id: Id = Id.from_uuid(uuid.uuid4())
         self.title: str = "Deadpool & Wolverine"
         self.description: str = "Deadpool and a variant of Wolverine."
         self.poster_image: str | None = "deadpool_and_wolverine.jpg"
@@ -18,7 +18,7 @@ class MovieBuilder:
         self.genres: MovieGenres = MovieGenres([])
         self.showtimes: MovieShowtimes = MovieShowtimes([])
 
-    def with_id(self, id: ID) -> "MovieBuilder":
+    def with_id(self, id: Id) -> "MovieBuilder":
         self.id = id
         return self
 

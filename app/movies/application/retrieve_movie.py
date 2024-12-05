@@ -4,12 +4,12 @@ from datetime import date
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.movie import Movie
 from app.movies.domain.repositories.movie_repository import MovieRepository
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 @dataclass
 class RetrieveMovieParams:
-    movie_id: ID
+    movie_id: Id
     showtime_date: date
 
 

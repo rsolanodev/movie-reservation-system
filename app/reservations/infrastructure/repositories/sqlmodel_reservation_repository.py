@@ -9,7 +9,7 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
 
@@ -27,17 +27,17 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             seat_model.status = SeatStatus.RESERVED
             seat_model.reservation_id = reservation.id.to_uuid()
 
-    def find_seats(self, seat_ids: list[ID]) -> Seats:
+    def find_seats(self, seat_ids: list[Id]) -> Seats:
         seat_models = self._session.exec(
             select(SeatModel).filter(SeatModel.id.in_([seat_id.to_uuid() for seat_id in seat_ids])),  # type: ignore
         ).all()
         return Seats([seat_model.to_domain() for seat_model in seat_models])
 
-    def get(self, reservation_id: ID) -> Reservation:
+    def get(self, reservation_id: Id) -> Reservation:
         reservation_model = self._session.get_one(ReservationModel, reservation_id.to_uuid())
         return reservation_model.to_domain()
 
-    def release(self, reservation_id: ID) -> None:
+    def release(self, reservation_id: Id) -> None:
         self._session.exec(
             update(SeatModel)
             .where(SeatModel.reservation_id == reservation_id.to_uuid())  # type: ignore
@@ -45,7 +45,7 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
         )
         self._session.commit()
 
-    def find_by_user_id(self, user_id: ID) -> list[MovieReservation]:
+    def find_by_user_id(self, user_id: Id) -> list[MovieReservation]:
         reservation_models = self._session.exec(
             select(ReservationModel)
             .options(
@@ -63,10 +63,10 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
 
     def _build_movie_reservation(self, reservation_model: ReservationModel) -> MovieReservation:
         return MovieReservation(
-            reservation_id=ID(reservation_model.id),
+            reservation_id=Id(reservation_model.id),
             show_datetime=self._ensure_utc_timezone(reservation_model.showtime.show_datetime),
             movie=Movie(
-                id=ID(reservation_model.showtime.movie_id),
+                id=Id(reservation_model.showtime.movie_id),
                 title=reservation_model.showtime.movie.title,
                 poster_image=reservation_model.showtime.movie.poster_image,
             ),
