@@ -1,15 +1,13 @@
-from uuid import UUID
-
 from sqlmodel import SQLModel
 
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import Seat
 
 
 class SeatResponse(SQLModel):
-    id: UUID
+    id: str
     row: int
     number: int
-    status: SeatStatus
+    status: str
 
     @classmethod
     def from_domain(cls, seat: Seat) -> "SeatResponse":

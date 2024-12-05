@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
-from uuid import UUID
+
+from app.shared.domain.value_objects.id import Id
 
 
 class SeatStatus(StrEnum):
@@ -11,7 +12,7 @@ class SeatStatus(StrEnum):
 
 @dataclass
 class Seat:
-    id: UUID
+    id: Id
     row: int
     number: int
     status: SeatStatus

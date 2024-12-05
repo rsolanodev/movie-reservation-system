@@ -1,8 +1,7 @@
-from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
+from app.shared.domain.value_objects.id import Id
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.application.delete_showtime import DeleteShowtime
 from app.showtimes.application.retrieve_seats import RetrieveSeats
@@ -21,8 +20,8 @@ def create_showtime(session: SessionDep, request_body: CreateShowtimePayload) ->
             repository=SqlModelShowtimeRepository(session=session),
         ).execute(
             params=CreateShowtimeParams(
-                movie_id=request_body.movie_id,
-                room_id=request_body.room_id,
+                movie_id=Id(request_body.movie_id),
+                room_id=Id(request_body.room_id),
                 show_datetime=request_body.show_datetime,
             )
         )
@@ -34,16 +33,16 @@ def create_showtime(session: SessionDep, request_body: CreateShowtimePayload) ->
 
 
 @router.delete("/{showtime_id}/", status_code=status.HTTP_200_OK, dependencies=[Depends(get_current_active_superuser)])
-def delete_showtime(session: SessionDep, showtime_id: UUID) -> None:
+def delete_showtime(session: SessionDep, showtime_id: str) -> None:
     DeleteShowtime(
         repository=SqlModelShowtimeRepository(session=session),
-    ).execute(showtime_id=showtime_id)
+    ).execute(showtime_id=Id(showtime_id))
 
 
 @router.get("/{showtime_id}/seats/", response_model=list[SeatResponse], status_code=status.HTTP_200_OK)
-def retrieve_seats(session: SessionDep, showtime_id: UUID) -> list[SeatResponse]:
+def retrieve_seats(session: SessionDep, showtime_id: str) -> list[SeatResponse]:
     seats = RetrieveSeats(
         repository=SqlModelShowtimeRepository(session=session),
-    ).execute(showtime_id=showtime_id)
+    ).execute(showtime_id=Id(showtime_id))
 
     return [SeatResponse.from_domain(seat) for seat in seats]

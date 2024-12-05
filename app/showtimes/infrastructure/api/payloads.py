@@ -1,10 +1,9 @@
 from datetime import datetime
-from uuid import UUID
 
 from sqlmodel import SQLModel
 
 
 class CreateShowtimePayload(SQLModel):
-    movie_id: UUID
-    room_id: UUID
+    movie_id: str
+    room_id: str
     show_datetime: datetime

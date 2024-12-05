@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlmodel import Session
 
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
 from app.showtimes.domain.seat import Seat, SeatStatus
@@ -25,9 +26,9 @@ class TestSqlModelShowtimeRepository:
 
         assert SqlModelShowtimeRepository(session=session).exists(
             showtime=Showtime(
-                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
             )
         )
@@ -42,9 +43,9 @@ class TestSqlModelShowtimeRepository:
 
         assert not SqlModelShowtimeRepository(session=session).exists(
             showtime=Showtime(
-                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
-                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
+                movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
+                room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 show_datetime=datetime(2023, 4, 1, 22, 0, tzinfo=timezone.utc),
             )
         )
@@ -56,13 +57,13 @@ class TestSqlModelShowtimeRepository:
             seat_configuration=[{"row": 1, "number": 2}, {"row": 3, "number": 4}],
         )
         showtime = Showtime.create(
-            movie_id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"),
+            movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
             show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
-            room_id=room.id,
+            room_id=Id.from_uuid(room.id),
         )
         SqlModelShowtimeRepository(session=session).create(showtime)
 
-        showtime_model = session.get_one(ShowtimeModel, showtime.id)
+        showtime_model = session.get_one(ShowtimeModel, showtime.id.to_uuid())
         assert showtime_model.movie_id == UUID("ec725625-f502-4d39-9401-a415d8c1f964")
         assert showtime_model.room_id == UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600")
         assert showtime_model.show_datetime == datetime(2023, 4, 2, 20, 0)
@@ -81,7 +82,7 @@ class TestSqlModelShowtimeRepository:
             show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
         )
 
-        SqlModelShowtimeRepository(session=session).delete(showtime_id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
+        SqlModelShowtimeRepository(session=session).delete(showtime_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
 
         showtime_model = session.get(ShowtimeModel, UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"))
         assert showtime_model is None
@@ -103,7 +104,9 @@ class TestSqlModelShowtimeRepository:
         seat_model_factory.create(showtime_id=showtime_id, row=1, number=2, status=SeatStatus.RESERVED)
         seat_model_factory.create(row=1, number=1)
 
-        seats = SqlModelShowtimeRepository(session=session).retrive_seats(showtime_id=showtime_id)
+        seats = SqlModelShowtimeRepository(session=session).retrive_seats(
+            showtime_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601")
+        )
 
         assert seats == [
             Seat(id=ANY, row=1, number=1, status=SeatStatus.AVAILABLE),
