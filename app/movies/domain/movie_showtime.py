@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 
 
 @dataclass
 class MovieShowtime:
-    id: ID
+    id: Id
     show_datetime: datetime
 
     def is_future(self) -> bool:

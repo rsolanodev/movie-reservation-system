@@ -7,7 +7,7 @@ from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.domain.exceptions import GenreAlreadyAssigned
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
-from app.shared.domain.value_objects.id import ID
+from app.shared.domain.value_objects.id import Id
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
@@ -32,7 +32,7 @@ class TestAddMovieGenre:
             MovieBuilder()
             .with_genre(
                 genre=GenreFactoryTest().create(
-                    id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                    id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
                     name="Action",
                 )
             )
@@ -42,7 +42,7 @@ class TestAddMovieGenre:
 
         with pytest.raises(GenreAlreadyAssigned):
             AddMovieGenre(repository=mock_movie_repository).execute(
-                movie_id=movie.id, genre_id=ID("d108f84b-3568-446b-896c-3ba2bc74cda9")
+                movie_id=movie.id, genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9")
             )
 
         mock_movie_repository.get.assert_called_once_with(id=movie.id)
