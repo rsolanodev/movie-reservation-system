@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import date, timezone
+from datetime import date
 from uuid import UUID
 
 from sqlalchemy import func
@@ -10,6 +10,7 @@ from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
@@ -110,12 +111,7 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
 
     @staticmethod
     def _build_movie_showtime(showtime_model: ShowtimeModel) -> MovieShowtime:
-        show_datetime = showtime_model.show_datetime
-
-        if show_datetime.tzinfo is None:
-            show_datetime = show_datetime.replace(tzinfo=timezone.utc)
-
         return MovieShowtime(
             id=Id.from_uuid(showtime_model.id),
-            show_datetime=show_datetime,
+            show_datetime=DateTime.from_datetime(showtime_model.show_datetime),
         )

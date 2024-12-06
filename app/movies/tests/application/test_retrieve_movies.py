@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -14,6 +14,7 @@ from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import MovieShowtimeFactoryTest
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -36,7 +37,7 @@ class TestRetrieveMovies:
             .with_showtime(
                 MovieShowtimeFactoryTest().create(
                     id=Id("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 )
             )
             .build(),
@@ -51,7 +52,7 @@ class TestRetrieveMovies:
             .with_showtime(
                 MovieShowtimeFactoryTest().create(
                     id=Id("f48c4dae-b0e2-43f6-a659-599f5e254270"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 )
             )
             .build(),
@@ -77,7 +78,7 @@ class TestRetrieveMovies:
                     [
                         MovieShowtime(
                             id=Id("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         )
                     ]
                 ),
@@ -99,7 +100,7 @@ class TestRetrieveMovies:
                     [
                         MovieShowtime(
                             id=Id("f48c4dae-b0e2-43f6-a659-599f5e254270"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         )
                     ]
                 ),
@@ -131,7 +132,7 @@ class TestRetrieveMovies:
                     [
                         MovieShowtime(
                             id=Id("f48c4dae-b0e2-43f6-a659-599f5e254270"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         )
                     ]
                 ),

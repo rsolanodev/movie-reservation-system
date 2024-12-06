@@ -11,6 +11,7 @@ from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
@@ -146,7 +147,7 @@ class TestSqlModelMovieRepository:
                     [
                         MovieShowtime(
                             id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         ),
                     ],
                 ),
@@ -181,7 +182,7 @@ class TestSqlModelMovieRepository:
                     [
                         MovieShowtime(
                             id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         ),
                     ],
                 ),
@@ -212,11 +213,11 @@ class TestSqlModelMovieRepository:
                     [
                         MovieShowtime(
                             id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                         ),
                         MovieShowtime(
                             id=Id("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
-                            show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+                            show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 23, 0)),
                         ),
                     ],
                 ),
@@ -252,11 +253,11 @@ class TestSqlModelMovieRepository:
                 [
                     MovieShowtime(
                         id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                        show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                     ),
                     MovieShowtime(
                         id=Id("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
-                        show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+                        show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 23, 0)),
                     ),
                 ]
             ),

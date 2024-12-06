@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -17,6 +17,7 @@ from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -43,7 +44,7 @@ class TestRetrieveMovie:
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
                     id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 )
             )
             .build()
@@ -71,7 +72,7 @@ class TestRetrieveMovie:
                 [
                     MovieShowtime(
                         id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                        show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                        show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                     )
                 ],
             ),
