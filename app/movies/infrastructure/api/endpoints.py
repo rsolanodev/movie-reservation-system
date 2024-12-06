@@ -50,10 +50,13 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     response_model=list[RetrieveMovieResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movies(session: SessionDep, available_date: date, genre_id: str | None = None) -> list[Movie]:
-    return RetrieveMovies(repository=SqlModelMovieRepository(session=session)).execute(
+def retrieve_movies(
+    session: SessionDep, available_date: date, genre_id: str | None = None
+) -> list[RetrieveMovieResponse]:
+    movies = RetrieveMovies(repository=SqlModelMovieRepository(session=session)).execute(
         params=RetrieveMoviesParams(available_date=available_date, genre_id=Id(genre_id) if genre_id else None),
     )
+    return [RetrieveMovieResponse.from_domain(movie=movie) for movie in movies]
 
 
 @router.post(
@@ -84,13 +87,14 @@ def create_movie(
     response_model=RetrieveMovieResponse,
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: date) -> Movie:
+def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: date) -> RetrieveMovieResponse:
     try:
-        return RetrieveMovie(
+        movie = RetrieveMovie(
             repository=SqlModelMovieRepository(session=session),
         ).execute(params=RetrieveMovieParams(movie_id=Id(movie_id), showtime_date=showtime_date))
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
+    return RetrieveMovieResponse.from_domain(movie=movie)
 
 
 @router.patch(

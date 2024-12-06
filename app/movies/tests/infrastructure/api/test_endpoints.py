@@ -25,6 +25,7 @@ from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
@@ -744,7 +745,7 @@ class TestRetrieveMovieEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
                     id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 )
             )
             .build()
@@ -871,7 +872,7 @@ class TestRetrieveMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
                     id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 )
             )
             .build(),
@@ -886,7 +887,7 @@ class TestRetrieveMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
                     id=Id("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                    show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 23)),
                 )
             )
             .build(),
@@ -939,7 +940,7 @@ class TestRetrieveMoviesEndpoint:
             .with_showtime(
                 showtime=MovieShowtimeFactoryTest().create(
                     id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22)),
                 )
             )
             .build()
