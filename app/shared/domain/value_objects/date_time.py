@@ -6,6 +6,10 @@ from datetime import datetime, timezone
 class DateTime:
     _value: datetime
 
+    @property
+    def value(self) -> datetime:
+        return self._value
+
     @classmethod
     def from_datetime(cls, value: datetime) -> "DateTime":
         if value.tzinfo is None:
