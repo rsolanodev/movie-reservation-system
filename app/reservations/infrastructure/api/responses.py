@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlmodel import SQLModel
 
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
@@ -26,7 +24,7 @@ class ReservedSeatResponse(SQLModel):
 
 class MovieReservationResponse(SQLModel):
     reservation_id: str
-    show_datetime: datetime
+    show_datetime: str
     movie: MovieResponse
     seats: list[ReservedSeatResponse]
 
@@ -34,7 +32,7 @@ class MovieReservationResponse(SQLModel):
     def from_domain(cls, reservation: MovieReservation) -> "MovieReservationResponse":
         return cls(
             reservation_id=reservation.reservation_id,
-            show_datetime=reservation.show_datetime,
+            show_datetime=reservation.show_datetime.to_string(),
             movie=MovieResponse.from_domain(reservation.movie),
             seats=[ReservedSeatResponse.from_domain(seat) for seat in reservation.seats],
         )

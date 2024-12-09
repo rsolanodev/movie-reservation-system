@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -7,6 +7,7 @@ import pytest
 from app.reservations.application.retrieve_reservations import RetrieveReservations
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 
@@ -19,7 +20,7 @@ class TestRetrieveReservations:
         expected_movie_reservation = [
             MovieReservation(
                 reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
-                show_datetime=datetime(2024, 1, 2, 22, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2024, 1, 2, 22, 0)),
                 movie=Movie(
                     id=Id("d64a9a87-4484-46f9-8ec1-f1e1c9fe2880"),
                     title="Robot Salvaje",
@@ -29,7 +30,7 @@ class TestRetrieveReservations:
             ),
             MovieReservation(
                 reservation_id=Id("ffd7e9f4-bec7-4487-8f2f-d84b49d0bcee"),
-                show_datetime=datetime(2024, 1, 1, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2024, 1, 1, 20, 0)),
                 movie=Movie(
                     id=Id("6c42605f-ac4a-405d-94f2-1f0ea3de5ddb"),
                     title="La Sustancia",

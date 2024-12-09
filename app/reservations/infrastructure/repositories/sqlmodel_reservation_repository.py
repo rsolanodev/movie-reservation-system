@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import select, update
 
@@ -9,6 +7,7 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.infrastructure.models import ShowtimeModel
@@ -64,7 +63,7 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
     def _build_movie_reservation(self, reservation_model: ReservationModel) -> MovieReservation:
         return MovieReservation(
             reservation_id=Id(reservation_model.id),
-            show_datetime=self._ensure_utc_timezone(reservation_model.showtime.show_datetime),
+            show_datetime=DateTime.from_datetime(reservation_model.showtime.show_datetime),
             movie=Movie(
                 id=Id(reservation_model.showtime.movie_id),
                 title=reservation_model.showtime.movie.title,
@@ -76,10 +75,7 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
         )
 
     def _sort_movie_reservations(self, movie_reservations: list[MovieReservation]) -> list[MovieReservation]:
-        return sorted(movie_reservations, key=lambda movie_reservation: movie_reservation.show_datetime, reverse=True)
+        return sorted(movie_reservations, key=lambda mr: mr.show_datetime.value, reverse=True)
 
     def _sort_reserved_seats(self, seats: list[ReservedSeat]) -> list[ReservedSeat]:
         return sorted(seats, key=lambda seat: (seat.row, seat.number))
-
-    def _ensure_utc_timezone(self, show_datetime: datetime) -> datetime:
-        return show_datetime.replace(tzinfo=timezone.utc) if show_datetime.tzinfo is None else show_datetime

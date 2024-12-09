@@ -15,6 +15,7 @@ from app.reservations.tests.builders.seat_builder_test import SeatBuilderTest
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 
@@ -162,7 +163,7 @@ class TestSqlModelReservationRepository:
         assert reservations == [
             MovieReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
-                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
                     id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",
@@ -229,7 +230,7 @@ class TestSqlModelReservationRepository:
         assert reservations == [
             MovieReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
-                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
                     id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",
@@ -239,7 +240,7 @@ class TestSqlModelReservationRepository:
             ),
             MovieReservation(
                 reservation_id=Id("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"),
-                show_datetime=datetime(2023, 4, 3, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 20, 0)),
                 movie=Movie(
                     id=Id("421d2efb-7523-43e1-ba97-f9057f08d468"),
                     title="La Sustancia",
@@ -291,7 +292,7 @@ class TestSqlModelReservationRepository:
         assert reservations == [
             MovieReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
-                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
                     id=Id("8c8ec976-9692-4c86-921d-28cf1302550c"),
                     title="Robot Salvaje",

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
 
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 
@@ -20,6 +20,6 @@ class Movie:
 @dataclass
 class MovieReservation:
     reservation_id: Id
-    show_datetime: datetime
+    show_datetime: DateTime
     movie: Movie
     seats: list[ReservedSeat]
