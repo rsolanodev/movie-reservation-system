@@ -17,6 +17,7 @@ from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
+from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
@@ -53,13 +54,13 @@ class TestRetrieveMovie:
         movie = RetrieveMovie(repository=mock_movie_repository).execute(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                showtime_date=date(2023, 4, 3),
+                showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
         )
 
         mock_movie_repository.get_movie_for_date.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            showtime_date=date(2023, 4, 3),
+            showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )
 
         assert movie == Movie(
@@ -85,11 +86,11 @@ class TestRetrieveMovie:
             RetrieveMovie(repository=mock_movie_repository).execute(
                 params=RetrieveMovieParams(
                     movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                    showtime_date=date(2023, 4, 3),
+                    showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
                 )
             )
 
         mock_movie_repository.get_movie_for_date.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            showtime_date=date(2023, 4, 3),
+            showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )

@@ -87,11 +87,11 @@ def create_movie(
     response_model=RetrieveMovieResponse,
     status_code=status.HTTP_200_OK,
 )
-def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: date) -> RetrieveMovieResponse:
+def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> RetrieveMovieResponse:
     try:
-        movie = RetrieveMovie(
-            repository=SqlModelMovieRepository(session=session),
-        ).execute(params=RetrieveMovieParams(movie_id=Id(movie_id), showtime_date=showtime_date))
+        movie = RetrieveMovie(repository=SqlModelMovieRepository(session=session)).execute(
+            params=RetrieveMovieParams.from_primitive(movie_id=movie_id, showtime_date=showtime_date)
+        )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
     return RetrieveMovieResponse.from_domain(movie=movie)

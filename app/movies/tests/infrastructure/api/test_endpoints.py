@@ -25,6 +25,7 @@ from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
 )
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
@@ -757,7 +758,7 @@ class TestRetrieveMovieEndpoint:
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                showtime_date=date(2023, 4, 3),
+                showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
         )
 
@@ -793,7 +794,7 @@ class TestRetrieveMovieEndpoint:
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                showtime_date=date(2023, 4, 3),
+                showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
         )
 
