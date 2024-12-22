@@ -19,9 +19,9 @@ def create_showtime(session: SessionDep, request_body: CreateShowtimePayload) ->
         CreateShowtime(
             repository=SqlModelShowtimeRepository(session=session),
         ).execute(
-            params=CreateShowtimeParams(
-                movie_id=Id(request_body.movie_id),
-                room_id=Id(request_body.room_id),
+            params=CreateShowtimeParams.from_primitives(
+                movie_id=request_body.movie_id,
+                room_id=request_body.room_id,
                 show_datetime=request_body.show_datetime,
             )
         )

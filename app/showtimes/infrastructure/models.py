@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.showtimes.domain.showtime import Showtime
 
@@ -29,7 +30,7 @@ class ShowtimeModel(SQLModel, table=True):
             id=showtime.id.to_uuid(),
             movie_id=showtime.movie_id.to_uuid(),
             room_id=showtime.room_id.to_uuid(),
-            show_datetime=showtime.show_datetime,
+            show_datetime=showtime.show_datetime.value,
         )
 
     def to_domain(self) -> Showtime:
@@ -37,5 +38,5 @@ class ShowtimeModel(SQLModel, table=True):
             id=Id.from_uuid(self.id),
             movie_id=Id.from_uuid(self.movie_id),
             room_id=Id.from_uuid(self.room_id),
-            show_datetime=self.show_datetime,
+            show_datetime=DateTime.from_datetime(self.show_datetime),
         )

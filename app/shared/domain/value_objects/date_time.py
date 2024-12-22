@@ -23,5 +23,9 @@ class DateTime:
     def to_string(self) -> str:
         return self._value.strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    @classmethod
+    def from_string(cls, value: str) -> "DateTime":
+        return cls.from_datetime(datetime.fromisoformat(value))
+
     def __ge__(self, other: "DateTime") -> bool:
         return self._value >= other._value
