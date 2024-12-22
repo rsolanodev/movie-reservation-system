@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
@@ -75,7 +76,7 @@ class TestCreateShowtimeEndpoint:
             params=CreateShowtimeParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2022, 8, 10, 22, 0, 0)),
             )
         )
 
@@ -105,7 +106,7 @@ class TestCreateShowtimeEndpoint:
             params=CreateShowtimeParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2022, 8, 10, 22, 0, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2022, 8, 10, 22, 0, 0)),
             )
         )
 

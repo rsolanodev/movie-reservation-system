@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlmodel import Session
 
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
@@ -29,7 +30,7 @@ class TestSqlModelShowtimeRepository:
                 id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 1, 20, 0)),
             )
         )
 
@@ -46,7 +47,7 @@ class TestSqlModelShowtimeRepository:
                 id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 1, 22, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 1, 22, 0)),
             )
         )
 
@@ -58,7 +59,7 @@ class TestSqlModelShowtimeRepository:
         )
         showtime = Showtime.create(
             movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
-            show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+            show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
             room_id=Id.from_uuid(room.id),
         )
         SqlModelShowtimeRepository(session=session).create(showtime)

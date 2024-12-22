@@ -13,7 +13,7 @@ class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
     def exists(self, showtime: Showtime) -> bool:
         statement = select(ShowtimeModel).where(
             ShowtimeModel.movie_id == showtime.movie_id.to_uuid(),
-            ShowtimeModel.show_datetime == showtime.show_datetime,
+            ShowtimeModel.show_datetime == showtime.show_datetime.value,
             ShowtimeModel.room_id == showtime.room_id.to_uuid(),
         )
         result = self._session.exec(statement).one_or_none()

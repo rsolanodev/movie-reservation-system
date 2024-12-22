@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from unittest.mock import ANY, Mock, create_autospec
 
 import pytest
 
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
@@ -23,7 +24,7 @@ class TestCreateShowtime:
             params=CreateShowtimeParams(
                 movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
             )
         )
 
@@ -32,7 +33,7 @@ class TestCreateShowtime:
                 id=ANY,
                 movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
             )
         )
         mock_showtime_repository.create.assert_called_once_with(
@@ -40,7 +41,7 @@ class TestCreateShowtime:
                 id=ANY,
                 movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
             )
         )
 
@@ -52,7 +53,7 @@ class TestCreateShowtime:
                 params=CreateShowtimeParams(
                     movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                     room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                    show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
                 )
             )
 
@@ -61,7 +62,7 @@ class TestCreateShowtime:
                 id=ANY,
                 movie_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
                 room_id=Id("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-                show_datetime=datetime(2023, 4, 2, 20, 0, tzinfo=timezone.utc),
+                show_datetime=DateTime.from_datetime(datetime(2023, 4, 2, 20, 0)),
             )
         )
         mock_showtime_repository.create.assert_not_called()
