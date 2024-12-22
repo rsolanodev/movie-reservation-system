@@ -11,6 +11,7 @@ from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
@@ -240,7 +241,7 @@ class TestSqlModelMovieRepository:
 
         movie = SqlModelMovieRepository(session=session).get_movie_for_date(
             movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
-            showtime_date=date(2023, 4, 3),
+            showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )
 
         assert movie == Movie(
@@ -266,7 +267,7 @@ class TestSqlModelMovieRepository:
     def test_get_movie_for_date_that_does_not_exist(self, session: Session) -> None:
         movie = SqlModelMovieRepository(session=session).get_movie_for_date(
             movie_id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
-            showtime_date=date(2023, 4, 3),
+            showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )
 
         assert movie is None

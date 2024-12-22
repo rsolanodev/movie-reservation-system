@@ -10,6 +10,7 @@ from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
+from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
@@ -82,13 +83,13 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
 
         return list(movies.values())
 
-    def get_movie_for_date(self, movie_id: Id, showtime_date: date) -> Movie | None:
+    def get_movie_for_date(self, movie_id: Id, showtime_date: Date) -> Movie | None:
         movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
             select(MovieModel, ShowtimeModel)
             .options(selectinload(MovieModel.genres))  # type: ignore
             .join(ShowtimeModel)
             .where(
-                func.date(ShowtimeModel.show_datetime) == showtime_date,
+                func.date(ShowtimeModel.show_datetime) == showtime_date.value,
                 MovieModel.id == movie_id.to_uuid(),
             )
             .order_by(ShowtimeModel.show_datetime)  # type: ignore

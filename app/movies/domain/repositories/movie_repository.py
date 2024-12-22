@@ -2,6 +2,7 @@ from datetime import date
 from typing import Protocol
 
 from app.movies.domain.movie import Movie
+from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.id import Id
 
 
@@ -18,4 +19,4 @@ class MovieRepository(Protocol):
 
     def get_available_movies_for_date(self, available_date: date) -> list[Movie]: ...
 
-    def get_movie_for_date(self, movie_id: Id, showtime_date: date) -> Movie | None: ...
+    def get_movie_for_date(self, movie_id: Id, showtime_date: Date) -> Movie | None: ...
