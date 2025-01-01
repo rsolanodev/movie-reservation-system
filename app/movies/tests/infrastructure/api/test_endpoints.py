@@ -197,6 +197,11 @@ class TestUpdateMovieEndpoint:
             yield mock.return_value
 
     @pytest.fixture
+    def mock_movie_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieFinder") as mock:
+            yield mock.return_value
+
+    @pytest.fixture
     def movie(self) -> Movie:
         return (
             MovieBuilder()
@@ -233,6 +238,7 @@ class TestUpdateMovieEndpoint:
         client: TestClient,
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
@@ -248,7 +254,7 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -275,6 +281,7 @@ class TestUpdateMovieEndpoint:
         client: TestClient,
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
@@ -285,7 +292,7 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -308,6 +315,7 @@ class TestUpdateMovieEndpoint:
         client: TestClient,
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_update_movie.return_value.execute.side_effect = MovieDoesNotExist
@@ -321,7 +329,7 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -335,7 +343,7 @@ class TestUpdateMovieEndpoint:
         assert response.json() == {"detail": "The movie does not exist"}
 
     def test_returns_401_when_user_is_not_authenticated(
-        self, client: TestClient, mock_update_movie: Mock, mock_movie_repository: Mock
+        self, client: TestClient, mock_update_movie: Mock, mock_movie_repository: Mock, mock_movie_finder: Mock
     ) -> None:
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -347,6 +355,7 @@ class TestUpdateMovieEndpoint:
 
         mock_update_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_movie_finder.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -356,6 +365,7 @@ class TestUpdateMovieEndpoint:
         client: TestClient,
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.patch(
@@ -369,6 +379,7 @@ class TestUpdateMovieEndpoint:
 
         mock_update_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_movie_finder.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}

@@ -112,6 +112,7 @@ def update_movie(
     try:
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
+            finder=SqlModelMovieFinder(session=session),
         ).execute(
             params=UpdateMovieParams(
                 id=Id(movie_id),
