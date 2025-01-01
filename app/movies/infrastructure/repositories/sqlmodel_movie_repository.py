@@ -10,7 +10,6 @@ from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
-from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
@@ -82,33 +81,6 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             movies[movie_model.id].add_showtime(movie_showtime)
 
         return list(movies.values())
-
-    def get_movie_for_date(self, movie_id: Id, showtime_date: Date) -> Movie | None:
-        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
-            select(MovieModel, ShowtimeModel)
-            .options(selectinload(MovieModel.genres))  # type: ignore
-            .join(ShowtimeModel)
-            .where(
-                func.date(ShowtimeModel.show_datetime) == showtime_date.value,
-                MovieModel.id == movie_id.to_uuid(),
-            )
-            .order_by(ShowtimeModel.show_datetime)  # type: ignore
-        ).all()
-
-        if not movie_showtime_models:
-            return None
-
-        movie_model = movie_showtime_models[0][0]
-        movie = movie_model.to_domain()
-
-        for genre_model in movie_model.genres:
-            movie.add_genre(genre_model.to_domain())
-
-        for _, showtime_model in movie_showtime_models:
-            movie_showtime = self._build_movie_showtime(showtime_model)
-            movie.add_showtime(movie_showtime)
-
-        return movie
 
     @staticmethod
     def _build_movie_showtime(showtime_model: ShowtimeModel) -> MovieShowtime:

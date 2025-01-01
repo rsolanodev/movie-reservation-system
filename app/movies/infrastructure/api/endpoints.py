@@ -25,6 +25,7 @@ from app.movies.infrastructure.api.responses import (
     UpdateMovieResponse,
 )
 from app.movies.infrastructure.api.utils import build_poster_image
+from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_genre_repository import (
     SqlModelGenreRepository,
 )
@@ -89,7 +90,7 @@ def create_movie(
 )
 def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> RetrieveMovieResponse:
     try:
-        movie = RetrieveMovie(repository=SqlModelMovieRepository(session=session)).execute(
+        movie = RetrieveMovie(finder=SqlModelMovieFinder(session=session)).execute(
             params=RetrieveMovieParams.from_primitive(movie_id=movie_id, showtime_date=showtime_date)
         )
     except MovieDoesNotExist:

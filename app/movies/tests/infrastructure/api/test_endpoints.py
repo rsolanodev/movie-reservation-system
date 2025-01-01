@@ -679,8 +679,8 @@ class TestRetrieveMovieEndpoint:
             yield mock
 
     @pytest.fixture
-    def mock_movie_repository(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
+    def mock_movie_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieFinder") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
@@ -723,10 +723,7 @@ class TestRetrieveMovieEndpoint:
         }
 
     def test_returns_200_and_calls_retrieve_movie(
-        self,
-        client: TestClient,
-        mock_retrieve_movie: Mock,
-        mock_movie_repository: Mock,
+        self, client: TestClient, mock_retrieve_movie: Mock, mock_movie_finder: Mock
     ) -> None:
         mock_retrieve_movie.return_value.execute.return_value = (
             MovieBuilder()
@@ -754,7 +751,7 @@ class TestRetrieveMovieEndpoint:
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movie.assert_called_once_with(finder=mock_movie_finder)
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -781,16 +778,13 @@ class TestRetrieveMovieEndpoint:
         }
 
     def test_returns_404_when_movie_does_not_exist(
-        self,
-        client: TestClient,
-        mock_retrieve_movie: Mock,
-        mock_movie_repository: Mock,
+        self, client: TestClient, mock_retrieve_movie: Mock, mock_movie_finder: Mock
     ) -> None:
         mock_retrieve_movie.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_retrieve_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movie.assert_called_once_with(finder=mock_movie_finder)
         mock_retrieve_movie.return_value.execute.assert_called_once_with(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),

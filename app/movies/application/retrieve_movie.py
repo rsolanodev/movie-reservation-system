@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.movie import Movie
-from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.id import Id
 
@@ -18,11 +18,11 @@ class RetrieveMovieParams:
 
 
 class RetrieveMovie:
-    def __init__(self, repository: MovieRepository) -> None:
-        self._repository = repository
+    def __init__(self, finder: MovieFinder) -> None:
+        self._finder = finder
 
     def execute(self, params: RetrieveMovieParams) -> Movie:
-        movie = self._repository.get_movie_for_date(
+        movie = self._finder.find_movie_by_showtime_date(
             movie_id=params.movie_id,
             showtime_date=params.showtime_date,
         )
