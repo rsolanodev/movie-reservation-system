@@ -9,10 +9,10 @@ from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMoviePa
 from app.movies.domain.collections.movie_genres import MovieGenres
 from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
-from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
 from app.movies.tests.factories.movie_showtime_factory_test import (
     MovieShowtimeFactoryTest,
@@ -26,11 +26,11 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 @freeze_time("2023-04-03T22:00:00Z")
 class TestRetrieveMovie:
     @pytest.fixture
-    def mock_movie_repository(self) -> Any:
-        return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
+    def mock_movie_finder(self) -> Any:
+        return create_autospec(spec=MovieFinder, instance=True, spec_set=True)
 
-    def test_retrieves_movie(self, mock_movie_repository: Mock) -> None:
-        mock_movie_repository.get_movie_for_date.return_value = (
+    def test_retrieves_movie(self, mock_movie_finder: Mock) -> None:
+        mock_movie_finder.find_movie_by_showtime_date.return_value = (
             MovieBuilder()
             .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_title("The Super Mario Bros. Movie")
@@ -51,14 +51,14 @@ class TestRetrieveMovie:
             .build()
         )
 
-        movie = RetrieveMovie(repository=mock_movie_repository).execute(
+        movie = RetrieveMovie(finder=mock_movie_finder).execute(
             params=RetrieveMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
         )
 
-        mock_movie_repository.get_movie_for_date.assert_called_once_with(
+        mock_movie_finder.find_movie_by_showtime_date.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )
@@ -79,18 +79,18 @@ class TestRetrieveMovie:
             ),
         )
 
-    def test_raise_exception_when_movie_does_not_exist(self, mock_movie_repository: Mock) -> None:
-        mock_movie_repository.get_movie_for_date.return_value = None
+    def test_raise_exception_when_movie_does_not_exist(self, mock_movie_finder: Mock) -> None:
+        mock_movie_finder.find_movie_by_showtime_date.return_value = None
 
         with pytest.raises(MovieDoesNotExist):
-            RetrieveMovie(repository=mock_movie_repository).execute(
+            RetrieveMovie(finder=mock_movie_finder).execute(
                 params=RetrieveMovieParams(
                     movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                     showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
                 )
             )
 
-        mock_movie_repository.get_movie_for_date.assert_called_once_with(
+        mock_movie_finder.find_movie_by_showtime_date.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
         )
