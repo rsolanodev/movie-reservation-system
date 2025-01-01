@@ -1,19 +1,8 @@
-from collections.abc import Sequence
-from datetime import date
-from uuid import UUID
-
-from sqlalchemy import func
-from sqlalchemy.orm import selectinload
-from sqlmodel import select
-
 from app.movies.domain.movie import Movie
-from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.domain.repositories.movie_repository import MovieRepository
 from app.movies.infrastructure.models import GenreModel, MovieModel
-from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
-from app.showtimes.infrastructure.models import ShowtimeModel
 
 
 class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
@@ -55,36 +44,3 @@ class SqlModelMovieRepository(MovieRepository, SqlModelRepository):
             movie_model.genres.remove(genre_model)
             self._session.add(movie_model)
             self._session.commit()
-
-    def get_available_movies_for_date(self, available_date: date) -> list[Movie]:
-        movie_showtime_models: Sequence[tuple[MovieModel, ShowtimeModel]] = self._session.exec(
-            select(MovieModel, ShowtimeModel)
-            .options(selectinload(MovieModel.genres))  # type: ignore
-            .join(ShowtimeModel)
-            .where(
-                func.date(ShowtimeModel.show_datetime) == available_date,
-                MovieModel.id == ShowtimeModel.movie_id,
-            )
-            .order_by(MovieModel.title, ShowtimeModel.show_datetime)  # type: ignore
-        ).all()
-
-        movies: dict[UUID, Movie] = {}
-        for movie_model, showtime_model in movie_showtime_models:
-            if movie_model.id not in movies:
-                movie = movie_model.to_domain()
-
-                for genre_model in movie_model.genres:
-                    movie.add_genre(genre_model.to_domain())
-                movies[movie_model.id] = movie
-
-            movie_showtime = self._build_movie_showtime(showtime_model)
-            movies[movie_model.id].add_showtime(movie_showtime)
-
-        return list(movies.values())
-
-    @staticmethod
-    def _build_movie_showtime(showtime_model: ShowtimeModel) -> MovieShowtime:
-        return MovieShowtime(
-            id=Id.from_uuid(showtime_model.id),
-            show_datetime=DateTime.from_datetime(showtime_model.show_datetime),
-        )

@@ -1,4 +1,3 @@
-from datetime import date
 from typing import Protocol
 
 from app.movies.domain.movie import Movie
@@ -15,5 +14,3 @@ class MovieRepository(Protocol):
     def add_genre(self, movie_id: Id, genre_id: Id) -> None: ...
 
     def remove_genre(self, movie_id: Id, genre_id: Id) -> None: ...
-
-    def get_available_movies_for_date(self, available_date: date) -> list[Movie]: ...
