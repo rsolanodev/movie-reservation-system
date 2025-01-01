@@ -91,7 +91,7 @@ def create_movie(
 def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> RetrieveMovieResponse:
     try:
         movie = RetrieveMovie(finder=SqlModelMovieFinder(session=session)).execute(
-            params=RetrieveMovieParams.from_primitive(movie_id=movie_id, showtime_date=showtime_date)
+            params=RetrieveMovieParams.from_primitives(movie_id=movie_id, showtime_date=showtime_date)
         )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")

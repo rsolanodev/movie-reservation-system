@@ -13,7 +13,7 @@ class RetrieveMovieParams:
     showtime_date: Date
 
     @classmethod
-    def from_primitive(cls, movie_id: str, showtime_date: str) -> "RetrieveMovieParams":
+    def from_primitives(cls, movie_id: str, showtime_date: str) -> "RetrieveMovieParams":
         return cls(movie_id=Id(movie_id), showtime_date=Date.from_string(showtime_date))
 
 
