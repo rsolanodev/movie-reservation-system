@@ -803,8 +803,8 @@ class TestRetrieveMoviesEndpoint:
             yield mock
 
     @pytest.fixture
-    def mock_movie_repository(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
+    def mock_movie_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieFinder") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
@@ -830,7 +830,7 @@ class TestRetrieveMoviesEndpoint:
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
 
-        response = client.get(f"api/v1/movies/?available_date=2023-04-03&genre_id={action_genre.id}")
+        response = client.get(f"api/v1/movies/?showtime_date=2023-04-03&genre_id={action_genre.id}")
 
         assert response.status_code == 200
         assert response.json() == [
@@ -855,7 +855,7 @@ class TestRetrieveMoviesEndpoint:
         ]
 
     def test_returns_200_and_calls_retrieve_movies(
-        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_finder: Mock
     ) -> None:
         mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
@@ -888,11 +888,11 @@ class TestRetrieveMoviesEndpoint:
             .build(),
         ]
 
-        response = client.get("api/v1/movies/?available_date=2023-04-03")
+        response = client.get("api/v1/movies/?showtime_date=2023-04-03")
 
-        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.assert_called_once_with(finder=mock_movie_finder)
         mock_retrieve_movies.return_value.execute.assert_called_once_with(
-            params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
+            params=RetrieveMoviesParams(showtime_date=Date.from_datetime_date(date(2023, 4, 3)), genre_id=None)
         )
 
         assert response.status_code == 200
@@ -926,7 +926,7 @@ class TestRetrieveMoviesEndpoint:
         ]
 
     def test_returns_200_and_calls_retrieve_movies_with_genre_filter(
-        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_finder: Mock
     ) -> None:
         mock_retrieve_movies.return_value.execute.return_value = [
             MovieBuilder()
@@ -941,12 +941,12 @@ class TestRetrieveMoviesEndpoint:
             .build()
         ]
 
-        response = client.get("api/v1/movies/?available_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9")
+        response = client.get("api/v1/movies/?showtime_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9")
 
-        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.assert_called_once_with(finder=mock_movie_finder)
         mock_retrieve_movies.return_value.execute.assert_called_once_with(
             params=RetrieveMoviesParams(
-                available_date=date(2023, 4, 3),
+                showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
                 genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
             )
         )
@@ -969,15 +969,15 @@ class TestRetrieveMoviesEndpoint:
         ]
 
     def test_returns_empty_list_when_no_movies(
-        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_repository: Mock
+        self, client: TestClient, mock_retrieve_movies: Mock, mock_movie_finder: Mock
     ) -> None:
         mock_retrieve_movies.return_value.execute.return_value = []
 
-        response = client.get("api/v1/movies/?available_date=2023-04-03")
+        response = client.get("api/v1/movies/?showtime_date=2023-04-03")
 
-        mock_retrieve_movies.assert_called_once_with(repository=mock_movie_repository)
+        mock_retrieve_movies.assert_called_once_with(finder=mock_movie_finder)
         mock_retrieve_movies.return_value.execute.assert_called_once_with(
-            params=RetrieveMoviesParams(available_date=date(2023, 4, 3), genre_id=None)
+            params=RetrieveMoviesParams(showtime_date=Date.from_datetime_date(date(2023, 4, 3)), genre_id=None)
         )
 
         assert response.status_code == 200

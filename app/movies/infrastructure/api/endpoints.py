@@ -1,5 +1,3 @@
-from datetime import date
-
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
@@ -52,10 +50,10 @@ def retrieve_genres(session: SessionDep) -> list[Genre]:
     status_code=status.HTTP_200_OK,
 )
 def retrieve_movies(
-    session: SessionDep, available_date: date, genre_id: str | None = None
+    session: SessionDep, showtime_date: str, genre_id: str | None = None
 ) -> list[RetrieveMovieResponse]:
-    movies = RetrieveMovies(repository=SqlModelMovieRepository(session=session)).execute(
-        params=RetrieveMoviesParams(available_date=available_date, genre_id=Id(genre_id) if genre_id else None),
+    movies = RetrieveMovies(finder=SqlModelMovieFinder(session=session)).execute(
+        params=RetrieveMoviesParams.from_primitives(showtime_date=showtime_date, genre_id=genre_id),
     )
     return [RetrieveMovieResponse.from_domain(movie=movie) for movie in movies]
 
