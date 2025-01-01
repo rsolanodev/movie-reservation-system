@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from app.movies.domain.exceptions import MovieDoesNotExist
+from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -16,8 +17,9 @@ class UpdateMovieParams:
 
 
 class UpdateMovie:
-    def __init__(self, repository: MovieRepository) -> None:
+    def __init__(self, repository: MovieRepository, finder: MovieFinder) -> None:
         self._repository = repository
+        self._finder = finder
 
     def execute(self, params: UpdateMovieParams) -> Movie:
         movie = self._get_or_raise_exception(id=params.id)
@@ -30,7 +32,7 @@ class UpdateMovie:
         return movie
 
     def _get_or_raise_exception(self, id: Id) -> Movie:
-        movie = self._repository.get(id=id)
+        movie = self._finder.find_movie(movie_id=id)
         if movie is None:
             raise MovieDoesNotExist()
         return movie
