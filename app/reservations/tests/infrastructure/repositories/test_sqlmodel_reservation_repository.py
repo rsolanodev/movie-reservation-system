@@ -5,7 +5,7 @@ import pytest
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
+from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
@@ -126,7 +126,7 @@ class TestSqlModelReservationRepository:
         )
 
         assert reservations == [
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
@@ -134,7 +134,7 @@ class TestSqlModelReservationRepository:
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
-                seats=[ReservedSeat(row=1, number=2)],
+                seats=[SeatLocation(row=1, number=2)],
             )
         ]
 
@@ -193,7 +193,7 @@ class TestSqlModelReservationRepository:
         )
 
         assert reservations == [
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
@@ -201,9 +201,9 @@ class TestSqlModelReservationRepository:
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
-                seats=[ReservedSeat(row=1, number=2)],
+                seats=[SeatLocation(row=1, number=2)],
             ),
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"),
                 show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 20, 0)),
                 movie=Movie(
@@ -211,7 +211,7 @@ class TestSqlModelReservationRepository:
                     title="La Sustancia",
                     poster_image="la_sustancia.jpg",
                 ),
-                seats=[ReservedSeat(row=1, number=3)],
+                seats=[SeatLocation(row=1, number=3)],
             ),
         ]
 
@@ -255,7 +255,7 @@ class TestSqlModelReservationRepository:
         )
 
         assert reservations == [
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
                 movie=Movie(
@@ -263,7 +263,7 @@ class TestSqlModelReservationRepository:
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
-                seats=[ReservedSeat(row=1, number=2), ReservedSeat(row=1, number=3)],
+                seats=[SeatLocation(row=1, number=2), SeatLocation(row=1, number=3)],
             ),
         ]
 

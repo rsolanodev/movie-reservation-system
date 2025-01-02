@@ -1,7 +1,7 @@
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import select, update
 
-from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
+from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
@@ -37,7 +37,7 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
         )
         self._session.commit()
 
-    def find_by_user_id(self, user_id: Id) -> list[MovieReservation]:
+    def find_by_user_id(self, user_id: Id) -> list[MovieShowReservation]:
         reservation_models = self._session.exec(
             select(ReservationModel)
             .options(
@@ -53,8 +53,8 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             [self._build_movie_reservation(reservation_model) for reservation_model in reservation_models]
         )
 
-    def _build_movie_reservation(self, reservation_model: ReservationModel) -> MovieReservation:
-        return MovieReservation(
+    def _build_movie_reservation(self, reservation_model: ReservationModel) -> MovieShowReservation:
+        return MovieShowReservation(
             reservation_id=Id(reservation_model.id),
             show_datetime=DateTime.from_datetime(reservation_model.showtime.show_datetime),
             movie=Movie(
@@ -63,12 +63,12 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
                 poster_image=reservation_model.showtime.movie.poster_image,
             ),
             seats=self._sort_reserved_seats(
-                [ReservedSeat(row=seat.row, number=seat.number) for seat in reservation_model.seats]
+                [SeatLocation(row=seat.row, number=seat.number) for seat in reservation_model.seats]
             ),
         )
 
-    def _sort_movie_reservations(self, movie_reservations: list[MovieReservation]) -> list[MovieReservation]:
+    def _sort_movie_reservations(self, movie_reservations: list[MovieShowReservation]) -> list[MovieShowReservation]:
         return sorted(movie_reservations, key=lambda mr: mr.show_datetime.value, reverse=True)
 
-    def _sort_reserved_seats(self, seats: list[ReservedSeat]) -> list[ReservedSeat]:
+    def _sort_reserved_seats(self, seats: list[SeatLocation]) -> list[SeatLocation]:
         return sorted(seats, key=lambda seat: (seat.row, seat.number))

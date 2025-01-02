@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel
 
-from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
+from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 
 
 class MovieResponse(SQLModel):
@@ -18,7 +18,7 @@ class ReservedSeatResponse(SQLModel):
     number: int
 
     @classmethod
-    def from_domain(cls, seat: ReservedSeat) -> "ReservedSeatResponse":
+    def from_domain(cls, seat: SeatLocation) -> "ReservedSeatResponse":
         return cls(row=seat.row, number=seat.number)
 
 
@@ -29,7 +29,7 @@ class MovieReservationResponse(SQLModel):
     seats: list[ReservedSeatResponse]
 
     @classmethod
-    def from_domain(cls, reservation: MovieReservation) -> "MovieReservationResponse":
+    def from_domain(cls, reservation: MovieShowReservation) -> "MovieReservationResponse":
         return cls(
             reservation_id=reservation.reservation_id,
             show_datetime=reservation.show_datetime.to_string(),
