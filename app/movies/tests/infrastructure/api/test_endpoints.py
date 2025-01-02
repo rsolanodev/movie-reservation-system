@@ -502,8 +502,8 @@ class TestRetrieveGenresEndpoint:
             yield mock
 
     @pytest.fixture
-    def mock_genre_repository(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.SqlModelGenreRepository") as mock:
+    def mock_genre_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelGenreFinder") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
@@ -524,7 +524,7 @@ class TestRetrieveGenresEndpoint:
         self,
         client: TestClient,
         mock_retrieve_genres: Mock,
-        mock_genre_repository: Mock,
+        mock_genre_finder: Mock,
     ) -> None:
         action_genre = Genre.create(name="Action")
         adventure_genre = Genre.create(name="Adventure")
@@ -538,7 +538,7 @@ class TestRetrieveGenresEndpoint:
 
         response = client.get("api/v1/movies/genres/")
 
-        mock_retrieve_genres.assert_called_once_with(repository=mock_genre_repository)
+        mock_retrieve_genres.assert_called_once_with(finder=mock_genre_finder)
         mock_retrieve_genres.return_value.execute.assert_called_once()
 
         assert response.status_code == 200

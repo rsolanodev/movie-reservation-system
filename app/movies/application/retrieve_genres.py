@@ -1,10 +1,10 @@
+from app.movies.domain.finders.genre_finder import GenreFinder
 from app.movies.domain.genre import Genre
-from app.movies.domain.repositories.genre_repository import GenreRepository
 
 
 class RetrieveGenres:
-    def __init__(self, repository: GenreRepository) -> None:
-        self._repository = repository
+    def __init__(self, finder: GenreFinder) -> None:
+        self._finder = finder
 
     def execute(self) -> list[Genre]:
-        return self._repository.get_all()
+        return self._finder.find_all()
