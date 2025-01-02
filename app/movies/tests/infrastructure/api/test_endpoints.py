@@ -560,6 +560,11 @@ class TestAddMovieGenreEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_movie_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieFinder") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
         movie_model = SqlModelMovieBuilderTest(session=session).build()
@@ -580,6 +585,7 @@ class TestAddMovieGenreEndpoint:
         client: TestClient,
         mock_add_movie_genre: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_add_movie_genre.return_value.execute.return_value = None
@@ -590,7 +596,7 @@ class TestAddMovieGenreEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_add_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
@@ -603,6 +609,7 @@ class TestAddMovieGenreEndpoint:
         client: TestClient,
         mock_add_movie_genre: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_add_movie_genre.return_value.execute.side_effect = GenreAlreadyAssigned
@@ -613,7 +620,7 @@ class TestAddMovieGenreEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository)
+        mock_add_movie_genre.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_add_movie_genre.return_value.execute.assert_called_once_with(
             movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
             genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
