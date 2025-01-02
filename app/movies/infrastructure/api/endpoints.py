@@ -23,10 +23,10 @@ from app.movies.infrastructure.api.responses import (
     UpdateMovieResponse,
 )
 from app.movies.infrastructure.api.utils import build_poster_image
-from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
-from app.movies.infrastructure.repositories.sqlmodel_genre_repository import (
-    SqlModelGenreRepository,
+from app.movies.infrastructure.finders.sqlmodel_genre_finder import (
+    SqlModelGenreFinder,
 )
+from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import (
     SqlModelMovieRepository,
 )
@@ -41,7 +41,7 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 def retrieve_genres(session: SessionDep) -> list[Genre]:
-    return RetrieveGenres(repository=SqlModelGenreRepository(session=session)).execute()
+    return RetrieveGenres(finder=SqlModelGenreFinder(session=session)).execute()
 
 
 @router.get(
