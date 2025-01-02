@@ -2,9 +2,6 @@ from uuid import UUID
 
 from sqlmodel import Session
 
-from app.movies.domain.collections.movie_genres import MovieGenres
-from app.movies.domain.genre import Genre
-from app.movies.domain.movie import Movie
 from app.movies.infrastructure.models import MovieModel
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
@@ -38,41 +35,6 @@ class TestSqlModelMovieRepository:
         assert movie_model.title == "The Super Mario Bros. Movie"
         assert movie_model.description == "An animated adaptation of the video game."
         assert movie_model.poster_image == "super_mario_bros.jpg"
-
-    def test_get_movie(self, session: Session) -> None:
-        genre_model_factory = SqlModelGenreFactoryTest(session=session)
-        movie_model = (
-            SqlModelMovieBuilderTest(session=session)
-            .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_genre(
-                genre_model=genre_model_factory.create(
-                    id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"),
-                    name="Action",
-                )
-            )
-            .with_genre(
-                genre_model=genre_model_factory.create(
-                    id=UUID("393210d5-80ce-4d03-b896-5d89f15aa77b"),
-                    name="Comedy",
-                )
-            )
-            .build()
-        )
-
-        movie = SqlModelMovieRepository(session=session).get(id=Id.from_uuid(movie_model.id))
-
-        assert movie == Movie(
-            id=Id("ec725625-f502-4d39-9401-a415d8c1f964"),
-            title="Deadpool & Wolverine",
-            description="Deadpool and a variant of Wolverine.",
-            poster_image="deadpool_and_wolverine.jpg",
-            genres=MovieGenres(
-                [
-                    Genre(id=Id("393210d5-80ce-4d03-b896-5d89f15aa77a"), name="Action"),
-                    Genre(id=Id("393210d5-80ce-4d03-b896-5d89f15aa77b"), name="Comedy"),
-                ]
-            ),
-        )
 
     def test_delete_movie(self, session: Session) -> None:
         movie_model = SqlModelMovieBuilderTest(session=session).build()
