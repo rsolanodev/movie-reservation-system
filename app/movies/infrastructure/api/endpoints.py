@@ -23,13 +23,9 @@ from app.movies.infrastructure.api.responses import (
     UpdateMovieResponse,
 )
 from app.movies.infrastructure.api.utils import build_poster_image
-from app.movies.infrastructure.finders.sqlmodel_genre_finder import (
-    SqlModelGenreFinder,
-)
+from app.movies.infrastructure.finders.sqlmodel_genre_finder import SqlModelGenreFinder
 from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
-from app.movies.infrastructure.repositories.sqlmodel_movie_repository import (
-    SqlModelMovieRepository,
-)
+from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.shared.domain.value_objects.id import Id
 
 router = APIRouter()
