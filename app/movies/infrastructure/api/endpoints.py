@@ -133,7 +133,10 @@ def update_movie(
 )
 def delete_movie(session: SessionDep, movie_id: str) -> None:
     try:
-        DeleteMovie(repository=SqlModelMovieRepository(session=session)).execute(id=Id(movie_id))
+        DeleteMovie(
+            repository=SqlModelMovieRepository(session=session),
+            finder=SqlModelMovieFinder(session=session),
+        ).execute(id=Id(movie_id))
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
 
