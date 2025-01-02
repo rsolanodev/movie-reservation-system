@@ -15,7 +15,7 @@ from app.reservations.domain.exceptions import (
     SeatsNotAvailable,
     ShowtimeHasStarted,
 )
-from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
+from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
@@ -234,7 +234,7 @@ class TestRetrieveReservationsEndpoint:
         user: UserModel,
     ) -> None:
         mock_retrieve_reservations.return_value.execute.return_value = [
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
                 show_datetime=DateTime.from_datetime(datetime(2024, 1, 2, 22, 0)),
                 movie=Movie(
@@ -242,9 +242,9 @@ class TestRetrieveReservationsEndpoint:
                     title="Robot Salvaje",
                     poster_image="robot_salvaje.jpg",
                 ),
-                seats=[ReservedSeat(row=1, number=2)],
+                seats=[SeatLocation(row=1, number=2)],
             ),
-            MovieReservation(
+            MovieShowReservation(
                 reservation_id=Id("ffd7e9f4-bec7-4487-8f2f-d84b49d0bcee"),
                 show_datetime=DateTime.from_datetime(datetime(2024, 1, 1, 20, 0)),
                 movie=Movie(
@@ -252,7 +252,7 @@ class TestRetrieveReservationsEndpoint:
                     title="La Sustancia",
                     poster_image="la_sustancia.jpg",
                 ),
-                seats=[ReservedSeat(row=3, number=4)],
+                seats=[SeatLocation(row=3, number=4)],
             ),
         ]
 
