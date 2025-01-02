@@ -1,7 +1,6 @@
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import select, update
 
-from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
@@ -25,12 +24,6 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             seat_model = self._session.get_one(SeatModel, seat.id.to_uuid())
             seat_model.status = SeatStatus.RESERVED
             seat_model.reservation_id = reservation.id.to_uuid()
-
-    def find_seats(self, seat_ids: list[Id]) -> Seats:
-        seat_models = self._session.exec(
-            select(SeatModel).filter(SeatModel.id.in_([seat_id.to_uuid() for seat_id in seat_ids])),  # type: ignore
-        ).all()
-        return Seats([seat_model.to_domain() for seat_model in seat_models])
 
     def get(self, reservation_id: Id) -> Reservation:
         reservation_model = self._session.get_one(ReservationModel, reservation_id.to_uuid())
