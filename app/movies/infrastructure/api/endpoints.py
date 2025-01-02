@@ -166,9 +166,10 @@ def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...
 )
 def remove_movie_genre(session: SessionDep, movie_id: str, genre_id: str) -> None:
     try:
-        RemoveMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-            movie_id=Id(movie_id), genre_id=Id(genre_id)
-        )
+        RemoveMovieGenre(
+            repository=SqlModelMovieRepository(session=session),
+            finder=SqlModelMovieFinder(session=session),
+        ).execute(movie_id=Id(movie_id), genre_id=Id(genre_id))
     except GenreNotAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
