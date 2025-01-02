@@ -148,9 +148,12 @@ def delete_movie(session: SessionDep, movie_id: str) -> None:
 )
 def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...)) -> None:
     try:
-        AddMovieGenre(repository=SqlModelMovieRepository(session=session)).execute(
-            movie_id=Id(movie_id), genre_id=Id(genre_id)
-        )
+        AddMovieGenre(
+            repository=SqlModelMovieRepository(session=session),
+            finder=SqlModelMovieFinder(session=session),
+        ).execute(movie_id=Id(movie_id), genre_id=Id(genre_id))
+    except MovieDoesNotExist:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
     except GenreAlreadyAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
