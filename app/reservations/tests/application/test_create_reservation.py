@@ -7,6 +7,7 @@ import pytest
 from app.reservations.application.create_reservation import CreateReservation, CreateReservationParams
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.exceptions import SeatsNotAvailable
+from app.reservations.domain.finders.seat_finder import SeatFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
@@ -20,13 +21,17 @@ class TestCreateReservation:
         return create_autospec(spec=ReservationRepository, instance=True, spec_set=True)
 
     @pytest.fixture
+    def mock_seat_finder(self) -> Any:
+        return create_autospec(spec=SeatFinder, instance=True, spec_set=True)
+
+    @pytest.fixture
     def mock_reservation_release_scheduler(self) -> Any:
         return create_autospec(spec=ReservationReleaseScheduler, instance=True, spec_set=True)
 
     def test_creates_reservation(
-        self, mock_reservation_repository: Mock, mock_reservation_release_scheduler: Mock
+        self, mock_reservation_repository: Mock, mock_seat_finder: Mock, mock_reservation_release_scheduler: Mock
     ) -> None:
-        mock_reservation_repository.find_seats.return_value = Seats(
+        mock_seat_finder.find_seats.return_value = Seats(
             [
                 Seat(id=Id("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
                 Seat(id=Id("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=SeatStatus.AVAILABLE),
@@ -34,7 +39,9 @@ class TestCreateReservation:
         )
 
         reservation = CreateReservation(
-            repository=mock_reservation_repository, reservation_release_scheduler=mock_reservation_release_scheduler
+            reservation_repository=mock_reservation_repository,
+            seat_finder=mock_seat_finder,
+            reservation_release_scheduler=mock_reservation_release_scheduler,
         ).execute(
             params=CreateReservationParams(
                 showtime_id=Id("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
@@ -43,7 +50,7 @@ class TestCreateReservation:
             )
         )
 
-        mock_reservation_repository.find_seats.assert_called_once_with(
+        mock_seat_finder.find_seats.assert_called_once_with(
             seat_ids=[Id("c555276e-0be4-48ea-9e27-fe1500384380"), Id("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
         mock_reservation_repository.create.assert_called_once_with(
@@ -76,9 +83,13 @@ class TestCreateReservation:
 
     @pytest.mark.parametrize("seat_status", [SeatStatus.RESERVED, SeatStatus.OCCUPIED])
     def test_does_not_create_reservation_when_seats_are_not_available(
-        self, mock_reservation_repository: Mock, mock_reservation_release_scheduler: Mock, seat_status: SeatStatus
+        self,
+        mock_reservation_repository: Mock,
+        mock_seat_finder: Mock,
+        mock_reservation_release_scheduler: Mock,
+        seat_status: SeatStatus,
     ) -> None:
-        mock_reservation_repository.find_seats.return_value = Seats(
+        mock_seat_finder.find_seats.return_value = Seats(
             [
                 Seat(id=Id("c555276e-0be4-48ea-9e27-fe1500384380"), row=1, number=1, status=SeatStatus.AVAILABLE),
                 Seat(id=Id("bb07c2f1-33f4-4987-ad02-8a420104f810"), row=1, number=2, status=seat_status),
@@ -87,7 +98,9 @@ class TestCreateReservation:
 
         with pytest.raises(SeatsNotAvailable):
             CreateReservation(
-                repository=mock_reservation_repository, reservation_release_scheduler=mock_reservation_release_scheduler
+                reservation_repository=mock_reservation_repository,
+                seat_finder=mock_seat_finder,
+                reservation_release_scheduler=mock_reservation_release_scheduler,
             ).execute(
                 params=CreateReservationParams(
                     showtime_id=Id("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
@@ -99,7 +112,7 @@ class TestCreateReservation:
                 )
             )
 
-        mock_reservation_repository.find_seats.assert_called_once_with(
+        mock_seat_finder.find_seats.assert_called_once_with(
             seat_ids=[Id("c555276e-0be4-48ea-9e27-fe1500384380"), Id("bb07c2f1-33f4-4987-ad02-8a420104f810")]
         )
         mock_reservation_repository.create.assert_not_called()

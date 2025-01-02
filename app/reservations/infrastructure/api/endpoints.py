@@ -12,6 +12,7 @@ from app.reservations.domain.exceptions import (
 )
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
 from app.reservations.infrastructure.api.responses import MovieReservationResponse
+from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.infrastructure.schedulers.celery_reservation_release_scheduler import (
     CeleryReservationReleaseScheduler,
@@ -25,7 +26,8 @@ router = APIRouter()
 def create_reservation(session: SessionDep, request_body: CreateReservationPayload, current_user: CurrentUser) -> None:
     try:
         CreateReservation(
-            repository=SqlModelReservationRepository(session=session),
+            reservation_repository=SqlModelReservationRepository(session=session),
+            seat_finder=SqlModelSeatFinder(session=session),
             reservation_release_scheduler=CeleryReservationReleaseScheduler(),
         ).execute(
             params=CreateReservationParams(

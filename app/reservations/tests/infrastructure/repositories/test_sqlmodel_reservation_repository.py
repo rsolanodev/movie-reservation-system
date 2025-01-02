@@ -7,7 +7,7 @@ from sqlmodel import Session
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_reservation import Movie, MovieReservation, ReservedSeat
 from app.reservations.domain.reservation import Reservation
-from app.reservations.domain.seat import Seat, SeatStatus
+from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
@@ -53,41 +53,6 @@ class TestSqlModelReservationRepository:
         session.refresh(parent_seat)
         assert parent_seat.reservation_id == reservation.id.to_uuid()
         assert parent_seat.status == SeatStatus.RESERVED
-
-    def test_find_seats(self, session: Session) -> None:
-        seat_available = (
-            SqlModelSeatBuilderTest(session)
-            .with_id(UUID("0a157516-12cd-4633-af2c-ae8d74f7edce"))
-            .with_row(1)
-            .with_number(1)
-            .with_status(SeatStatus.AVAILABLE)
-            .build()
-        )
-        seat_reserved = (
-            SqlModelSeatBuilderTest(session)
-            .with_id(UUID("a0f28786-73e6-4234-b92d-1dd7bb39cde1"))
-            .with_row(2)
-            .with_number(2)
-            .with_status(SeatStatus.RESERVED)
-            .build()
-        )
-        (
-            SqlModelSeatBuilderTest(session)
-            .with_id(UUID("20d7416a-ab97-458b-a9a2-9552ed34cf0a"))
-            .with_row(3)
-            .with_number(3)
-            .with_status(SeatStatus.OCCUPIED)
-            .build()
-        )
-
-        seats = SqlModelReservationRepository(session).find_seats(
-            seat_ids=[Id.from_uuid(seat_available.id), Id.from_uuid(seat_reserved.id)],
-        )
-
-        assert seats == [
-            Seat(id=Id.from_uuid(seat_available.id), row=1, number=1, status=SeatStatus.AVAILABLE),
-            Seat(id=Id.from_uuid(seat_reserved.id), row=2, number=2, status=SeatStatus.RESERVED),
-        ]
 
     @pytest.mark.parametrize("has_paid", [False, True])
     def test_get_reservation(self, session: Session, has_paid: bool) -> None:
