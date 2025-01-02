@@ -396,6 +396,11 @@ class TestDeleteMovieEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_movie_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieFinder") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
         movie_model = SqlModelMovieBuilderTest(session=session).build()
@@ -413,6 +418,7 @@ class TestDeleteMovieEndpoint:
         client: TestClient,
         mock_delete_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_delete_movie.return_value.execute.return_value = None
@@ -422,7 +428,7 @@ class TestDeleteMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_delete_movie.return_value.execute.assert_called_once_with(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
 
         assert response.status_code == 200
@@ -432,6 +438,7 @@ class TestDeleteMovieEndpoint:
         client: TestClient,
         mock_delete_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_delete_movie.return_value.execute.side_effect = MovieDoesNotExist
@@ -441,7 +448,7 @@ class TestDeleteMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_delete_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_delete_movie.return_value.execute.assert_called_once_with(
             id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
         )
@@ -454,6 +461,7 @@ class TestDeleteMovieEndpoint:
         client: TestClient,
         mock_delete_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
     ) -> None:
         response = client.delete(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -461,6 +469,7 @@ class TestDeleteMovieEndpoint:
 
         mock_delete_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_movie_finder.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -470,6 +479,7 @@ class TestDeleteMovieEndpoint:
         client: TestClient,
         mock_delete_movie: Mock,
         mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.delete(
@@ -479,6 +489,7 @@ class TestDeleteMovieEndpoint:
 
         mock_delete_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_movie_finder.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
