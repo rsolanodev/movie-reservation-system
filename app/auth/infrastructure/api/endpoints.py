@@ -11,9 +11,7 @@ from app.auth.domain.exceptions import (
     UserInactive,
 )
 from app.auth.infrastructure.responses import TokenResponse
-from app.shared.infrastructure.repositories.sqlmodel_user_repository import (
-    SqlModelUserRepository,
-)
+from app.shared.infrastructure.finders.sqlmodel_user_finder import SqlModelUserFinder
 
 router = APIRouter()
 
@@ -21,7 +19,7 @@ router = APIRouter()
 @router.post("/access-token/", response_model=TokenResponse)
 def authenticate_user(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> TokenResponse:
     try:
-        token = Authenticate(repository=SqlModelUserRepository(session=session)).execute(
+        token = Authenticate(finder=SqlModelUserFinder(session=session)).execute(
             email=form_data.username, password=form_data.password
         )
     except (UserDoesNotExist, IncorrectPassword):
