@@ -19,8 +19,8 @@ class TestAuthenticateUserEndpoint:
             yield mock
 
     @pytest.fixture
-    def mock_user_repository(self) -> Generator[Mock, None, None]:
-        with patch("app.auth.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
+    def mock_user_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.auth.infrastructure.api.endpoints.SqlModelUserFinder") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
@@ -38,7 +38,7 @@ class TestAuthenticateUserEndpoint:
         assert response.json() == {"token_type": "bearer", "access_token": ANY, "expires_in": 11520}
 
     def test_calls_authenticate_and_returns_access_token(
-        self, client: TestClient, mock_authenticate: Mock, mock_user_repository: Mock
+        self, client: TestClient, mock_authenticate: Mock, mock_user_finder: Mock
     ) -> None:
         mock_authenticate.return_value.execute.return_value = Token(
             access_token="access_token",
@@ -52,7 +52,7 @@ class TestAuthenticateUserEndpoint:
                 "password": "Passw0rd!",
             },
         )
-        mock_authenticate.assert_called_once_with(repository=mock_user_repository)
+        mock_authenticate.assert_called_once_with(finder=mock_user_finder)
         mock_authenticate.return_value.execute.assert_called_once_with(
             email="rubensoljim@gmail.com", password="Passw0rd!"
         )

@@ -20,6 +20,11 @@ class TestCreateUserEndpoint:
         with patch("app.users.infrastructure.api.endpoints.SqlModelUserRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_user_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.users.infrastructure.api.endpoints.SqlModelUserFinder") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     def test_integration(self, client: TestClient) -> None:
         response = client.post(
@@ -41,7 +46,7 @@ class TestCreateUserEndpoint:
         }
 
     def test_returns_201_and_calls_create_user(
-        self, client: TestClient, mock_create_user: Mock, mock_user_repository: Mock
+        self, client: TestClient, mock_create_user: Mock, mock_user_repository: Mock, mock_user_finder: Mock
     ) -> None:
         mock_create_user.return_value.execute.return_value = UserFactoryTest().create()
 
@@ -54,7 +59,7 @@ class TestCreateUserEndpoint:
             },
         )
 
-        mock_create_user.assert_called_once_with(repository=mock_user_repository)
+        mock_create_user.assert_called_once_with(repository=mock_user_repository, finder=mock_user_finder)
         mock_create_user.return_value.execute.assert_called_once_with(
             params=CreateUserParams(
                 email="rubensoljim@gmail.com",
