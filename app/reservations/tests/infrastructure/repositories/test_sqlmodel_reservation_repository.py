@@ -1,12 +1,10 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-import pytest
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
@@ -53,28 +51,6 @@ class TestSqlModelReservationRepository:
         session.refresh(parent_seat)
         assert parent_seat.reservation_id == reservation.id.to_uuid()
         assert parent_seat.status == SeatStatus.RESERVED
-
-    @pytest.mark.parametrize("has_paid", [False, True])
-    def test_get_reservation(self, session: Session, has_paid: bool) -> None:
-        reservation_model = (
-            SqlModelReservationBuilderTest(session)
-            .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
-            .with_user_id(UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
-            .with_showtime_id(UUID("ffa502e6-8869-490c-8799-5bea26c7146d"))
-            .with_has_paid(has_paid)
-            .build()
-        )
-
-        reservation = SqlModelReservationRepository(session).get(
-            reservation_id=Id.from_uuid(reservation_model.id),
-        )
-
-        assert reservation == Reservation(
-            id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
-            user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
-            showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
-            has_paid=has_paid,
-        )
 
     def test_release_reservation(self, session: Session) -> None:
         reservation_model = SqlModelReservationBuilderTest(session).build()

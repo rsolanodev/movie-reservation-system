@@ -36,8 +36,8 @@ class CreateReservation:
         reservation = Reservation.create(user_id=params.user_id, showtime_id=params.showtime_id)
         reservation.add_seats(seats)
         self._reservation_repository.create(reservation=reservation)
-        self._launch_reservation_release_task(reservation_id=reservation.id)
+        self._launch_release_reservation_task(reservation_id=reservation.id)
         return reservation
 
-    def _launch_reservation_release_task(self, reservation_id: Id) -> None:
+    def _launch_release_reservation_task(self, reservation_id: Id) -> None:
         self._reservation_release_scheduler.schedule(reservation_id=reservation_id, delay=timedelta(minutes=15))

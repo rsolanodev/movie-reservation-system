@@ -25,10 +25,6 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             seat_model.status = SeatStatus.RESERVED
             seat_model.reservation_id = reservation.id.to_uuid()
 
-    def get(self, reservation_id: Id) -> Reservation:
-        reservation_model = self._session.get_one(ReservationModel, reservation_id.to_uuid())
-        return reservation_model.to_domain()
-
     def release(self, reservation_id: Id) -> None:
         self._session.exec(
             update(SeatModel)

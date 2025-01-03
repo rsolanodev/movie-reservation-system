@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -49,6 +50,13 @@ def session(connection: Connection) -> Generator[Session, None, None]:
         yield session
     finally:
         session.close()
+
+
+@pytest.fixture
+def mock_get_db_session(session: Session) -> Generator[Session, None, None]:
+    with patch("app.database.get_db_session") as mock:
+        mock.return_value.__enter__.return_value = session
+        yield session
 
 
 @pytest.fixture
