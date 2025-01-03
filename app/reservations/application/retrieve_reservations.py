@@ -1,11 +1,11 @@
+from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import MovieShowReservation
-from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.shared.domain.value_objects.id import Id
 
 
 class RetrieveReservations:
-    def __init__(self, repository: ReservationRepository) -> None:
-        self._repository = repository
+    def __init__(self, finder: ReservationFinder) -> None:
+        self._finder = finder
 
     def execute(self, user_id: Id) -> list[MovieShowReservation]:
-        return self._repository.find_by_user_id(user_id=user_id)
+        return self._finder.find_movie_show_reservations_by_user_id(user_id=user_id)

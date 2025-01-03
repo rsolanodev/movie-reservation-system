@@ -12,6 +12,7 @@ from app.reservations.domain.exceptions import (
 )
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
 from app.reservations.infrastructure.api.responses import MovieReservationResponse
+from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.infrastructure.schedulers.celery_reservation_release_scheduler import (
@@ -42,9 +43,9 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
 
 @router.get("/", response_model=list[MovieReservationResponse], status_code=status.HTTP_200_OK)
 def retrieve_reservations(session: SessionDep, current_user: CurrentUser) -> list[MovieReservationResponse]:
-    movie_reservations = RetrieveReservations(
-        repository=SqlModelReservationRepository(session=session),
-    ).execute(user_id=Id.from_uuid(current_user.id))
+    movie_reservations = RetrieveReservations(finder=SqlModelReservationFinder(session=session)).execute(
+        user_id=Id.from_uuid(current_user.id)
+    )
     return [MovieReservationResponse.from_domain(reservation) for reservation in movie_reservations]
 
 
