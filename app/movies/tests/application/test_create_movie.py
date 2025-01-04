@@ -4,6 +4,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 from fastapi import UploadFile
+from fastapi_storages.base import BaseStorage
 
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
 from app.movies.domain.poster_image import PosterImage
@@ -15,12 +16,18 @@ class TestCreateMovie:
     def mock_movie_repository(self) -> Any:
         return create_autospec(spec=MovieRepository, instance=True, spec_set=True)
 
-    def test_creates_movie(self, mock_movie_repository: Mock) -> None:
+    @pytest.fixture
+    def mock_storage(self) -> Any:
+        return create_autospec(spec=BaseStorage, instance=True, spec_set=True)
+
+    def test_creates_movie(self, mock_movie_repository: Mock, mock_storage: Mock) -> None:
+        mock_storage.write.return_value = "poster_image.jpg"
+
         poster_image = UploadFile(
             file=tempfile.NamedTemporaryFile(),  # type: ignore
             filename="poster_image.jpg",
         )
-        movie = CreateMovie(repository=mock_movie_repository).execute(
+        movie = CreateMovie(repository=mock_movie_repository, storage=mock_storage).execute(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description=(
@@ -30,8 +37,7 @@ class TestCreateMovie:
                 ),
                 poster_image=PosterImage(
                     filename=poster_image.filename,
-                    content=poster_image.file.read(),
-                    content_type=poster_image.content_type,
+                    file=poster_image.file.read(),
                 ),
             )
         )
@@ -46,8 +52,8 @@ class TestCreateMovie:
         )
         assert movie.poster_image == "poster_image.jpg"
 
-    def test_creates_movie_without_poster_image(self, mock_movie_repository: Mock) -> None:
-        movie = CreateMovie(repository=mock_movie_repository).execute(
+    def test_creates_movie_without_poster_image(self, mock_movie_repository: Mock, mock_storage: Mock) -> None:
+        movie = CreateMovie(repository=mock_movie_repository, storage=mock_storage).execute(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description=(
@@ -60,6 +66,7 @@ class TestCreateMovie:
         )
 
         mock_movie_repository.save.assert_called_once_with(movie=movie)
+        mock_storage.write.assert_not_called()
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == (

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+from typing import BinaryIO
 
 
 @dataclass
 class PosterImage:
-    filename: str | None
-    content: bytes
-    content_type: str | None
+    filename: str
+    file: BinaryIO
