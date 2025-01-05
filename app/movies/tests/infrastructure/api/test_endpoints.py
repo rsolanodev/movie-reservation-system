@@ -215,6 +215,11 @@ class TestUpdateMovieEndpoint:
             yield mock.return_value
 
     @pytest.fixture
+    def mock_storage(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.PublicMediaS3Storage") as mock:
+            yield mock.return_value
+
+    @pytest.fixture
     def movie(self) -> Movie:
         return (
             MovieBuilder()
@@ -226,7 +231,11 @@ class TestUpdateMovieEndpoint:
         )
 
     @pytest.mark.integration
-    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+    def test_integration(
+        self, session: Session, client: TestClient, mock_storage: Mock, superuser_token_headers: dict[str, str]
+    ) -> None:
+        mock_storage.write.return_value = "new_poster.jpg"
+
         movie_model = SqlModelMovieBuilderTest(session=session).build()
 
         response = client.patch(
@@ -241,6 +250,8 @@ class TestUpdateMovieEndpoint:
 
         assert response.status_code == 200
 
+        mock_storage.write.assert_called_once_with(file=ANY, name="new_poster.jpg")
+
         session.refresh(movie_model)
         assert movie_model.title == "New Title"
         assert movie_model.description == "New description"
@@ -252,6 +263,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
         mock_movie_finder: Mock,
+        mock_storage: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
@@ -267,7 +279,9 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
+        mock_update_movie.assert_called_once_with(
+            repository=mock_movie_repository, finder=mock_movie_finder, storage=mock_storage
+        )
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -291,6 +305,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
         mock_movie_finder: Mock,
+        mock_storage: Mock,
         superuser_token_headers: dict[str, str],
         movie: Movie,
     ) -> None:
@@ -301,7 +316,9 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
+        mock_update_movie.assert_called_once_with(
+            repository=mock_movie_repository, finder=mock_movie_finder, storage=mock_storage
+        )
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -325,6 +342,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
         mock_movie_finder: Mock,
+        mock_storage: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_update_movie.return_value.execute.side_effect = MovieDoesNotExist
@@ -338,7 +356,9 @@ class TestUpdateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_update_movie.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
+        mock_update_movie.assert_called_once_with(
+            repository=mock_movie_repository, finder=mock_movie_finder, storage=mock_storage
+        )
         mock_update_movie.return_value.execute.assert_called_once_with(
             params=UpdateMovieParams(
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
@@ -352,7 +372,12 @@ class TestUpdateMovieEndpoint:
         assert response.json() == {"detail": "The movie does not exist"}
 
     def test_returns_401_when_user_is_not_authenticated(
-        self, client: TestClient, mock_update_movie: Mock, mock_movie_repository: Mock, mock_movie_finder: Mock
+        self,
+        client: TestClient,
+        mock_update_movie: Mock,
+        mock_movie_repository: Mock,
+        mock_movie_finder: Mock,
+        mock_storage: Mock,
     ) -> None:
         response = client.patch(
             "api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/",
@@ -365,6 +390,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
         mock_movie_finder.assert_not_called()
+        mock_storage.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -375,6 +401,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie: Mock,
         mock_movie_repository: Mock,
         mock_movie_finder: Mock,
+        mock_storage: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.patch(
@@ -389,6 +416,7 @@ class TestUpdateMovieEndpoint:
         mock_update_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
         mock_movie_finder.assert_not_called()
+        mock_storage.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
