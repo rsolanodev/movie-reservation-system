@@ -1,4 +1,5 @@
 import secrets
+from functools import lru_cache
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
@@ -84,4 +85,6 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://redis:6379/0"
 
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

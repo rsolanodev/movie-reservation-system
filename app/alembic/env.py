@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.settings import settings
+from app.settings import get_settings
 from sqlmodel import SQLModel
 
 from app.users.infrastructure.models import UserModel
@@ -14,8 +14,8 @@ from app.rooms.infrastructure.models import RoomModel
 from app.reservations.infrastructure.models import SeatModel, ReservationModel
 
 target_metadata = SQLModel.metadata
-
 config = context.config
+settings = get_settings()
 
 fileConfig(config.config_file_name)
 

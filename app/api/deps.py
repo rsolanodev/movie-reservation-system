@@ -7,8 +7,10 @@ from jwt.exceptions import InvalidTokenError
 from sqlmodel import Session
 
 from app.database import get_db_session
-from app.settings import settings
+from app.settings import get_settings
 from app.users.infrastructure.models import UserModel
+
+settings = get_settings()
 
 SessionDep = Annotated[Session, Depends(get_db_session)]
 

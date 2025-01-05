@@ -12,7 +12,7 @@ from app.auth.domain.exceptions import (
     UserDoesNotExist,
     UserInactive,
 )
-from app.settings import settings
+from app.settings import Settings
 from app.shared.domain.finders.user_finder import UserFinder
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
 
@@ -23,7 +23,7 @@ class TestAuthenticate:
         return create_autospec(spec=UserFinder, instance=True, spec_set=True)
 
     @freeze_time("2021-08-01T12:00:00Z")
-    def test_authenticate_user(self, mock_user_finder: Mock) -> None:
+    def test_authenticate_user(self, mock_user_finder: Mock, settings: Settings) -> None:
         mock_user_finder.find_user_by_email.return_value = UserFactoryTest().create()
 
         token = Authenticate(finder=mock_user_finder).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
