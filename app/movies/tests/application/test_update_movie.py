@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -35,11 +36,7 @@ class TestUpdateMovie:
 
     @pytest.fixture
     def poster_image(self) -> PosterImage:
-        return PosterImage(
-            filename="super_mario_bros.jpg",
-            content=b"image",
-            content_type="image/jpeg",
-        )
+        return PosterImage(filename="super_mario_bros.jpg", file=BytesIO(b"image"))
 
     def test_updates_movie(
         self, mock_movie_repository: Mock, mock_movie_finder: Mock, movie: Movie, poster_image: PosterImage

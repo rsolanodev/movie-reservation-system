@@ -84,6 +84,11 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://redis:6379/0"
 
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_S3_BUCKET_NAME: str = ""
+    AWS_S3_ENDPOINT_URL: str = "s3.amazonaws.com"
+
 
 @lru_cache
 def get_settings() -> Settings:

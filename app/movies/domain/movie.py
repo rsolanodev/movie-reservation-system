@@ -19,7 +19,12 @@ class Movie:
     showtimes: MovieShowtimes = field(default_factory=MovieShowtimes)
 
     @classmethod
-    def create(cls, title: str, description: str | None, poster_image: str | None) -> "Movie":
+    def create(
+        cls,
+        title: str,
+        description: str | None,
+        poster_image: str | None = None,
+    ) -> "Movie":
         return cls(
             id=Id.from_uuid(uuid.uuid4()),
             title=title,
@@ -27,7 +32,12 @@ class Movie:
             poster_image=poster_image,
         )
 
-    def update(self, title: str | None, description: str | None, poster_image: str | None) -> None:
+    def update(
+        self,
+        title: str | None = None,
+        description: str | None = None,
+        poster_image: str | None = None,
+    ) -> None:
         if title is not None:
             self.title = title
 
