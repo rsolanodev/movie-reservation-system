@@ -1,25 +1,28 @@
 from collections.abc import Generator
+from unittest.mock import patch
 
 import pytest
 
-from app.settings import Settings, settings
+from app.settings import Settings
 from app.shared.infrastructure.storages.s3_storage import PublicMediaS3Storage
 
 
 class TestPublicMediaS3Storage:
-    @pytest.fixture
-    def test_settings(self) -> Generator[Settings, None, None]:
-        settings.AWS_ACCESS_KEY_ID = "access"
-        settings.AWS_SECRET_ACCESS_KEY = "secret"
-        settings.AWS_S3_BUCKET_NAME = "test"
-        settings.AWS_S3_ENDPOINT_URL = "s3.amazonaws.com"
-        yield settings
+    @pytest.fixture(autouse=True)
+    def override_settings(self) -> Generator[None, None, None]:
+        with patch(
+            "app.shared.infrastructure.storages.s3_storage.get_settings",
+            return_value=Settings(
+                AWS_ACCESS_KEY_ID="access",
+                AWS_SECRET_ACCESS_KEY="secret",
+                AWS_S3_BUCKET_NAME="test",
+                AWS_S3_ENDPOINT_URL="s3.amazonaws.com",
+            ),
+        ):
+            yield
 
-    @pytest.fixture
-    def storage(self, test_settings: Settings) -> PublicMediaS3Storage:
-        return PublicMediaS3Storage()
-
-    def test_s3_storage_configuration(self, storage: PublicMediaS3Storage) -> None:
+    def test_s3_storage_configuration(self) -> None:
+        storage = PublicMediaS3Storage()
         assert storage.AWS_ACCESS_KEY_ID == "access"
         assert storage.AWS_SECRET_ACCESS_KEY == "secret"
         assert storage.AWS_S3_BUCKET_NAME == "test"

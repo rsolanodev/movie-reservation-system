@@ -4,5 +4,5 @@ from typing import BinaryIO
 
 @dataclass
 class PosterImage:
-    filename: str
+    filename: str | None
     file: BinaryIO

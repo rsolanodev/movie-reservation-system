@@ -27,6 +27,7 @@ from app.movies.infrastructure.finders.sqlmodel_genre_finder import SqlModelGenr
 from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
 from app.shared.domain.value_objects.id import Id
+from app.shared.infrastructure.storages.s3_storage import PublicMediaS3Storage
 
 router = APIRouter()
 
@@ -68,11 +69,12 @@ def create_movie(
 ) -> Movie:
     return CreateMovie(
         repository=SqlModelMovieRepository(session=session),
+        storage=PublicMediaS3Storage(),
     ).execute(
-        params=CreateMovieParams(
+        params=CreateMovieParams.from_fastapi(
             title=title,
             description=description,
-            poster_image=build_poster_image(uploaded_file=poster_image),
+            upload_poster_image=poster_image,
         )
     )
 

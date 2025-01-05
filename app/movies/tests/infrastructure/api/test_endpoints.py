@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from datetime import date, datetime, timezone
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 from uuid import UUID
 
 import pytest
@@ -43,8 +43,17 @@ class TestCreateMovieEndpoint:
         with patch("app.movies.infrastructure.api.endpoints.SqlModelMovieRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_storage(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.PublicMediaS3Storage") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
-    def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
+    def test_integration(
+        self, session: Session, client: TestClient, superuser_token_headers: dict[str, str], mock_storage: Mock
+    ) -> None:
+        mock_storage.write.return_value = "deadpool_and_wolverine.jpg"
+
         response = client.post(
             "api/v1/movies/",
             data={
@@ -57,6 +66,8 @@ class TestCreateMovieEndpoint:
 
         assert response.status_code == 201
 
+        mock_storage.write.assert_called_once_with(file=ANY, name="deadpool_and_wolverine.jpg")
+
         movie_model = session.exec(select(MovieModel)).first()
         assert movie_model is not None
         assert movie_model.title == "Deadpool & Wolverine"
@@ -68,6 +79,7 @@ class TestCreateMovieEndpoint:
         client: TestClient,
         mock_create_movie: Mock,
         mock_movie_repository: Mock,
+        mock_storage: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_create_movie.return_value.execute.return_value = (
@@ -84,16 +96,12 @@ class TestCreateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_create_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_create_movie.assert_called_once_with(repository=mock_movie_repository, storage=mock_storage)
         mock_create_movie.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
-                poster_image=PosterImage(
-                    filename="deadpool_and_wolverine.jpg",
-                    content=b"image",
-                    content_type="image/jpeg",
-                ),
+                poster_image=PosterImage(filename="deadpool_and_wolverine.jpg", file=ANY),
             )
         )
 
@@ -110,6 +118,7 @@ class TestCreateMovieEndpoint:
         client: TestClient,
         mock_create_movie: Mock,
         mock_movie_repository: Mock,
+        mock_storage: Mock,
         superuser_token_headers: dict[str, str],
     ) -> None:
         mock_create_movie.return_value.execute.return_value = (
@@ -125,7 +134,7 @@ class TestCreateMovieEndpoint:
             headers=superuser_token_headers,
         )
 
-        mock_create_movie.assert_called_once_with(repository=mock_movie_repository)
+        mock_create_movie.assert_called_once_with(repository=mock_movie_repository, storage=mock_storage)
         mock_create_movie.return_value.execute.assert_called_once_with(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
@@ -147,6 +156,7 @@ class TestCreateMovieEndpoint:
         client: TestClient,
         mock_create_movie: Mock,
         mock_movie_repository: Mock,
+        mock_storage: Mock,
     ) -> None:
         response = client.post(
             "api/v1/movies/",
@@ -158,6 +168,7 @@ class TestCreateMovieEndpoint:
 
         mock_create_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_storage.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}
@@ -167,6 +178,7 @@ class TestCreateMovieEndpoint:
         client: TestClient,
         mock_create_movie: Mock,
         mock_movie_repository: Mock,
+        mock_storage: Mock,
         user_token_headers: dict[str, str],
     ) -> None:
         response = client.post(
@@ -180,6 +192,7 @@ class TestCreateMovieEndpoint:
 
         mock_create_movie.assert_not_called()
         mock_movie_repository.assert_not_called()
+        mock_storage.assert_not_called()
 
         assert response.status_code == 403
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
@@ -260,11 +273,7 @@ class TestUpdateMovieEndpoint:
                 id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 title="Deadpool & Wolverine",
                 description="Deadpool and a variant of Wolverine.",
-                poster_image=PosterImage(
-                    filename="deadpool_and_wolverine.jpg",
-                    content=b"image",
-                    content_type="image/jpeg",
-                ),
+                poster_image=PosterImage(filename="deadpool_and_wolverine.jpg", file=ANY),
             )
         )
 

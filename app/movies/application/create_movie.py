@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from fastapi import UploadFile
 from fastapi_storages.base import BaseStorage
 
 from app.movies.domain.movie import Movie
@@ -12,6 +13,19 @@ class CreateMovieParams:
     title: str
     description: str | None
     poster_image: PosterImage | None
+
+    @classmethod
+    def from_fastapi(
+        cls, title: str, description: str | None, upload_poster_image: UploadFile | None
+    ) -> "CreateMovieParams":
+        poster_image: PosterImage | None = None
+
+        if upload_poster_image is not None:
+            poster_image = PosterImage(
+                filename=upload_poster_image.filename,
+                file=upload_poster_image.file,
+            )
+        return cls(title=title, description=description, poster_image=poster_image)
 
 
 class CreateMovie:
@@ -30,4 +44,8 @@ class CreateMovie:
         return movie
 
     def _upload_poster_image(self, poster_image: PosterImage) -> str:
-        return self._storage.write(file=poster_image.file, name=poster_image.filename)
+        poster_image_path: str = self._storage.write(
+            file=poster_image.file,
+            name=poster_image.filename,
+        )
+        return poster_image_path

@@ -1,4 +1,4 @@
-import tempfile
+from io import BytesIO
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
@@ -23,10 +23,9 @@ class TestCreateMovie:
     def test_creates_movie(self, mock_movie_repository: Mock, mock_storage: Mock) -> None:
         mock_storage.write.return_value = "poster_image.jpg"
 
-        poster_image = UploadFile(
-            file=tempfile.NamedTemporaryFile(),  # type: ignore
-            filename="poster_image.jpg",
-        )
+        file = BytesIO(b"image content")
+        poster_image = UploadFile(file=file, filename="poster_image.jpg")
+
         movie = CreateMovie(repository=mock_movie_repository, storage=mock_storage).execute(
             params=CreateMovieParams(
                 title="Deadpool & Wolverine",
@@ -35,10 +34,7 @@ class TestCreateMovie:
                     "Variance Authority, but instead recruits a variant of Wolverine to save "
                     "his universe from extinction."
                 ),
-                poster_image=PosterImage(
-                    filename=poster_image.filename,
-                    file=poster_image.file.read(),
-                ),
+                poster_image=PosterImage(filename=poster_image.filename, file=file),
             )
         )
 
