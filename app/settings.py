@@ -1,4 +1,5 @@
 import secrets
+from functools import lru_cache
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
@@ -89,4 +90,6 @@ class Settings(BaseSettings):
     AWS_S3_ENDPOINT_URL: str = "s3.amazonaws.com"
 
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

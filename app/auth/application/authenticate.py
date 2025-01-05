@@ -1,7 +1,9 @@
 from app.auth.domain.exceptions import IncorrectPassword, UserDoesNotExist, UserInactive
 from app.auth.domain.token import Token
-from app.settings import settings
+from app.settings import get_settings
 from app.shared.domain.finders.user_finder import UserFinder
+
+settings = get_settings()
 
 
 class Authenticate:
