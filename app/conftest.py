@@ -10,10 +10,15 @@ from sqlmodel import Session, SQLModel
 from app.auth.domain.token import Token
 from app.database import get_db_session
 from app.main import app
-from app.settings import settings
+from app.settings import Settings, get_settings
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
 from app.users.infrastructure.models import UserModel
+
+
+@pytest.fixture
+def settings() -> Settings:
+    return get_settings()
 
 
 @pytest.fixture(scope="session")
@@ -83,7 +88,7 @@ def superuser(session: Session) -> UserModel:
 
 
 @pytest.fixture
-def user_token_headers(user: UserModel) -> dict[str, str]:
+def user_token_headers(user: UserModel, settings: Settings) -> dict[str, str]:
     token = Token.create(
         user_id=Id.from_uuid(user.id),
         secret_key=settings.SECRET_KEY,
@@ -93,7 +98,7 @@ def user_token_headers(user: UserModel) -> dict[str, str]:
 
 
 @pytest.fixture
-def superuser_token_headers(superuser: UserModel) -> dict[str, str]:
+def superuser_token_headers(superuser: UserModel, settings: Settings) -> dict[str, str]:
     token = Token.create(
         user_id=Id.from_uuid(superuser.id),
         secret_key=settings.SECRET_KEY,

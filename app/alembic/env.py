@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.settings import settings
+from app.settings import get_settings
 from sqlmodel import SQLModel
 
 from app.users.infrastructure.models import UserModel
@@ -21,6 +21,7 @@ fileConfig(config.config_file_name)
 
 
 def get_url():
+    settings = get_settings()
     return str(settings.SQLALCHEMY_DATABASE_URI)
 
 

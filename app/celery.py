@@ -1,6 +1,8 @@
 from celery import Celery
 
-from app.settings import settings
+from app.settings import get_settings
+
+settings = get_settings()
 
 app = Celery("app")
 app.conf.broker_url = settings.REDIS_URL
