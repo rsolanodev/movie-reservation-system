@@ -22,7 +22,6 @@ from app.movies.infrastructure.api.responses import (
     RetrieveMovieResponse,
     UpdateMovieResponse,
 )
-from app.movies.infrastructure.api.utils import build_poster_image
 from app.movies.infrastructure.finders.sqlmodel_genre_finder import SqlModelGenreFinder
 from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
@@ -111,12 +110,10 @@ def update_movie(
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
             finder=SqlModelMovieFinder(session=session),
+            storage=PublicMediaS3Storage(),
         ).execute(
-            params=UpdateMovieParams(
-                id=Id(movie_id),
-                title=title,
-                description=description,
-                poster_image=build_poster_image(uploaded_file=poster_image),
+            params=UpdateMovieParams.from_fastapi(
+                id=movie_id, title=title, description=description, upload_poster_image=poster_image
             )
         )
     except MovieDoesNotExist:
