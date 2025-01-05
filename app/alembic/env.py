@@ -14,14 +14,13 @@ from app.rooms.infrastructure.models import RoomModel
 from app.reservations.infrastructure.models import SeatModel, ReservationModel
 
 target_metadata = SQLModel.metadata
-
 config = context.config
+settings = get_settings()
 
 fileConfig(config.config_file_name)
 
 
 def get_url():
-    settings = get_settings()
     return str(settings.SQLALCHEMY_DATABASE_URI)
 
 
