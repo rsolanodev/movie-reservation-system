@@ -19,13 +19,8 @@ jobs:
       SECRET_KEY: secretkey
       ENVIRONMENT: local
       BACKEND_CORS_ORIGINS: "http://localhost,https://localhost"
-      SMTP_HOST:
-      SMTP_USER:
-      SMTP_PASSWORD:
-      EMAILS_FROM_EMAIL: noreply@example.com
       POSTGRES_PORT: 5432
       REDIS_URL: redis://redis:6379/0
-      SENTRY_DSN:
 
     steps:
       - name: Checkout repository
@@ -44,13 +39,8 @@ jobs:
           echo "SECRET_KEY=${{ env.SECRET_KEY }}" >> .env
           echo "ENVIRONMENT=${{ env.ENVIRONMENT }}" >> .env
           echo "BACKEND_CORS_ORIGINS=${{ env.BACKEND_CORS_ORIGINS }}" >> .env
-          echo "SMTP_HOST=${{ env.SMTP_HOST }}" >> .env
-          echo "SMTP_USER=${{ env.SMTP_USER }}" >> .env
-          echo "SMTP_PASSWORD=${{ env.SMTP_PASSWORD }}" >> .env
-          echo "EMAILS_FROM_EMAIL=${{ env.EMAILS_FROM_EMAIL }}" >> .env
           echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
           echo "REDIS_URL=${{ env.REDIS_URL }}" >> .env
-          echo "SENTRY_DSN=${{ env.SENTRY_DSN }}" >> .env
 
       - name: Build and start services
         run: |
