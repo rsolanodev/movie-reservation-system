@@ -10,7 +10,6 @@ class ReservationBuilderTest:
         self.id: Id = Id.from_uuid(uuid.uuid4())
         self.user_id: Id = Id.from_uuid(uuid.uuid4())
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
-        self.has_paid: bool = False
         self.status: str = ReservationStatus.PENDING
         self.seats: Seats = Seats([])
 
@@ -26,10 +25,6 @@ class ReservationBuilderTest:
         self.showtime_id = showtime_id
         return self
 
-    def with_has_paid(self, has_paid: bool) -> "ReservationBuilderTest":
-        self.has_paid = has_paid
-        return self
-
     def with_seats(self, seats: Seats) -> "ReservationBuilderTest":
         self.seats = seats
         return self
@@ -43,7 +38,6 @@ class ReservationBuilderTest:
             id=self.id,
             user_id=self.user_id,
             showtime_id=self.showtime_id,
-            has_paid=self.has_paid,
             status=self.status,
             seats=self.seats,
         )

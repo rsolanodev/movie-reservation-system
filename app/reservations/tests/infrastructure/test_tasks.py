@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from sqlmodel import Session
 
+from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.tasks import release_reservation_task
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
@@ -34,9 +35,10 @@ class TestReleaseReservationTask:
             yield session
 
     @pytest.mark.integration
-    @pytest.mark.parametrize("has_paid, status", [(True, SeatStatus.RESERVED), (False, SeatStatus.AVAILABLE)])
-    def test_integration(self, mock_db_session: Session, has_paid: bool, status: SeatStatus) -> None:
-        reservation_model = SqlModelReservationBuilderTest(mock_db_session).with_has_paid(has_paid).build()
+    def test_integration(self, mock_db_session: Session) -> None:
+        reservation_model = (
+            SqlModelReservationBuilderTest(mock_db_session).with_status(ReservationStatus.PENDING).build()
+        )
         seat_model = (
             SqlModelSeatBuilderTest(mock_db_session)
             .with_status(SeatStatus.RESERVED)
@@ -46,9 +48,8 @@ class TestReleaseReservationTask:
 
         release_reservation_task(reservation_id=Id.from_uuid(reservation_model.id))
 
-        expected_reservation_id = reservation_model.id if has_paid else None
-        assert seat_model.reservation_id == expected_reservation_id
-        assert seat_model.status == status
+        assert seat_model.reservation_id is None
+        assert seat_model.status == SeatStatus.AVAILABLE
 
     def test_calls_release_reservation(
         self, mock_release_reservation: Mock, mock_reservation_repository: Mock, mock_reservation_finder: Mock

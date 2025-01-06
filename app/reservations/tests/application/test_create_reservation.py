@@ -58,7 +58,6 @@ class TestCreateReservation:
                 id=reservation.id,
                 user_id=Id("1553d340-89eb-433b-a101-981bdaa740ed"),
                 showtime_id=Id("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
-                has_paid=False,
                 status=ReservationStatus.PENDING,
                 seats=Seats(
                     [

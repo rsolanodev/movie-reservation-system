@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-import pytest
 from sqlmodel import Session
 
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
@@ -16,14 +15,12 @@ from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieB
 
 
 class TestSqlModelReservationFinder:
-    @pytest.mark.parametrize("has_paid", [False, True])
-    def test_find_reservation(self, session: Session, has_paid: bool) -> None:
+    def test_find_reservation(self, session: Session) -> None:
         reservation_model = (
             SqlModelReservationBuilderTest(session)
             .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
             .with_user_id(UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
             .with_showtime_id(UUID("ffa502e6-8869-490c-8799-5bea26c7146d"))
-            .with_has_paid(has_paid)
             .build()
         )
 
@@ -35,7 +32,6 @@ class TestSqlModelReservationFinder:
             id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
             user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
-            has_paid=has_paid,
             status=ReservationStatus.PENDING,
         )
 
@@ -56,7 +52,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build()
         )
         (
@@ -113,13 +109,13 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build(),
             SqlModelReservationBuilderTest(session)
             .with_id(UUID("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("ef18bb4c-2109-443f-883d-cb48cfbddd58"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build(),
         )
         (
@@ -181,7 +177,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build(),
         )
         (
@@ -232,7 +228,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build()
         )
         (
@@ -248,7 +244,7 @@ class TestSqlModelReservationFinder:
 
         assert reservations == []
 
-    def test_does_not_find_movie_show_reservations_by_user_id_when_does_not_have_seats_occupied(
+    def test_does_not_find_movie_show_reservations_by_user_id_when_reservation_is_pending(
         self, session: Session
     ) -> None:
         (
@@ -264,7 +260,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.PENDING)
             .build()
         )
         (
