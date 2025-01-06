@@ -39,6 +39,7 @@ class ReservationModel(SQLModel, table=True):
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
     has_paid: bool = Field(default=False)
+    status: str
     created_at: datetime = Field(default_factory=datetime.now)
 
     @classmethod
@@ -47,6 +48,7 @@ class ReservationModel(SQLModel, table=True):
             id=reservation.id.to_uuid(),
             user_id=reservation.user_id.to_uuid(),
             showtime_id=reservation.showtime_id.to_uuid(),
+            status=reservation.status,
         )
 
     def to_domain(self) -> Reservation:
@@ -54,5 +56,6 @@ class ReservationModel(SQLModel, table=True):
             id=Id.from_uuid(self.id),
             user_id=Id.from_uuid(self.user_id),
             showtime_id=Id.from_uuid(self.showtime_id),
+            status=self.status,
             has_paid=self.has_paid,
         )

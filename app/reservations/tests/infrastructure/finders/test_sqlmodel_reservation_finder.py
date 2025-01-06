@@ -5,7 +5,7 @@ import pytest
 from sqlmodel import Session
 
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import Reservation
+from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
@@ -36,6 +36,7 @@ class TestSqlModelReservationFinder:
             user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
             has_paid=has_paid,
+            status=ReservationStatus.PENDING,
         )
 
     def test_find_movie_show_reservations_by_user_id(self, session: Session) -> None:

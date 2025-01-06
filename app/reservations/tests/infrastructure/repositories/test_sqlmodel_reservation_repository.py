@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
+from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
@@ -39,6 +40,7 @@ class TestSqlModelReservationRepository:
         reservation_model = session.get_one(ReservationModel, reservation.id.to_uuid())
         assert reservation_model.user_id == UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a")
         assert reservation_model.showtime_id == UUID("ffa502e6-8869-490c-8799-5bea26c7146d")
+        assert reservation_model.status == ReservationStatus.PENDING
 
         session.refresh(main_seat)
         assert main_seat.reservation_id == reservation.id.to_uuid()
