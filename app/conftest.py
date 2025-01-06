@@ -3,12 +3,11 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Connection, Engine, create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 from sqlmodel import Session, SQLModel
 
+from app.api.deps import get_fastapi_session
 from app.auth.domain.token import Token
-from app.database import get_db_session
 from app.main import app
 from app.settings import Settings, get_settings
 from app.shared.domain.value_objects.id import Id
@@ -21,7 +20,7 @@ def settings() -> Settings:
     return get_settings()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def engine() -> Engine:
     return create_engine("sqlite://", connect_args={"check_same_thread": False})
 
@@ -48,20 +47,20 @@ def connection(
 
 @pytest.fixture
 def session(connection: Connection) -> Generator[Session, None, None]:
-    SessionLocal = sessionmaker(class_=Session, expire_on_commit=False, bind=connection)
-    session = SessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
+    with Session(bind=connection) as session:
+        try:
+            yield session
+            session.rollback()
+        finally:
+            session.close()
 
 
 @pytest.fixture
 def client(session: Session) -> Generator[TestClient, None, None]:
-    def override_get_session() -> Session:
+    def get_override_session() -> Session:
         return session
 
-    app.dependency_overrides[get_db_session] = override_get_session
+    app.dependency_overrides[get_fastapi_session] = get_override_session
 
     with TestClient(app) as client:
         yield client

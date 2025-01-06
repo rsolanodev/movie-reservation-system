@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import Annotated
 from uuid import UUID
 
@@ -6,13 +7,19 @@ from fastapi import Depends, HTTPException, security, status
 from jwt.exceptions import InvalidTokenError
 from sqlmodel import Session
 
-from app.database import get_db_session
+from app.database import get_session
 from app.settings import get_settings
 from app.users.infrastructure.models import UserModel
 
 settings = get_settings()
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+
+def get_fastapi_session() -> Generator[Session, None, None]:
+    with get_session() as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_fastapi_session)]
 
 reusable_oauth2 = security.OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/access-token/")
 TokenDep = Annotated[str, Depends(reusable_oauth2)]

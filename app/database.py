@@ -11,7 +11,7 @@ engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
 
 @contextmanager
-def get_db_session() -> Generator[Session, None, None]:
+def get_session() -> Generator[Session, None, None]:
     session = Session(engine)
     try:
         yield session
