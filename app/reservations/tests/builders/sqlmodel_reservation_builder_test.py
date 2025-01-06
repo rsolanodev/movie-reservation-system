@@ -14,7 +14,7 @@ class SqlModelReservationBuilderTest:
         self.user_id: uuid.UUID = uuid.uuid4()
         self.showtime_id: uuid.UUID = uuid.uuid4()
         self.has_paid: bool = False
-        self.status: ReservationStatus = ReservationStatus.PENDING
+        self.status: str = ReservationStatus.PENDING
 
     def with_id(self, id: uuid.UUID) -> "SqlModelReservationBuilderTest":
         self.id = id

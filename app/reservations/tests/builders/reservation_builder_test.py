@@ -11,7 +11,7 @@ class ReservationBuilderTest:
         self.user_id: Id = Id.from_uuid(uuid.uuid4())
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
         self.has_paid: bool = False
-        self.status: ReservationStatus = ReservationStatus.PENDING
+        self.status: str = ReservationStatus.PENDING
         self.seats: Seats = Seats([])
 
     def with_id(self, id: Id) -> "ReservationBuilderTest":
