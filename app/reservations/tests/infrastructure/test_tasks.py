@@ -30,7 +30,7 @@ class TestReleaseReservationTask:
 
     @pytest.fixture
     def mock_db_session(self, session: Session) -> Generator[Session, None, None]:
-        with patch("app.reservations.infrastructure.tasks.get_db_session") as mock:
+        with patch("app.reservations.infrastructure.tasks.get_session") as mock:
             mock.return_value.__enter__.return_value = session
             yield session
 
