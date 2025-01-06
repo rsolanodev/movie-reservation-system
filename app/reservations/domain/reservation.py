@@ -18,7 +18,6 @@ class Reservation:
     id: Id
     user_id: Id
     showtime_id: Id
-    has_paid: bool
     status: str
     seats: Seats = field(default_factory=Seats)
 
@@ -28,9 +27,14 @@ class Reservation:
             id=Id.from_uuid(uuid.uuid4()),
             user_id=user_id,
             showtime_id=showtime_id,
-            has_paid=False,
             status=ReservationStatus.PENDING,
         )
 
     def add_seats(self, seats: Seats) -> None:
         self.seats.extend(seats)
+
+    def is_confirmed(self) -> bool:
+        return self.status == ReservationStatus.CONFIRMED
+
+    def cancel(self) -> None:
+        self.status = ReservationStatus.CANCELLED

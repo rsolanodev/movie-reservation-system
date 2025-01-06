@@ -51,7 +51,7 @@ class TestSqlModelReservationRepository:
         assert parent_seat.status == SeatStatus.RESERVED
 
     def test_release_reservation(self, session: Session) -> None:
-        reservation_model = SqlModelReservationBuilderTest(session).build()
+        reservation_model = SqlModelReservationBuilderTest(session).with_status(ReservationStatus.PENDING).build()
         seat_model = (
             SqlModelSeatBuilderTest(session)
             .with_status(SeatStatus.RESERVED)
@@ -59,9 +59,11 @@ class TestSqlModelReservationRepository:
             .build()
         )
 
-        SqlModelReservationRepository(session).release(
-            reservation_id=Id.from_uuid(reservation_model.id),
-        )
+        reservation = reservation_model.to_domain()
+        reservation.cancel()
 
+        SqlModelReservationRepository(session).release(reservation=reservation)
+
+        assert reservation_model.status == ReservationStatus.CANCELLED
         assert seat_model.status == SeatStatus.AVAILABLE
         assert seat_model.reservation_id is None

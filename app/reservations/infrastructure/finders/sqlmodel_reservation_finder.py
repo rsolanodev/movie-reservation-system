@@ -3,9 +3,8 @@ from sqlmodel import select
 
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import Reservation
-from app.reservations.domain.seat import SeatStatus
-from app.reservations.infrastructure.models import ReservationModel, SeatModel
+from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.infrastructure.models import ReservationModel
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.finders.sqlmodel_finder import SqlModelFinder
@@ -26,7 +25,7 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
             )
             .where(
                 ReservationModel.user_id == user_id.to_uuid(),
-                ReservationModel.seats.any(SeatModel.status == SeatStatus.OCCUPIED),  # type: ignore
+                ReservationModel.status == ReservationStatus.CONFIRMED,
             )
         ).all()
         return self._sort_movie_show_reservations(

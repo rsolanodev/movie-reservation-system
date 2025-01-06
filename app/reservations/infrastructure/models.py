@@ -33,13 +33,12 @@ class SeatModel(SQLModel, table=True):
 
 class ReservationModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    status: str
     user_id: uuid.UUID = Field(foreign_key="usermodel.id")
     showtime_id: uuid.UUID = Field(foreign_key="showtimemodel.id")
     showtime: "ShowtimeModel" = Relationship(back_populates="reservations")
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
-    has_paid: bool = Field(default=False)
-    status: str
     created_at: datetime = Field(default_factory=datetime.now)
 
     @classmethod
@@ -57,5 +56,4 @@ class ReservationModel(SQLModel, table=True):
             user_id=Id.from_uuid(self.user_id),
             showtime_id=Id.from_uuid(self.showtime_id),
             status=self.status,
-            has_paid=self.has_paid,
         )

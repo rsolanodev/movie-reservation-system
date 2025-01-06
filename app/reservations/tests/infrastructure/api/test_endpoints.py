@@ -16,6 +16,7 @@ from app.reservations.domain.exceptions import (
     ShowtimeHasStarted,
 )
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
+from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
@@ -197,7 +198,7 @@ class TestRetrieveReservationsEndpoint:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(user.id)
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_has_paid(True)
+            .with_status(ReservationStatus.CONFIRMED)
             .build()
         )
         (

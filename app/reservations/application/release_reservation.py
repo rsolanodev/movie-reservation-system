@@ -11,7 +11,8 @@ class ReleaseReservation:
     def execute(self, reservation_id: Id) -> None:
         reservation = self._finder.find_reservation(reservation_id)
 
-        if reservation.has_paid:
+        if reservation.is_confirmed():
             return
 
-        self._repository.release(reservation_id)
+        reservation.cancel()
+        self._repository.release(reservation)
