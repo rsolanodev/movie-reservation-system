@@ -9,7 +9,7 @@ from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.finders.seat_finder import SeatFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.reservation import Reservation
+from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
 from app.reservations.domain.seat import Seat, SeatStatus
 from app.shared.domain.value_objects.id import Id
@@ -59,6 +59,7 @@ class TestCreateReservation:
                 user_id=Id("1553d340-89eb-433b-a101-981bdaa740ed"),
                 showtime_id=Id("aa7a9372-09a0-415a-8c65-ec5aa6026e72"),
                 has_paid=False,
+                status=ReservationStatus.PENDING,
                 seats=Seats(
                     [
                         Seat(

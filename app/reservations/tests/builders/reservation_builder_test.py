@@ -1,7 +1,7 @@
 import uuid
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.reservation import Reservation
+from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.shared.domain.value_objects.id import Id
 
 
@@ -11,6 +11,7 @@ class ReservationBuilderTest:
         self.user_id: Id = Id.from_uuid(uuid.uuid4())
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
         self.has_paid: bool = False
+        self.status: str = ReservationStatus.PENDING
         self.seats: Seats = Seats([])
 
     def with_id(self, id: Id) -> "ReservationBuilderTest":
@@ -33,11 +34,16 @@ class ReservationBuilderTest:
         self.seats = seats
         return self
 
+    def with_status(self, status: ReservationStatus) -> "ReservationBuilderTest":
+        self.status = status
+        return self
+
     def build(self) -> Reservation:
         return Reservation(
             id=self.id,
             user_id=self.user_id,
             showtime_id=self.showtime_id,
             has_paid=self.has_paid,
+            status=self.status,
             seats=self.seats,
         )
