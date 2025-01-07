@@ -7,10 +7,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
-from app.movies.application.create_movie import CreateMovieParams
+from app.movies.application.commands.create_movie import CreateMovieParams
+from app.movies.application.commands.update_movie import UpdateMovieParams
 from app.movies.application.queries.find_movie import FindMovieParams
 from app.movies.application.queries.find_movies import FindMoviesParams
-from app.movies.application.update_movie import UpdateMovieParams
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
     GenreNotAssigned,
