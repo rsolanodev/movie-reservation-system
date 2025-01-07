@@ -4,8 +4,8 @@ from app.api.deps import SessionDep, get_current_active_superuser
 from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.delete_movie import DeleteMovie
+from app.movies.application.queries.find_all_genres import FindAllGenres
 from app.movies.application.remove_movie_genre import RemoveMovieGenre
-from app.movies.application.retrieve_genres import RetrieveGenres
 from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.application.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
@@ -37,7 +37,7 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 def retrieve_genres(session: SessionDep) -> list[Genre]:
-    return RetrieveGenres(finder=SqlModelGenreFinder(session=session)).execute()
+    return FindAllGenres(finder=SqlModelGenreFinder(session=session)).execute()
 
 
 @router.get(

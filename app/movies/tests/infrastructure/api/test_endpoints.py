@@ -534,8 +534,8 @@ class TestDeleteMovieEndpoint:
 
 class TestRetrieveGenresEndpoint:
     @pytest.fixture
-    def mock_retrieve_genres(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.RetrieveGenres") as mock:
+    def mock_find_all_genres(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.FindAllGenres") as mock:
             yield mock
 
     @pytest.fixture
@@ -557,17 +557,17 @@ class TestRetrieveGenresEndpoint:
             {"id": str(genre_comedy.id), "name": "Comedy"},
         ]
 
-    def test_returns_200_and_calls_retrieve_genres(
+    def test_returns_200_and_calls_find_all_genres(
         self,
         client: TestClient,
-        mock_retrieve_genres: Mock,
+        mock_find_all_genres: Mock,
         mock_genre_finder: Mock,
     ) -> None:
         action_genre = Genre.create(name="Action")
         adventure_genre = Genre.create(name="Adventure")
         comedy_genre = Genre.create(name="Comedy")
 
-        mock_retrieve_genres.return_value.execute.return_value = [
+        mock_find_all_genres.return_value.execute.return_value = [
             action_genre,
             adventure_genre,
             comedy_genre,
@@ -575,8 +575,8 @@ class TestRetrieveGenresEndpoint:
 
         response = client.get("api/v1/movies/genres/")
 
-        mock_retrieve_genres.assert_called_once_with(finder=mock_genre_finder)
-        mock_retrieve_genres.return_value.execute.assert_called_once()
+        mock_find_all_genres.assert_called_once_with(finder=mock_genre_finder)
+        mock_find_all_genres.return_value.execute.assert_called_once()
 
         assert response.status_code == 200
         assert response.json() == [
