@@ -5,22 +5,16 @@ from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.delete_movie import DeleteMovie
 from app.movies.application.queries.find_all_genres import FindAllGenres
+from app.movies.application.queries.find_movies import FindMovies, FindMoviesParams
 from app.movies.application.remove_movie_genre import RemoveMovieGenre
 from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
-from app.movies.application.retrieve_movies import RetrieveMovies, RetrieveMoviesParams
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
     GenreNotAssigned,
     MovieDoesNotExist,
 )
-from app.movies.domain.movie import Movie
-from app.movies.infrastructure.api.responses import (
-    CreateMovieResponse,
-    GenreResponse,
-    RetrieveMovieResponse,
-    UpdateMovieResponse,
-)
+from app.movies.infrastructure.api.responses import GenreResponse, MovieExtendedResponse, MovieResponse
 from app.movies.infrastructure.finders.sqlmodel_genre_finder import SqlModelGenreFinder
 from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
@@ -30,33 +24,23 @@ from app.shared.infrastructure.storages.s3_storage import PublicMediaS3Storage
 router = APIRouter()
 
 
-@router.get(
-    "/genres/",
-    response_model=list[GenreResponse],
-    status_code=status.HTTP_200_OK,
-)
+@router.get("/genres/", response_model=list[GenreResponse], status_code=status.HTTP_200_OK)
 def list_genres(session: SessionDep) -> list[GenreResponse]:
     genres = FindAllGenres(finder=SqlModelGenreFinder(session=session)).execute()
     return GenreResponse.from_domain_list(genres=genres)
 
 
-@router.get(
-    "/",
-    response_model=list[RetrieveMovieResponse],
-    status_code=status.HTTP_200_OK,
-)
-def retrieve_movies(
-    session: SessionDep, showtime_date: str, genre_id: str | None = None
-) -> list[RetrieveMovieResponse]:
-    movies = RetrieveMovies(finder=SqlModelMovieFinder(session=session)).execute(
-        params=RetrieveMoviesParams.from_primitives(showtime_date=showtime_date, genre_id=genre_id),
+@router.get("/", response_model=list[MovieExtendedResponse], status_code=status.HTTP_200_OK)
+def list_movies(session: SessionDep, showtime_date: str, genre_id: str | None = None) -> list[MovieExtendedResponse]:
+    movies = FindMovies(finder=SqlModelMovieFinder(session=session)).execute(
+        params=FindMoviesParams.from_primitives(showtime_date=showtime_date, genre_id=genre_id),
     )
-    return [RetrieveMovieResponse.from_domain(movie=movie) for movie in movies]
+    return MovieExtendedResponse.from_domain_list(movies=movies)
 
 
 @router.post(
     "/",
-    response_model=CreateMovieResponse,
+    response_model=MovieResponse,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_active_superuser)],
 )
@@ -65,37 +49,27 @@ def create_movie(
     title: str = Form(min_length=1, max_length=100),
     description: str | None = Form(default=None),
     poster_image: UploadFile | None = File(default=None),
-) -> Movie:
-    return CreateMovie(
-        repository=SqlModelMovieRepository(session=session),
-        storage=PublicMediaS3Storage(),
-    ).execute(
-        params=CreateMovieParams.from_fastapi(
-            title=title,
-            description=description,
-            upload_poster_image=poster_image,
-        )
+) -> MovieResponse:
+    movie = CreateMovie(repository=SqlModelMovieRepository(session=session), storage=PublicMediaS3Storage()).execute(
+        params=CreateMovieParams.from_fastapi(title=title, description=description, upload_poster_image=poster_image)
     )
+    return MovieResponse.from_domain(movie=movie)
 
 
-@router.get(
-    "/{movie_id}/",
-    response_model=RetrieveMovieResponse,
-    status_code=status.HTTP_200_OK,
-)
-def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> RetrieveMovieResponse:
+@router.get("/{movie_id}/", response_model=MovieExtendedResponse, status_code=status.HTTP_200_OK)
+def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> MovieExtendedResponse:
     try:
         movie = RetrieveMovie(finder=SqlModelMovieFinder(session=session)).execute(
             params=RetrieveMovieParams.from_primitives(movie_id=movie_id, showtime_date=showtime_date)
         )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
-    return RetrieveMovieResponse.from_domain(movie=movie)
+    return MovieExtendedResponse.from_domain(movie=movie)
 
 
 @router.patch(
     "/{movie_id}/",
-    response_model=UpdateMovieResponse,
+    response_model=MovieResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_superuser)],
 )
@@ -105,7 +79,7 @@ def update_movie(
     title: str = Form(min_length=1, max_length=100, default=None),
     description: str | None = Form(default=None),
     poster_image: UploadFile | None = None,
-) -> UpdateMovieResponse:
+) -> MovieResponse:
     try:
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
@@ -118,14 +92,10 @@ def update_movie(
         )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")
-    return UpdateMovieResponse.from_domain(movie=movie)
+    return MovieResponse.from_domain(movie=movie)
 
 
-@router.delete(
-    "/{movie_id}/",
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_current_active_superuser)],
-)
+@router.delete("/{movie_id}/", status_code=status.HTTP_200_OK, dependencies=[Depends(get_current_active_superuser)])
 def delete_movie(session: SessionDep, movie_id: str) -> None:
     try:
         DeleteMovie(
@@ -137,9 +107,7 @@ def delete_movie(session: SessionDep, movie_id: str) -> None:
 
 
 @router.post(
-    "/{movie_id}/genres/",
-    status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_current_active_superuser)],
+    "/{movie_id}/genres/", status_code=status.HTTP_200_OK, dependencies=[Depends(get_current_active_superuser)]
 )
 def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...)) -> None:
     try:
