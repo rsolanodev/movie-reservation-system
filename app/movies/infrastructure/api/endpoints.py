@@ -5,9 +5,9 @@ from app.movies.application.add_movie_genre import AddMovieGenre
 from app.movies.application.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.delete_movie import DeleteMovie
 from app.movies.application.queries.find_all_genres import FindAllGenres
+from app.movies.application.queries.find_movie import FindMovie, FindMovieParams
 from app.movies.application.queries.find_movies import FindMovies, FindMoviesParams
 from app.movies.application.remove_movie_genre import RemoveMovieGenre
-from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
 from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
@@ -57,10 +57,10 @@ def create_movie(
 
 
 @router.get("/{movie_id}/", response_model=MovieExtendedResponse, status_code=status.HTTP_200_OK)
-def retrieve_movie(session: SessionDep, movie_id: str, showtime_date: str) -> MovieExtendedResponse:
+def get_movie(session: SessionDep, movie_id: str, showtime_date: str) -> MovieExtendedResponse:
     try:
-        movie = RetrieveMovie(finder=SqlModelMovieFinder(session=session)).execute(
-            params=RetrieveMovieParams.from_primitives(movie_id=movie_id, showtime_date=showtime_date)
+        movie = FindMovie(finder=SqlModelMovieFinder(session=session)).execute(
+            params=FindMovieParams.from_primitives(movie_id=movie_id, showtime_date=showtime_date)
         )
     except MovieDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The movie does not exist")

@@ -8,8 +8,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
 from app.movies.application.create_movie import CreateMovieParams
+from app.movies.application.queries.find_movie import FindMovieParams
 from app.movies.application.queries.find_movies import FindMoviesParams
-from app.movies.application.retrieve_movie import RetrieveMovieParams
 from app.movies.application.update_movie import UpdateMovieParams
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
@@ -745,10 +745,10 @@ class TestRemoveMovieGenreEndpoint:
         assert response.json() == {"detail": "The genre is not assigned to the movie"}
 
 
-class TestRetrieveMovieEndpoint:
+class TestGetMovieEndpoint:
     @pytest.fixture
-    def mock_retrieve_movie(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.RetrieveMovie") as mock:
+    def mock_find_movie(self) -> Generator[Mock, None, None]:
+        with patch("app.movies.infrastructure.api.endpoints.FindMovie") as mock:
             yield mock
 
     @pytest.fixture
@@ -795,10 +795,10 @@ class TestRetrieveMovieEndpoint:
             ],
         }
 
-    def test_returns_200_and_calls_retrieve_movie(
-        self, client: TestClient, mock_retrieve_movie: Mock, mock_movie_finder: Mock
+    def test_returns_200_and_calls_find_movie(
+        self, client: TestClient, mock_find_movie: Mock, mock_movie_finder: Mock
     ) -> None:
-        mock_retrieve_movie.return_value.execute.return_value = (
+        mock_find_movie.return_value.execute.return_value = (
             MovieBuilder()
             .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
@@ -824,9 +824,9 @@ class TestRetrieveMovieEndpoint:
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_retrieve_movie.assert_called_once_with(finder=mock_movie_finder)
-        mock_retrieve_movie.return_value.execute.assert_called_once_with(
-            params=RetrieveMovieParams(
+        mock_find_movie.assert_called_once_with(finder=mock_movie_finder)
+        mock_find_movie.return_value.execute.assert_called_once_with(
+            params=FindMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
@@ -851,15 +851,15 @@ class TestRetrieveMovieEndpoint:
         }
 
     def test_returns_404_when_movie_does_not_exist(
-        self, client: TestClient, mock_retrieve_movie: Mock, mock_movie_finder: Mock
+        self, client: TestClient, mock_find_movie: Mock, mock_movie_finder: Mock
     ) -> None:
-        mock_retrieve_movie.return_value.execute.side_effect = MovieDoesNotExist
+        mock_find_movie.return_value.execute.side_effect = MovieDoesNotExist
 
         response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
-        mock_retrieve_movie.assert_called_once_with(finder=mock_movie_finder)
-        mock_retrieve_movie.return_value.execute.assert_called_once_with(
-            params=RetrieveMovieParams(
+        mock_find_movie.assert_called_once_with(finder=mock_movie_finder)
+        mock_find_movie.return_value.execute.assert_called_once_with(
+            params=FindMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
