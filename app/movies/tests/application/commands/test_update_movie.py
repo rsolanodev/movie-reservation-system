@@ -5,7 +5,7 @@ from unittest.mock import Mock, create_autospec
 import pytest
 from fastapi_storages.base import BaseStorage
 
-from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
+from app.movies.application.commands.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.movie import Movie

@@ -3,7 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.movies.application.delete_movie import DeleteMovie
+from app.movies.application.commands.delete_movie import DeleteMovie
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.repositories.movie_repository import MovieRepository

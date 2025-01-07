@@ -3,7 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.movies.application.add_movie_genre import AddMovieGenre
+from app.movies.application.commands.add_movie_genre import AddMovieGenre
 from app.movies.domain.exceptions import GenreAlreadyAssigned
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.repositories.movie_repository import MovieRepository

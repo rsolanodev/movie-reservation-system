@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
-from app.movies.application.add_movie_genre import AddMovieGenre
-from app.movies.application.create_movie import CreateMovie, CreateMovieParams
-from app.movies.application.delete_movie import DeleteMovie
+from app.movies.application.commands.add_movie_genre import AddMovieGenre
+from app.movies.application.commands.create_movie import CreateMovie, CreateMovieParams
+from app.movies.application.commands.delete_movie import DeleteMovie
+from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre
+from app.movies.application.commands.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.application.queries.find_all_genres import FindAllGenres
 from app.movies.application.queries.find_movie import FindMovie, FindMovieParams
 from app.movies.application.queries.find_movies import FindMovies, FindMoviesParams
-from app.movies.application.remove_movie_genre import RemoveMovieGenre
-from app.movies.application.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import (
     GenreAlreadyAssigned,
     GenreNotAssigned,
