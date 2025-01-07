@@ -5,7 +5,7 @@ from unittest.mock import Mock, create_autospec
 import pytest
 from freezegun import freeze_time
 
-from app.movies.application.retrieve_movie import RetrieveMovie, RetrieveMovieParams
+from app.movies.application.queries.find_movie import FindMovie, FindMovieParams
 from app.movies.domain.collections.movie_genres import MovieGenres
 from app.movies.domain.collections.movie_showtimes import MovieShowtimes
 from app.movies.domain.exceptions import MovieDoesNotExist
@@ -14,9 +14,7 @@ from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
 from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
-from app.movies.tests.factories.movie_showtime_factory_test import (
-    MovieShowtimeFactoryTest,
-)
+from app.movies.tests.factories.movie_showtime_factory_test import MovieShowtimeFactoryTest
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -24,12 +22,12 @@ from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
 
 @freeze_time("2023-04-03T22:00:00Z")
-class TestRetrieveMovie:
+class TestFindMovie:
     @pytest.fixture
     def mock_movie_finder(self) -> Any:
         return create_autospec(spec=MovieFinder, instance=True, spec_set=True)
 
-    def test_retrieves_movie(self, mock_movie_finder: Mock) -> None:
+    def test_find_movie(self, mock_movie_finder: Mock) -> None:
         mock_movie_finder.find_movie_by_showtime_date.return_value = (
             MovieBuilder()
             .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
@@ -51,8 +49,8 @@ class TestRetrieveMovie:
             .build()
         )
 
-        movie = RetrieveMovie(finder=mock_movie_finder).execute(
-            params=RetrieveMovieParams(
+        movie = FindMovie(finder=mock_movie_finder).execute(
+            params=FindMovieParams(
                 movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                 showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
             )
@@ -83,8 +81,8 @@ class TestRetrieveMovie:
         mock_movie_finder.find_movie_by_showtime_date.return_value = None
 
         with pytest.raises(MovieDoesNotExist):
-            RetrieveMovie(finder=mock_movie_finder).execute(
-                params=RetrieveMovieParams(
+            FindMovie(finder=mock_movie_finder).execute(
+                params=FindMovieParams(
                     movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
                     showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
                 )
