@@ -13,6 +13,10 @@ class GenreResponse(SQLModel):
     def from_domain(cls, genre: Genre) -> "GenreResponse":
         return cls(id=genre.id, name=genre.name)
 
+    @classmethod
+    def from_domain_list(cls, genres: list[Genre]) -> list["GenreResponse"]:
+        return [cls.from_domain(genre) for genre in genres]
+
 
 class MovieResponse(SQLModel):
     id: str

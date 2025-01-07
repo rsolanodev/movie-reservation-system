@@ -14,7 +14,6 @@ from app.movies.domain.exceptions import (
     GenreNotAssigned,
     MovieDoesNotExist,
 )
-from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.infrastructure.api.responses import (
     CreateMovieResponse,
@@ -36,8 +35,9 @@ router = APIRouter()
     response_model=list[GenreResponse],
     status_code=status.HTTP_200_OK,
 )
-def retrieve_genres(session: SessionDep) -> list[Genre]:
-    return FindAllGenres(finder=SqlModelGenreFinder(session=session)).execute()
+def list_genres(session: SessionDep) -> list[GenreResponse]:
+    genres = FindAllGenres(finder=SqlModelGenreFinder(session=session)).execute()
+    return GenreResponse.from_domain_list(genres=genres)
 
 
 @router.get(

@@ -532,7 +532,7 @@ class TestDeleteMovieEndpoint:
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
 
 
-class TestRetrieveGenresEndpoint:
+class TestListGenresEndpoint:
     @pytest.fixture
     def mock_find_all_genres(self) -> Generator[Mock, None, None]:
         with patch("app.movies.infrastructure.api.endpoints.FindAllGenres") as mock:
