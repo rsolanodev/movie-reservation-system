@@ -5,7 +5,7 @@ import pytest
 
 from app.shared.domain.finders.user_finder import UserFinder
 from app.shared.tests.factories.user_factory_test import UserFactoryTest
-from app.users.application.create_user import CreateUser, CreateUserParams
+from app.users.application.commands.create_user import CreateUser, CreateUserParams
 from app.users.domain.exceptions import UserAlreadyExists
 from app.users.domain.repositories.user_repository import UserRepository
 
