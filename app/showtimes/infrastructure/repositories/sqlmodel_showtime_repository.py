@@ -4,7 +4,7 @@ from app.reservations.infrastructure.models import SeatModel
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import SeatStatus
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 
@@ -46,20 +46,3 @@ class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
         if showtime_model:
             self._session.delete(showtime_model)
             self._session.commit()
-
-    def retrive_seats(self, showtime_id: Id) -> list[Seat]:
-        statement = (
-            select(SeatModel)
-            .where(SeatModel.showtime_id == showtime_id.to_uuid())
-            .order_by(SeatModel.row, SeatModel.number)  # type: ignore
-        )
-        seat_models = self._session.exec(statement).all()
-        return [self._build_seat(seat_model) for seat_model in seat_models]
-
-    def _build_seat(self, seat_model: SeatModel) -> Seat:
-        return Seat(
-            id=Id.from_uuid(seat_model.id),
-            row=seat_model.row,
-            number=seat_model.number,
-            status=SeatStatus(seat_model.status),
-        )
