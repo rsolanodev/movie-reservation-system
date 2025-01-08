@@ -3,7 +3,7 @@ from app.showtimes.domain.repositories.showtime_repository import ShowtimeReposi
 from app.showtimes.domain.seat import Seat
 
 
-class RetrieveSeats:
+class FindSeats:
     def __init__(self, repository: ShowtimeRepository) -> None:
         self._repository = repository
 
