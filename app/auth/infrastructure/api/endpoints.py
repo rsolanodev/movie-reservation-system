@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import SessionDep
-from app.auth.application.authenticate import Authenticate
+from app.auth.application.commands.authenticate import Authenticate
 from app.auth.domain.exceptions import (
     IncorrectPassword,
     UserDoesNotExist,
