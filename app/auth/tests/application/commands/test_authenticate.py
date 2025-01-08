@@ -6,7 +6,7 @@ import jwt
 import pytest
 from freezegun import freeze_time
 
-from app.auth.application.authenticate import Authenticate
+from app.auth.application.commands.authenticate import Authenticate
 from app.auth.domain.exceptions import (
     IncorrectPassword,
     UserDoesNotExist,
