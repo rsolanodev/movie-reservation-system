@@ -3,7 +3,7 @@ from app.reservations.domain.movie_show_reservation import MovieShowReservation
 from app.shared.domain.value_objects.id import Id
 
 
-class RetrieveReservations:
+class FindReservations:
     def __init__(self, finder: ReservationFinder) -> None:
         self._finder = finder
 

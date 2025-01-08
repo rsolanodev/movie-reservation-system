@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status
 from app.api.deps import CurrentUser, SessionDep
 from app.reservations.application.cancel_reservation import CancelReservation, CancelReservationParams
 from app.reservations.application.create_reservation import CreateReservation, CreateReservationParams
-from app.reservations.application.retrieve_reservations import RetrieveReservations
+from app.reservations.application.queries.find_reservations import FindReservations
 from app.reservations.domain.exceptions import (
     ReservationDoesNotBelongToUser,
     ReservationDoesNotExist,
@@ -42,11 +42,11 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
 
 
 @router.get("/", response_model=list[MovieReservationResponse], status_code=status.HTTP_200_OK)
-def retrieve_reservations(session: SessionDep, current_user: CurrentUser) -> list[MovieReservationResponse]:
-    movie_reservations = RetrieveReservations(finder=SqlModelReservationFinder(session=session)).execute(
+def list_reservations(session: SessionDep, current_user: CurrentUser) -> list[MovieReservationResponse]:
+    movie_reservations = FindReservations(finder=SqlModelReservationFinder(session=session)).execute(
         user_id=Id.from_uuid(current_user.id)
     )
-    return [MovieReservationResponse.from_domain(reservation) for reservation in movie_reservations]
+    return MovieReservationResponse.from_domain_list(movie_reservations)
 
 
 @router.delete("/{reservation_id}/", status_code=status.HTTP_204_NO_CONTENT)

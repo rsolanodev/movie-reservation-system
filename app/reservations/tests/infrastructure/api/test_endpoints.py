@@ -163,10 +163,10 @@ class TestCreateReservationEndpoint:
         assert response.json() == {"detail": "Not authenticated"}
 
 
-class TestRetrieveReservationsEndpoint:
+class TestListReservationsEndpoint:
     @pytest.fixture
-    def mock_retrieve_reservations(self) -> Generator[Mock, None, None]:
-        with patch("app.reservations.infrastructure.api.endpoints.RetrieveReservations") as mock:
+    def mock_find_reservations(self) -> Generator[Mock, None, None]:
+        with patch("app.reservations.infrastructure.api.endpoints.FindReservations") as mock:
             yield mock
 
     @pytest.fixture
@@ -226,15 +226,15 @@ class TestRetrieveReservationsEndpoint:
             }
         ]
 
-    def test_returns_200_and_calls_retrieve_reservations(
+    def test_returns_200_and_calls_find_reservations(
         self,
         client: TestClient,
-        mock_retrieve_reservations: Mock,
+        mock_find_reservations: Mock,
         mock_reservation_finder: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
-        mock_retrieve_reservations.return_value.execute.return_value = [
+        mock_find_reservations.return_value.execute.return_value = [
             MovieShowReservation(
                 reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
                 show_datetime=DateTime.from_datetime(datetime(2024, 1, 2, 22, 0)),
@@ -259,8 +259,8 @@ class TestRetrieveReservationsEndpoint:
 
         response = client.get("api/v1/reservations/", headers=user_token_headers)
 
-        mock_retrieve_reservations.assert_called_once_with(finder=mock_reservation_finder)
-        mock_retrieve_reservations.return_value.execute.assert_called_once_with(user_id=Id.from_uuid(user.id))
+        mock_find_reservations.assert_called_once_with(finder=mock_reservation_finder)
+        mock_find_reservations.return_value.execute.assert_called_once_with(user_id=Id.from_uuid(user.id))
 
         assert response.status_code == 200
         assert response.json() == [
@@ -287,11 +287,11 @@ class TestRetrieveReservationsEndpoint:
         ]
 
     def test_returns_401_when_user_is_not_authenticated(
-        self, client: TestClient, mock_retrieve_reservations: Mock, mock_reservation_finder: Mock
+        self, client: TestClient, mock_find_reservations: Mock, mock_reservation_finder: Mock
     ) -> None:
         response = client.get("api/v1/reservations/")
 
-        mock_retrieve_reservations.assert_not_called()
+        mock_find_reservations.assert_not_called()
         mock_reservation_finder.assert_not_called()
 
         assert response.status_code == 401
