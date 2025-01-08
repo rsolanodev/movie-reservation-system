@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.shared.domain.value_objects.id import Id
-from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
-from app.showtimes.application.delete_showtime import DeleteShowtime
+from app.showtimes.application.commands.create_showtime import CreateShowtime, CreateShowtimeParams
+from app.showtimes.application.commands.delete_showtime import DeleteShowtime
 from app.showtimes.application.queries.find_seats import FindSeats
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
