@@ -3,7 +3,7 @@ from unittest.mock import ANY, Mock, create_autospec
 
 import pytest
 
-from app.rooms.application.create_room import CreateRoom, CreateRoomParams
+from app.rooms.application.commands.create_room import CreateRoom, CreateRoomParams
 from app.rooms.domain.repositories.room_repository import RoomRepository
 from app.rooms.domain.room import Room
 
