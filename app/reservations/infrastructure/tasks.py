@@ -1,6 +1,6 @@
 from app.celery import app
 from app.database import get_session
-from app.reservations.application.release_reservation import ReleaseReservation
+from app.reservations.application.commands.release_reservation import ReleaseReservation
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.shared.domain.value_objects.id import Id

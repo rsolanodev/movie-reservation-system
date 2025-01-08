@@ -7,8 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.reservations.application.cancel_reservation import CancelReservationParams
-from app.reservations.application.create_reservation import CreateReservationParams
+from app.reservations.application.commands.cancel_reservation import CancelReservationParams
+from app.reservations.application.commands.create_reservation import CreateReservationParams
 from app.reservations.domain.exceptions import (
     ReservationDoesNotBelongToUser,
     ReservationDoesNotExist,
