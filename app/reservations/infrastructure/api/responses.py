@@ -36,3 +36,7 @@ class MovieReservationResponse(SQLModel):
             movie=MovieResponse.from_domain(reservation.movie),
             seats=[ReservedSeatResponse.from_domain(seat) for seat in reservation.seats],
         )
+
+    @classmethod
+    def from_domain_list(cls, reservations: list[MovieShowReservation]) -> list["MovieReservationResponse"]:
+        return [cls.from_domain(reservation) for reservation in reservations]

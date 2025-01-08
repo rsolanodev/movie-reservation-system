@@ -4,19 +4,19 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.reservations.application.retrieve_reservations import RetrieveReservations
+from app.reservations.application.queries.find_reservations import FindReservations
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 
-class TestRetrieveReservations:
+class TestFindReservations:
     @pytest.fixture
     def mock_reservation_finder(self) -> Any:
         return create_autospec(spec=ReservationFinder, instance=True, spec_set=True)
 
-    def test_retrieve_reservations(self, mock_reservation_finder: Mock) -> None:
+    def test_find_reservations(self, mock_reservation_finder: Mock) -> None:
         expected_movie_reservation = [
             MovieShowReservation(
                 reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"),
@@ -41,7 +41,7 @@ class TestRetrieveReservations:
         ]
         mock_reservation_finder.find_movie_show_reservations_by_user_id.return_value = expected_movie_reservation
 
-        movie_reservations = RetrieveReservations(finder=mock_reservation_finder).execute(
+        movie_reservations = FindReservations(finder=mock_reservation_finder).execute(
             user_id=Id("123e4567-e89b-12d3-a456-426614174000")
         )
 
