@@ -3,7 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre
+from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre, RemoveMovieGenreParams
 from app.movies.domain.exceptions import GenreNotAssigned
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -30,7 +30,10 @@ class TestRemoveMovieGenre:
         )
 
         RemoveMovieGenre(repository=mock_movie_repository, finder=mock_movie_finder).execute(
-            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"), genre_id=Id("3b74494d-0a95-49b1-91ef-bb211f802961")
+            params=RemoveMovieGenreParams(
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                genre_id=Id("3b74494d-0a95-49b1-91ef-bb211f802961"),
+            )
         )
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
@@ -48,8 +51,10 @@ class TestRemoveMovieGenre:
 
         with pytest.raises(GenreNotAssigned):
             RemoveMovieGenre(repository=mock_movie_repository, finder=mock_movie_finder).execute(
-                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-                genre_id=Id("3b74494d-0a95-49b1-91ef-bb211f802961"),
+                params=RemoveMovieGenreParams(
+                    movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                    genre_id=Id("3b74494d-0a95-49b1-91ef-bb211f802961"),
+                )
             )
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))

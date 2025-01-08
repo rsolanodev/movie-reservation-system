@@ -9,6 +9,7 @@ from sqlmodel import Session, select
 
 from app.movies.application.commands.add_movie_genre import AddMovieGenreParams
 from app.movies.application.commands.create_movie import CreateMovieParams
+from app.movies.application.commands.remove_movie_genre import RemoveMovieGenreParams
 from app.movies.application.commands.update_movie import UpdateMovieParams
 from app.movies.application.queries.find_movie import FindMovieParams
 from app.movies.application.queries.find_movies import FindMoviesParams
@@ -719,8 +720,10 @@ class TestRemoveMovieGenreEndpoint:
 
         mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_remove_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            params=RemoveMovieGenreParams(
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            )
         )
 
         assert response.status_code == 200
@@ -742,8 +745,10 @@ class TestRemoveMovieGenreEndpoint:
 
         mock_remove_movie_genre.assert_called_once_with(repository=mock_movie_repository, finder=mock_movie_finder)
         mock_remove_movie_genre.return_value.execute.assert_called_once_with(
-            movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
-            genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            params=RemoveMovieGenreParams(
+                movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"),
+                genre_id=Id("2e9c5b5b-1b7e-4b7e-8d8b-2b4b4b1f1a4e"),
+            )
         )
 
         assert response.status_code == 400
