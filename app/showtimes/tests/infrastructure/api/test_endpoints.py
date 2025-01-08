@@ -240,10 +240,10 @@ class TestDeleteShowtimeEndpoint:
         assert response.json() == {"detail": "The user doesn't have enough privileges"}
 
 
-class TestRetrieveSeatsEndpoint:
+class TestListSeatsEndpoint:
     @pytest.fixture
-    def mock_retrieve_seats(self) -> Generator[Mock, None, None]:
-        with patch("app.showtimes.infrastructure.api.endpoints.RetrieveSeats") as mock:
+    def mock_find_seats(self) -> Generator[Mock, None, None]:
+        with patch("app.showtimes.infrastructure.api.endpoints.FindSeats") as mock:
             yield mock
 
     @pytest.fixture
@@ -281,17 +281,17 @@ class TestRetrieveSeatsEndpoint:
         ]
 
     @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])
-    def test_returns_200_and_calls_retrieve_seats(
-        self, client: TestClient, mock_retrieve_seats: Mock, mock_showtime_repository: Mock, status: SeatStatus
+    def test_returns_200_and_calls_find_seats(
+        self, client: TestClient, mock_find_seats: Mock, mock_showtime_repository: Mock, status: SeatStatus
     ) -> None:
-        mock_retrieve_seats.return_value.execute.return_value = [
+        mock_find_seats.return_value.execute.return_value = [
             Seat(id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=2, status=status),
         ]
 
         response = client.get("api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/seats/")
 
-        mock_retrieve_seats.assert_called_once_with(repository=mock_showtime_repository)
-        mock_retrieve_seats.return_value.execute.assert_called_once_with(
+        mock_find_seats.assert_called_once_with(repository=mock_showtime_repository)
+        mock_find_seats.return_value.execute.assert_called_once_with(
             showtime_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
 
