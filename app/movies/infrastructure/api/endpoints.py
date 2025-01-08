@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.deps import SessionDep, get_current_active_superuser
-from app.movies.application.commands.add_movie_genre import AddMovieGenre
+from app.movies.application.commands.add_movie_genre import AddMovieGenre, AddMovieGenreParams
 from app.movies.application.commands.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.commands.delete_movie import DeleteMovie
 from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre
@@ -112,9 +112,8 @@ def delete_movie(session: SessionDep, movie_id: str) -> None:
 def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...)) -> None:
     try:
         AddMovieGenre(
-            repository=SqlModelMovieRepository(session=session),
-            finder=SqlModelMovieFinder(session=session),
-        ).execute(movie_id=Id(movie_id), genre_id=Id(genre_id))
+            repository=SqlModelMovieRepository(session=session), finder=SqlModelMovieFinder(session=session)
+        ).execute(params=AddMovieGenreParams.from_primitives(movie_id=movie_id, genre_id=genre_id))
     except GenreAlreadyAssigned:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

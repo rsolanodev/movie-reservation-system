@@ -3,7 +3,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.movies.application.commands.add_movie_genre import AddMovieGenre
+from app.movies.application.commands.add_movie_genre import AddMovieGenre, AddMovieGenreParams
 from app.movies.domain.exceptions import GenreAlreadyAssigned
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.repositories.movie_repository import MovieRepository
@@ -28,7 +28,7 @@ class TestAddMovieGenre:
         mock_movie_finder.find_movie.return_value = movie
 
         AddMovieGenre(repository=mock_movie_repository, finder=mock_movie_finder).execute(
-            movie_id=movie.id, genre_id=genre.id
+            params=AddMovieGenreParams(movie_id=movie.id, genre_id=genre.id)
         )
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=movie.id)
@@ -51,7 +51,7 @@ class TestAddMovieGenre:
 
         with pytest.raises(GenreAlreadyAssigned):
             AddMovieGenre(repository=mock_movie_repository, finder=mock_movie_finder).execute(
-                movie_id=movie.id, genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9")
+                params=AddMovieGenreParams(movie_id=movie.id, genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"))
             )
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=movie.id)
