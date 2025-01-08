@@ -4,7 +4,7 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.reservations.application.create_reservation import CreateReservation, CreateReservationParams
+from app.reservations.application.commands.create_reservation import CreateReservation, CreateReservationParams
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.finders.seat_finder import SeatFinder

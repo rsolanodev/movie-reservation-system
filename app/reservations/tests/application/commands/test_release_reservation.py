@@ -3,14 +3,14 @@ from unittest.mock import Mock, create_autospec
 
 import pytest
 
-from app.reservations.application.release_reservation import ReleaseReservation
+from app.reservations.application.commands.release_reservation import ReleaseReservation
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
 
 
-class TestReservationRelease:
+class TestReleaseReservation:
     @pytest.fixture
     def mock_reservation_repository(self) -> Any:
         return create_autospec(spec=ReservationRepository, instance=True, spec_set=True)
