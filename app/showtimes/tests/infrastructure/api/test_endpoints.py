@@ -11,7 +11,7 @@ from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
-from app.showtimes.application.create_showtime import CreateShowtimeParams
+from app.showtimes.application.commands.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.seat import Seat, SeatStatus
 from app.showtimes.infrastructure.models import ShowtimeModel

@@ -4,7 +4,7 @@ from unittest.mock import Mock, create_autospec
 import pytest
 
 from app.shared.domain.value_objects.id import Id
-from app.showtimes.application.delete_showtime import DeleteShowtime
+from app.showtimes.application.commands.delete_showtime import DeleteShowtime
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 
 

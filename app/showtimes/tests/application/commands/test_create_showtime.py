@@ -6,7 +6,7 @@ import pytest
 
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-from app.showtimes.application.create_showtime import CreateShowtime, CreateShowtimeParams
+from app.showtimes.application.commands.create_showtime import CreateShowtime, CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
 from app.showtimes.domain.showtime import Showtime
