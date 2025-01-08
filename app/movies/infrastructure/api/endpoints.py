@@ -4,7 +4,7 @@ from app.api.deps import SessionDep, get_current_active_superuser
 from app.movies.application.commands.add_movie_genre import AddMovieGenre, AddMovieGenreParams
 from app.movies.application.commands.create_movie import CreateMovie, CreateMovieParams
 from app.movies.application.commands.delete_movie import DeleteMovie
-from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre
+from app.movies.application.commands.remove_movie_genre import RemoveMovieGenre, RemoveMovieGenreParams
 from app.movies.application.commands.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.application.queries.find_all_genres import FindAllGenres
 from app.movies.application.queries.find_movie import FindMovie, FindMovieParams
@@ -116,8 +116,7 @@ def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...
         ).execute(params=AddMovieGenreParams.from_primitives(movie_id=movie_id, genre_id=genre_id))
     except GenreAlreadyAssigned:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The genre is already assigned to the movie",
+            status_code=status.HTTP_400_BAD_REQUEST, detail="The genre is already assigned to the movie"
         )
 
 
@@ -129,11 +128,7 @@ def add_movie_genre(session: SessionDep, movie_id: str, genre_id: str = Form(...
 def remove_movie_genre(session: SessionDep, movie_id: str, genre_id: str) -> None:
     try:
         RemoveMovieGenre(
-            repository=SqlModelMovieRepository(session=session),
-            finder=SqlModelMovieFinder(session=session),
-        ).execute(movie_id=Id(movie_id), genre_id=Id(genre_id))
+            repository=SqlModelMovieRepository(session=session), finder=SqlModelMovieFinder(session=session)
+        ).execute(params=RemoveMovieGenreParams.from_primitives(movie_id=movie_id, genre_id=genre_id))
     except GenreNotAssigned:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The genre is not assigned to the movie",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The genre is not assigned to the movie")
