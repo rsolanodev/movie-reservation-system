@@ -8,6 +8,7 @@ from app.showtimes.application.queries.find_seats import FindSeats
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.infrastructure.api.payloads import CreateShowtimePayload
 from app.showtimes.infrastructure.api.responses import SeatResponse
+from app.showtimes.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.showtimes.infrastructure.repositories.sqlmodel_showtime_repository import SqlModelShowtimeRepository
 
 router = APIRouter()
@@ -37,5 +38,5 @@ def delete_showtime(session: SessionDep, showtime_id: str) -> None:
 
 @router.get("/{showtime_id}/seats/", response_model=list[SeatResponse], status_code=status.HTTP_200_OK)
 def list_seats(session: SessionDep, showtime_id: str) -> list[SeatResponse]:
-    seats = FindSeats(repository=SqlModelShowtimeRepository(session=session)).execute(showtime_id=Id(showtime_id))
+    seats = FindSeats(finder=SqlModelSeatFinder(session=session)).execute(showtime_id=Id(showtime_id))
     return SeatResponse.from_domain_list(seats)

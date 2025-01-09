@@ -247,8 +247,8 @@ class TestListSeatsEndpoint:
             yield mock
 
     @pytest.fixture
-    def mock_showtime_repository(self) -> Generator[Mock, None, None]:
-        with patch("app.showtimes.infrastructure.api.endpoints.SqlModelShowtimeRepository") as mock:
+    def mock_seat_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.showtimes.infrastructure.api.endpoints.SqlModelSeatFinder") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
@@ -282,7 +282,7 @@ class TestListSeatsEndpoint:
 
     @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])
     def test_returns_200_and_calls_find_seats(
-        self, client: TestClient, mock_find_seats: Mock, mock_showtime_repository: Mock, status: SeatStatus
+        self, client: TestClient, mock_find_seats: Mock, mock_seat_finder: Mock, status: SeatStatus
     ) -> None:
         mock_find_seats.return_value.execute.return_value = [
             Seat(id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e600"), row=1, number=2, status=status),
@@ -290,7 +290,7 @@ class TestListSeatsEndpoint:
 
         response = client.get("api/v1/showtimes/913822a0-750b-4cb6-b7b9-e01869d7d62d/seats/")
 
-        mock_find_seats.assert_called_once_with(repository=mock_showtime_repository)
+        mock_find_seats.assert_called_once_with(finder=mock_seat_finder)
         mock_find_seats.return_value.execute.assert_called_once_with(
             showtime_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         )
