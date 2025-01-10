@@ -1,6 +1,7 @@
 from sqlalchemy.orm import joinedload, selectinload
 from sqlmodel import select
 
+from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import Reservation, ReservationStatus
@@ -15,6 +16,12 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
     def find_reservation(self, reservation_id: Id) -> Reservation:
         reservation_model = self._session.get_one(ReservationModel, reservation_id.to_uuid())
         return reservation_model.to_domain()
+
+    def find_pending(self) -> Reservations:
+        reservation_models = self._session.exec(
+            select(ReservationModel).where(ReservationModel.status == ReservationStatus.PENDING)
+        ).all()
+        return Reservations([reservation_model.to_domain() for reservation_model in reservation_models])
 
     def find_movie_show_reservations_by_user_id(self, user_id: Id) -> list[MovieShowReservation]:
         reservation_models = self._session.exec(

@@ -1,8 +1,9 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 from unittest.mock import Mock, create_autospec
 
 import pytest
+from freezegun import freeze_time
 
 from app.reservations.application.commands.create_reservation import CreateReservation, CreateReservationParams
 from app.reservations.domain.collections.seats import Seats
@@ -12,9 +13,11 @@ from app.reservations.domain.repositories.reservation_repository import Reservat
 from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.schedulers.reservation_release_scheduler import ReservationReleaseScheduler
 from app.reservations.domain.seat import Seat, SeatStatus
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 
+@freeze_time("2025-01-10T12:00:00Z")
 class TestCreateReservation:
     @pytest.fixture
     def mock_reservation_repository(self) -> Any:
@@ -75,6 +78,7 @@ class TestCreateReservation:
                         ),
                     ]
                 ),
+                created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
             )
         )
         mock_reservation_release_scheduler.schedule.assert_called_once_with(

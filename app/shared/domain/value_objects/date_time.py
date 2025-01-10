@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 
 @dataclass(frozen=True)
@@ -9,6 +9,9 @@ class DateTime:
     @property
     def value(self) -> datetime:
         return self._value
+
+    def subtract_minutes(self, minutes: int) -> "DateTime":
+        return self.from_datetime(self._value - timedelta(minutes=minutes))
 
     @classmethod
     def from_datetime(cls, value: datetime) -> "DateTime":
@@ -29,3 +32,6 @@ class DateTime:
 
     def __ge__(self, other: "DateTime") -> bool:
         return self._value >= other._value
+
+    def __lt__(self, other: "DateTime") -> bool:
+        return self._value < other._value

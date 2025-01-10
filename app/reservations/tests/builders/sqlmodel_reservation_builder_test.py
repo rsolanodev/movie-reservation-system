@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from sqlmodel import Session
 
@@ -14,6 +15,7 @@ class SqlModelReservationBuilderTest:
         self.user_id: uuid.UUID = uuid.uuid4()
         self.showtime_id: uuid.UUID = uuid.uuid4()
         self.status: str = ReservationStatus.PENDING
+        self.created_at: datetime = datetime.now()
 
     def with_id(self, id: uuid.UUID) -> "SqlModelReservationBuilderTest":
         self.id = id
@@ -31,12 +33,17 @@ class SqlModelReservationBuilderTest:
         self.status = status
         return self
 
+    def with_created_at(self, created_at: datetime) -> "SqlModelReservationBuilderTest":
+        self.created_at = created_at
+        return self
+
     def build(self) -> ReservationModel:
         reservation_model = ReservationModel(
             id=self.id,
             user_id=self.user_id,
             showtime_id=self.showtime_id,
             status=self.status,
+            created_at=self.created_at,
         )
         self._session.add(reservation_model)
         return reservation_model
