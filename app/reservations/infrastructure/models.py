@@ -6,6 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 if TYPE_CHECKING:
@@ -34,12 +35,12 @@ class SeatModel(SQLModel, table=True):
 class ReservationModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     status: str
+    created_at: datetime
     user_id: uuid.UUID = Field(foreign_key="usermodel.id")
     showtime_id: uuid.UUID = Field(foreign_key="showtimemodel.id")
     showtime: "ShowtimeModel" = Relationship(back_populates="reservations")
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
-    created_at: datetime = Field(default_factory=datetime.now)
 
     @classmethod
     def from_domain(cls, reservation: Reservation) -> "ReservationModel":
@@ -48,6 +49,7 @@ class ReservationModel(SQLModel, table=True):
             user_id=reservation.user_id.to_uuid(),
             showtime_id=reservation.showtime_id.to_uuid(),
             status=reservation.status,
+            created_at=reservation.created_at.value,
         )
 
     def to_domain(self) -> Reservation:
@@ -56,4 +58,5 @@ class ReservationModel(SQLModel, table=True):
             user_id=Id.from_uuid(self.user_id),
             showtime_id=Id.from_uuid(self.showtime_id),
             status=self.status,
+            created_at=DateTime.from_datetime(self.created_at),
         )

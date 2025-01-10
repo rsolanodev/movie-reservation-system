@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from freezegun import freeze_time
 from sqlmodel import Session
 
+from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.seat import SeatStatus
@@ -14,6 +16,7 @@ from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 
 
+@freeze_time("2025-01-10T12:00:00Z")
 class TestSqlModelReservationFinder:
     def test_find_reservation(self, session: Session) -> None:
         reservation_model = (
@@ -33,6 +36,34 @@ class TestSqlModelReservationFinder:
             user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
             status=ReservationStatus.PENDING,
+            created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+        )
+
+    def test_find_pending(self, session: Session) -> None:
+        (
+            SqlModelReservationBuilderTest(session)
+            .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
+            .with_user_id(UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
+            .with_showtime_id(UUID("ffa502e6-8869-490c-8799-5bea26c7146d"))
+            .with_status(ReservationStatus.PENDING)
+            .build()
+        )
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CANCELLED).build()
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CONFIRMED).build()
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.REFUNDED).build()
+
+        reservations = SqlModelReservationFinder(session).find_pending()
+
+        assert reservations == Reservations(
+            [
+                Reservation(
+                    id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
+                    user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
+                    showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
+                    status=ReservationStatus.PENDING,
+                    created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+                )
+            ]
         )
 
     def test_find_movie_show_reservations_by_user_id(self, session: Session) -> None:

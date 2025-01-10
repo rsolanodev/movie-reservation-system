@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 
 from app.reservations.domain.collections.seats import Seats
+from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
 
@@ -19,6 +20,7 @@ class Reservation:
     user_id: Id
     showtime_id: Id
     status: str
+    created_at: DateTime
     seats: Seats = field(default_factory=Seats)
 
     @classmethod
@@ -28,6 +30,7 @@ class Reservation:
             user_id=user_id,
             showtime_id=showtime_id,
             status=ReservationStatus.PENDING,
+            created_at=DateTime.now(),
         )
 
     def add_seats(self, seats: Seats) -> None:
