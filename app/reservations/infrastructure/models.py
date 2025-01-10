@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
 from app.shared.domain.value_objects.date_time import DateTime
@@ -59,4 +60,5 @@ class ReservationModel(SQLModel, table=True):
             showtime_id=Id.from_uuid(self.showtime_id),
             status=self.status,
             created_at=DateTime.from_datetime(self.created_at),
+            seats=Seats([]),
         )

@@ -43,11 +43,6 @@ class TestCreateReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelSeatFinder") as mock:
             yield mock.return_value
 
-    @pytest.fixture(autouse=True)
-    def mock_reservation_release_scheduler(self) -> Generator[Mock, None, None]:
-        with patch("app.reservations.infrastructure.api.endpoints.CeleryReservationReleaseScheduler") as mock:
-            yield mock.return_value
-
     @pytest.mark.integration
     def test_integration(
         self, session: Session, client: TestClient, user_token_headers: dict[str, str], user: UserModel
@@ -73,7 +68,6 @@ class TestCreateReservationEndpoint:
         mock_create_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_seat_finder: Mock,
-        mock_reservation_release_scheduler: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
@@ -87,9 +81,7 @@ class TestCreateReservationEndpoint:
         )
 
         mock_create_reservation.assert_called_once_with(
-            reservation_repository=mock_reservation_repository,
-            seat_finder=mock_seat_finder,
-            reservation_release_scheduler=mock_reservation_release_scheduler,
+            reservation_repository=mock_reservation_repository, seat_finder=mock_seat_finder
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
@@ -107,7 +99,6 @@ class TestCreateReservationEndpoint:
         mock_create_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_seat_finder: Mock,
-        mock_reservation_release_scheduler: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
@@ -123,9 +114,7 @@ class TestCreateReservationEndpoint:
         )
 
         mock_create_reservation.assert_called_once_with(
-            reservation_repository=mock_reservation_repository,
-            seat_finder=mock_seat_finder,
-            reservation_release_scheduler=mock_reservation_release_scheduler,
+            reservation_repository=mock_reservation_repository, seat_finder=mock_seat_finder
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
@@ -144,7 +133,6 @@ class TestCreateReservationEndpoint:
         mock_create_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_seat_finder: Mock,
-        mock_reservation_release_scheduler: Mock,
     ) -> None:
         response = client.post(
             "api/v1/reservations/",
@@ -157,7 +145,6 @@ class TestCreateReservationEndpoint:
         mock_create_reservation.assert_not_called()
         mock_reservation_repository.assert_not_called()
         mock_seat_finder.assert_not_called()
-        mock_reservation_release_scheduler.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}

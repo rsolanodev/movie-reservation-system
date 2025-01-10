@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from sqlmodel import Session
 
 from app.reservations.domain.collections.reservations import Reservations
+from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.seat import SeatStatus
@@ -37,6 +38,7 @@ class TestSqlModelReservationFinder:
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
             status=ReservationStatus.PENDING,
             created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+            seats=Seats([]),
         )
 
     def test_find_pending(self, session: Session) -> None:
@@ -62,6 +64,7 @@ class TestSqlModelReservationFinder:
                     showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
                     status=ReservationStatus.PENDING,
                     created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+                    seats=Seats([]),
                 )
             ]
         )
