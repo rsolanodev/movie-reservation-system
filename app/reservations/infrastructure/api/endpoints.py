@@ -15,9 +15,6 @@ from app.reservations.infrastructure.api.responses import ReservationResponse
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
-from app.reservations.infrastructure.schedulers.celery_reservation_release_scheduler import (
-    CeleryReservationReleaseScheduler,
-)
 from app.shared.domain.value_objects.id import Id
 
 router = APIRouter()
@@ -29,7 +26,6 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
         CreateReservation(
             reservation_repository=SqlModelReservationRepository(session=session),
             seat_finder=SqlModelSeatFinder(session=session),
-            reservation_release_scheduler=CeleryReservationReleaseScheduler(),
         ).execute(
             params=CreateReservationParams(
                 showtime_id=Id(request_body.showtime_id),

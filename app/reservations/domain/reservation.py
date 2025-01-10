@@ -1,5 +1,5 @@
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 
 from app.reservations.domain.collections.seats import Seats
@@ -20,16 +20,17 @@ class Reservation:
     user_id: Id
     showtime_id: Id
     status: str
+    seats: Seats
     created_at: DateTime
-    seats: Seats = field(default_factory=Seats)
 
     @classmethod
-    def create(cls, user_id: Id, showtime_id: Id) -> "Reservation":
+    def create(cls, user_id: Id, showtime_id: Id, seats: Seats | None = None) -> "Reservation":
         return cls(
             id=Id.from_uuid(uuid.uuid4()),
             user_id=user_id,
             showtime_id=showtime_id,
             status=ReservationStatus.PENDING,
+            seats=seats or Seats([]),
             created_at=DateTime.now(),
         )
 
