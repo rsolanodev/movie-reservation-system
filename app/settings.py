@@ -25,8 +25,11 @@ class Settings(BaseSettings):
     DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
+    RESERVATION_EXPIRATION_MINUTES: int = 1
 
-    RESERVATION_EXPIRATION_MINUTES: int = 10
+    STRIPE_API_KEY: str = (
+        "sk_test_51Qhov5IDRkNv2IHA0CeiFpQhptm5gdPU4SeVnqQCUgJ2DvIrlofY7oOlcEJhvsHtP1QuZQpRmhypVeU2UHhSIrtr00bFHqleLs"
+    )
 
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
