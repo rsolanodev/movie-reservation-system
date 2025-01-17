@@ -27,9 +27,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
     RESERVATION_EXPIRATION_MINUTES: int = 10
 
-    STRIPE_API_KEY: str = (
-        "sk_test_51Qhov5IDRkNv2IHA0CeiFpQhptm5gdPU4SeVnqQCUgJ2DvIrlofY7oOlcEJhvsHtP1QuZQpRmhypVeU2UHhSIrtr00bFHqleLs"
-    )
+    STRIPE_API_KEY: str = ""
     STRIPE_DEFAULT_CURRENCY: str = "eur"
 
     AWS_ACCESS_KEY_ID: str = ""

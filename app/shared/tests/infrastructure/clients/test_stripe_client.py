@@ -3,11 +3,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.settings import Settings, get_settings
+from app.settings import Settings
 from app.shared.domain.payment_intent import PaymentIntent
 from app.shared.infrastructure.clients.stripe_client import StripeClient
-
-settings = get_settings()
 
 
 class TestStripeClient:
