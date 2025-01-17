@@ -258,3 +258,6 @@ tags
 # Linters
 .ruff_cache/
 .mypy_cache/
+
+# Local files
+stripe.html
