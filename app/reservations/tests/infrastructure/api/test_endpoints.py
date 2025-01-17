@@ -21,6 +21,7 @@ from app.reservations.domain.seat import SeatStatus
 from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.shared.domain.payment_intent import PaymentIntent
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
@@ -43,12 +44,27 @@ class TestCreateReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelSeatFinder") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_stripe_client(self) -> Generator[Mock, None, None]:
+        with patch("app.reservations.infrastructure.api.endpoints.StripeClient") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     def test_integration(
-        self, session: Session, client: TestClient, user_token_headers: dict[str, str], user: UserModel
+        self,
+        session: Session,
+        client: TestClient,
+        user_token_headers: dict[str, str],
+        user: UserModel,
+        mock_stripe_client: Mock,
     ) -> None:
         seat = SqlModelSeatFactoryTest(session).create_available()
 
+        mock_stripe_client.create_payment_intent.return_value = PaymentIntent(
+            client_secret="test_client_secret",
+            provider_payment_id="test_payment_id",
+            amount=42.99,
+        )
         response = client.post(
             "api/v1/reservations/",
             json={"showtime_id": str(seat.showtime_id), "seat_ids": [str(seat.id)]},
@@ -56,6 +72,11 @@ class TestCreateReservationEndpoint:
         )
 
         assert response.status_code == 201
+        assert response.json() == {
+            "client_secret": "test_client_secret",
+            "provider_payment_id": "test_payment_id",
+            "amount": 42.99,
+        }
 
         session.refresh(seat)
         assert seat.status == SeatStatus.RESERVED
@@ -68,9 +89,16 @@ class TestCreateReservationEndpoint:
         mock_create_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_seat_finder: Mock,
+        mock_stripe_client: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
+        mock_create_reservation.return_value.execute.return_value = PaymentIntent(
+            client_secret="test_client_secret",
+            provider_payment_id="test_payment_id",
+            amount=42.99,
+        )
+
         response = client.post(
             "api/v1/reservations/",
             json={
@@ -81,7 +109,9 @@ class TestCreateReservationEndpoint:
         )
 
         mock_create_reservation.assert_called_once_with(
-            reservation_repository=mock_reservation_repository, seat_finder=mock_seat_finder
+            reservation_repository=mock_reservation_repository,
+            seat_finder=mock_seat_finder,
+            payment_client=mock_stripe_client,
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
@@ -92,6 +122,11 @@ class TestCreateReservationEndpoint:
         )
 
         assert response.status_code == 201
+        assert response.json() == {
+            "client_secret": "test_client_secret",
+            "provider_payment_id": "test_payment_id",
+            "amount": 42.99,
+        }
 
     def test_returns_400_when_seats_not_available(
         self,
@@ -99,6 +134,7 @@ class TestCreateReservationEndpoint:
         mock_create_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_seat_finder: Mock,
+        mock_stripe_client: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
@@ -114,7 +150,9 @@ class TestCreateReservationEndpoint:
         )
 
         mock_create_reservation.assert_called_once_with(
-            reservation_repository=mock_reservation_repository, seat_finder=mock_seat_finder
+            reservation_repository=mock_reservation_repository,
+            seat_finder=mock_seat_finder,
+            payment_client=mock_stripe_client,
         )
         mock_create_reservation.return_value.execute.assert_called_once_with(
             params=CreateReservationParams(
@@ -128,11 +166,7 @@ class TestCreateReservationEndpoint:
         assert response.json() == {"detail": "Seats not available"}
 
     def test_returns_401_when_user_is_not_authenticated(
-        self,
-        client: TestClient,
-        mock_create_reservation: Mock,
-        mock_reservation_repository: Mock,
-        mock_seat_finder: Mock,
+        self, client: TestClient, mock_create_reservation: Mock
     ) -> None:
         response = client.post(
             "api/v1/reservations/",
@@ -143,8 +177,6 @@ class TestCreateReservationEndpoint:
         )
 
         mock_create_reservation.assert_not_called()
-        mock_reservation_repository.assert_not_called()
-        mock_seat_finder.assert_not_called()
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Not authenticated"}

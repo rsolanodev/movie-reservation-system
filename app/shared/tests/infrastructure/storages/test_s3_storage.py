@@ -11,8 +11,8 @@ class TestPublicMediaS3Storage:
     @pytest.fixture(autouse=True)
     def override_settings(self) -> Generator[None, None, None]:
         with patch(
-            "app.shared.infrastructure.storages.s3_storage.get_settings",
-            return_value=Settings(
+            "app.shared.infrastructure.storages.s3_storage.settings",
+            Settings(
                 AWS_ACCESS_KEY_ID="access",
                 AWS_SECRET_ACCESS_KEY="secret",
                 AWS_S3_BUCKET_NAME="test",

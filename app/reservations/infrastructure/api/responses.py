@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel
 
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
+from app.shared.domain.payment_intent import PaymentIntent
 
 
 class MovieResponse(SQLModel):
@@ -40,3 +41,17 @@ class ReservationResponse(SQLModel):
     @classmethod
     def from_domain_list(cls, reservations: list[MovieShowReservation]) -> list["ReservationResponse"]:
         return [cls.from_domain(reservation) for reservation in reservations]
+
+
+class PaymentIntentResponse(SQLModel):
+    client_secret: str
+    provider_payment_id: str
+    amount: float
+
+    @classmethod
+    def from_domain(cls, payment_intent: PaymentIntent) -> "PaymentIntentResponse":
+        return cls(
+            client_secret=payment_intent.client_secret,
+            provider_payment_id=payment_intent.provider_payment_id,
+            amount=payment_intent.amount,
+        )

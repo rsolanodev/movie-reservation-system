@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
-    RESERVATION_EXPIRATION_MINUTES: int = 10
+
+    RESERVATION_EXPIRATION_MINUTES: int = 30
+    GENERAL_ADMISSION_PRICE: float = 10.0
 
     STRIPE_API_KEY: str = ""
     STRIPE_DEFAULT_CURRENCY: str = "eur"
