@@ -20,7 +20,7 @@ class TestStripeClient:
     def override_settings(self) -> Generator[None, None, None]:
         with patch(
             "app.shared.infrastructure.clients.stripe_client.get_settings",
-            return_value=Settings(STRIPE_API_KEY="test_api_key"),
+            return_value=Settings(STRIPE_API_KEY="test_api_key", STRIPE_DEFAULT_CURRENCY="eur"),
         ):
             yield
 
@@ -29,15 +29,12 @@ class TestStripeClient:
             client_secret="test_client_secret", id="test_provider_payment_id"
         )
 
-        payment_intent = StripeClient().create_payment_intent(amount=10.0, currency="usd")
+        payment_intent = StripeClient().create_payment_intent(amount=10.0)
 
         mock_stripe.PaymentIntent.create.assert_called_once_with(
-            amount=1000, currency="usd", automatic_payment_methods={"enabled": True}
+            amount=1000, currency="eur", automatic_payment_methods={"enabled": True}
         )
 
         assert payment_intent == PaymentIntent(
-            client_secret="test_client_secret",
-            provider_payment_id="test_provider_payment_id",
-            amount=10.0,
-            currency="usd",
+            client_secret="test_client_secret", provider_payment_id="test_provider_payment_id", amount=10.0
         )

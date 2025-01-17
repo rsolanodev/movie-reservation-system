@@ -12,13 +12,14 @@ class StripeClient(PaymentClient):
         self._provider = stripe
         self._provider.api_key = settings.STRIPE_API_KEY
 
-    def create_payment_intent(self, amount: float, currency: str) -> PaymentIntent:
+    def create_payment_intent(self, amount: float) -> PaymentIntent:
         payment_intent = self._provider.PaymentIntent.create(
-            amount=int(amount * 100), currency=currency, automatic_payment_methods={"enabled": True}
+            amount=int(amount * 100),
+            currency=settings.STRIPE_DEFAULT_CURRENCY,
+            automatic_payment_methods={"enabled": True},
         )
         return PaymentIntent(
             client_secret=payment_intent.client_secret,
             provider_payment_id=payment_intent.id,
             amount=amount,
-            currency=currency,
         )

@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     STRIPE_API_KEY: str = (
         "sk_test_51Qhov5IDRkNv2IHA0CeiFpQhptm5gdPU4SeVnqQCUgJ2DvIrlofY7oOlcEJhvsHtP1QuZQpRmhypVeU2UHhSIrtr00bFHqleLs"
     )
+    STRIPE_DEFAULT_CURRENCY: str = "eur"
 
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
