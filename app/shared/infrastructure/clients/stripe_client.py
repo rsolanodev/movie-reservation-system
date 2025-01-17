@@ -19,7 +19,7 @@ class StripeClient(PaymentClient):
             automatic_payment_methods={"enabled": True},
         )
         return PaymentIntent(
-            client_secret=payment_intent.client_secret,
+            client_secret=payment_intent.client_secret,  # type: ignore
             provider_payment_id=payment_intent.id,
             amount=amount,
         )
