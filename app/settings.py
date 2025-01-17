@@ -25,8 +25,10 @@ class Settings(BaseSettings):
     DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
-
     RESERVATION_EXPIRATION_MINUTES: int = 10
+
+    STRIPE_API_KEY: str = ""
+    STRIPE_DEFAULT_CURRENCY: str = "eur"
 
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
