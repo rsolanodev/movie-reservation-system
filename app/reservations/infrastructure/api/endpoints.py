@@ -11,21 +11,25 @@ from app.reservations.domain.exceptions import (
     ShowtimeHasStarted,
 )
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
-from app.reservations.infrastructure.api.responses import ReservationResponse
+from app.reservations.infrastructure.api.responses import PaymentIntentResponse, ReservationResponse
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.shared.domain.value_objects.id import Id
+from app.shared.infrastructure.clients.stripe_client import StripeClient
 
 router = APIRouter()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_reservation(session: SessionDep, request_body: CreateReservationPayload, current_user: CurrentUser) -> None:
+def create_reservation(
+    session: SessionDep, request_body: CreateReservationPayload, current_user: CurrentUser
+) -> PaymentIntentResponse:
     try:
-        CreateReservation(
+        payment_intent = CreateReservation(
             reservation_repository=SqlModelReservationRepository(session=session),
             seat_finder=SqlModelSeatFinder(session=session),
+            payment_client=StripeClient(),
         ).execute(
             params=CreateReservationParams(
                 showtime_id=Id(request_body.showtime_id),
@@ -35,6 +39,7 @@ def create_reservation(session: SessionDep, request_body: CreateReservationPaylo
         )
     except SeatsNotAvailable:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Seats not available")
+    return PaymentIntentResponse.from_domain(payment_intent)
 
 
 @router.get("/", response_model=list[ReservationResponse], status_code=status.HTTP_200_OK)

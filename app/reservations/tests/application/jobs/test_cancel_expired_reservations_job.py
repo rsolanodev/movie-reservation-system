@@ -45,8 +45,8 @@ class TestCancelExpiredReservationsJob:
     @pytest.fixture(autouse=True)
     def override_settings(self) -> Generator[None, None, None]:
         with patch(
-            "app.shared.infrastructure.storages.s3_storage.get_settings",
-            return_value=Settings(RESERVATION_EXPIRATION_MINUTES=10),
+            "app.reservations.application.commands.cancel_expired_reservations.settings",
+            Settings(RESERVATION_EXPIRATION_MINUTES=10),
         ):
             yield
 

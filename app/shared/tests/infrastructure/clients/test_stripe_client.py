@@ -17,8 +17,8 @@ class TestStripeClient:
     @pytest.fixture(autouse=True)
     def override_settings(self) -> Generator[None, None, None]:
         with patch(
-            "app.shared.infrastructure.clients.stripe_client.get_settings",
-            return_value=Settings(STRIPE_API_KEY="test_api_key", STRIPE_DEFAULT_CURRENCY="eur"),
+            "app.shared.infrastructure.clients.stripe_client.settings",
+            Settings(STRIPE_API_KEY="test_api_key", STRIPE_DEFAULT_CURRENCY="eur"),
         ):
             yield
 
