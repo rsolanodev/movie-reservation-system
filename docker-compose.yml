@@ -93,36 +93,6 @@ services:
     networks:
       - default
 
-  worker:
-    build:
-      context: .
-      dockerfile: compose/backend/Dockerfile
-    command: /start-celeryworker
-    volumes:
-      - .:/app
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - redis
-      - backend
-    networks:
-      - default
-
-  beat:
-    build:
-      context: .
-      dockerfile: compose/backend/Dockerfile
-    command: /start-celerybeat
-    volumes:
-      - .:/app
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - redis
-      - backend
-    networks:
-      - default
-
 volumes:
   app-db-data:
 
