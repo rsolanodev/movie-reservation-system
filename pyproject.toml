@@ -52,7 +52,7 @@ strict = true
 exclude = ["venv", ".venv", "alembic"]
 
 [[tool.mypy.overrides]]
-module = ["boto3", "apscheduler"]
+module = ["boto3", "apscheduler.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
