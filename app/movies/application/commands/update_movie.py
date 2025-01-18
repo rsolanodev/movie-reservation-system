@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
 from fastapi import UploadFile
-from fastapi_storages.base import BaseStorage
 
 from app.movies.domain.exceptions import MovieDoesNotExist
 from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
+from app.shared.domain.storages.storage import Storage
 from app.shared.domain.value_objects.id import Id
 
 
@@ -24,13 +24,13 @@ class UpdateMovieParams:
     ) -> "UpdateMovieParams":
         poster_image: PosterImage | None = None
 
-        if upload_poster_image is not None:
+        if upload_poster_image and upload_poster_image.filename:
             poster_image = PosterImage(filename=upload_poster_image.filename, file=upload_poster_image.file)
         return cls(id=Id(id), title=title, description=description, poster_image=poster_image)
 
 
 class UpdateMovie:
-    def __init__(self, repository: MovieRepository, finder: MovieFinder, storage: BaseStorage) -> None:
+    def __init__(self, repository: MovieRepository, finder: MovieFinder, storage: Storage) -> None:
         self._repository = repository
         self._finder = finder
         self._storage = storage
@@ -53,8 +53,4 @@ class UpdateMovie:
         return movie
 
     def _upload_poster_image(self, poster_image: PosterImage) -> str:
-        poster_image_path: str = self._storage.write(
-            file=poster_image.file,
-            name=poster_image.filename,
-        )
-        return poster_image_path
+        return self._storage.upload_file(file=poster_image.file, name=poster_image.filename)

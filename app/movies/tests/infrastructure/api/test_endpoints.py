@@ -47,14 +47,14 @@ class TestCreateMovieEndpoint:
 
     @pytest.fixture
     def mock_storage(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.PublicMediaS3Storage") as mock:
+        with patch("app.movies.infrastructure.api.endpoints.MoviePosterS3Storage") as mock:
             yield mock.return_value
 
     @pytest.mark.integration
     def test_integration(
         self, session: Session, client: TestClient, superuser_token_headers: dict[str, str], mock_storage: Mock
     ) -> None:
-        mock_storage.write.return_value = "deadpool_and_wolverine.jpg"
+        mock_storage.upload_file.return_value = "movies/posters/deadpool_and_wolverine.jpg"
 
         response = client.post(
             "api/v1/movies/",
@@ -68,13 +68,11 @@ class TestCreateMovieEndpoint:
 
         assert response.status_code == 201
 
-        mock_storage.write.assert_called_once_with(file=ANY, name="deadpool_and_wolverine.jpg")
-
         movie_model = session.exec(select(MovieModel)).first()
         assert movie_model is not None
         assert movie_model.title == "Deadpool & Wolverine"
         assert movie_model.description == "Deadpool and a variant of Wolverine."
-        assert movie_model.poster_image == "deadpool_and_wolverine.jpg"
+        assert movie_model.poster_image == "movies/posters/deadpool_and_wolverine.jpg"
 
     def test_returns_201_and_calls_create_movie(
         self,
@@ -218,7 +216,7 @@ class TestUpdateMovieEndpoint:
 
     @pytest.fixture
     def mock_storage(self) -> Generator[Mock, None, None]:
-        with patch("app.movies.infrastructure.api.endpoints.PublicMediaS3Storage") as mock:
+        with patch("app.movies.infrastructure.api.endpoints.MoviePosterS3Storage") as mock:
             yield mock.return_value
 
     @pytest.fixture
@@ -236,7 +234,7 @@ class TestUpdateMovieEndpoint:
     def test_integration(
         self, session: Session, client: TestClient, mock_storage: Mock, superuser_token_headers: dict[str, str]
     ) -> None:
-        mock_storage.write.return_value = "new_poster.jpg"
+        mock_storage.upload_file.return_value = "movies/posters/new_poster.jpg"
 
         movie_model = SqlModelMovieBuilderTest(session=session).build()
 
@@ -252,12 +250,10 @@ class TestUpdateMovieEndpoint:
 
         assert response.status_code == 200
 
-        mock_storage.write.assert_called_once_with(file=ANY, name="new_poster.jpg")
-
         session.refresh(movie_model)
         assert movie_model.title == "New Title"
         assert movie_model.description == "New description"
-        assert movie_model.poster_image == "new_poster.jpg"
+        assert movie_model.poster_image == "movies/posters/new_poster.jpg"
 
     def test_returns_200_and_calls_update_movie(
         self,

@@ -18,8 +18,8 @@ from app.movies.infrastructure.api.responses import GenreResponse, MovieExtended
 from app.movies.infrastructure.finders.sqlmodel_genre_finder import SqlModelGenreFinder
 from app.movies.infrastructure.finders.sqlmodel_movie_finder import SqlModelMovieFinder
 from app.movies.infrastructure.repositories.sqlmodel_movie_repository import SqlModelMovieRepository
+from app.movies.infrastructure.storages.movie_poster_s3_storage import MoviePosterS3Storage
 from app.shared.domain.value_objects.id import Id
-from app.shared.infrastructure.storages.s3_storage import PublicMediaS3Storage
 
 router = APIRouter()
 
@@ -50,7 +50,7 @@ def create_movie(
     description: str | None = Form(default=None),
     poster_image: UploadFile | None = File(default=None),
 ) -> MovieResponse:
-    movie = CreateMovie(repository=SqlModelMovieRepository(session=session), storage=PublicMediaS3Storage()).execute(
+    movie = CreateMovie(repository=SqlModelMovieRepository(session=session), storage=MoviePosterS3Storage()).execute(
         params=CreateMovieParams.from_fastapi(title=title, description=description, upload_poster_image=poster_image)
     )
     return MovieResponse.from_domain(movie=movie)
@@ -84,7 +84,7 @@ def update_movie(
         movie = UpdateMovie(
             repository=SqlModelMovieRepository(session=session),
             finder=SqlModelMovieFinder(session=session),
-            storage=PublicMediaS3Storage(),
+            storage=MoviePosterS3Storage(),
         ).execute(
             params=UpdateMovieParams.from_fastapi(
                 id=movie_id, title=title, description=description, upload_poster_image=poster_image
