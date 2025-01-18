@@ -26,9 +26,9 @@ pillow = "^10.4.0"
 sqlalchemy-utils = "^0.41.2"
 celery = "^5.4.0"
 redis = "^5.1.1"
-fastapi-storages = "^0.3.0"
 apscheduler = "^3.11.0"
 stripe = "^11.4.1"
+boto3 = "^1.36.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
@@ -52,7 +52,7 @@ strict = true
 exclude = ["venv", ".venv", "alembic"]
 
 [[tool.mypy.overrides]]
-module = ["fastapi_storages.*", "apscheduler.*"]
+module = ["boto3", "apscheduler.*"]
 ignore_missing_imports = true
 
 [tool.ruff]

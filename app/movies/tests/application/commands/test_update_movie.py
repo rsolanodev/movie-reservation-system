@@ -3,7 +3,6 @@ from typing import Any
 from unittest.mock import Mock, create_autospec
 
 import pytest
-from fastapi_storages.base import BaseStorage
 
 from app.movies.application.commands.update_movie import UpdateMovie, UpdateMovieParams
 from app.movies.domain.exceptions import MovieDoesNotExist
@@ -11,6 +10,7 @@ from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.domain.repositories.movie_repository import MovieRepository
+from app.shared.domain.storages.storage import Storage
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
 
@@ -26,7 +26,7 @@ class TestUpdateMovie:
 
     @pytest.fixture
     def mock_storage(self) -> Any:
-        return create_autospec(spec=BaseStorage, instance=True, spec_set=True)
+        return create_autospec(spec=Storage, instance=True, spec_set=True)
 
     @pytest.fixture
     def movie(self) -> Movie:
@@ -51,7 +51,7 @@ class TestUpdateMovie:
         movie: Movie,
         poster_image: PosterImage,
     ) -> None:
-        mock_storage.write.return_value = "super_mario_bros.jpg"
+        mock_storage.upload_file.return_value = "super_mario_bros.jpg"
         mock_movie_finder.find_movie.return_value = movie
 
         movie = UpdateMovie(repository=mock_movie_repository, finder=mock_movie_finder, storage=mock_storage).execute(
@@ -65,7 +65,7 @@ class TestUpdateMovie:
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_movie_repository.save.assert_called_once_with(movie=movie)
-        mock_storage.write.assert_called_once_with(file=poster_image.file, name=poster_image.filename)
+        mock_storage.upload_file.assert_called_once_with(file=poster_image.file, name=poster_image.filename)
 
         assert movie.title == "The Super Mario Bros. Movie"
         assert movie.description == "An animated adaptation of the video game."
@@ -87,7 +87,7 @@ class TestUpdateMovie:
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_movie_repository.save.assert_called_once_with(movie=movie)
-        mock_storage.write.assert_not_called()
+        mock_storage.upload_file.assert_not_called()
 
         assert movie.title == "Deadpool & Wolverine"
         assert movie.description == "Deadpool and a variant of Wolverine."
@@ -110,4 +110,4 @@ class TestUpdateMovie:
 
         mock_movie_finder.find_movie.assert_called_once_with(movie_id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
         mock_movie_repository.save.assert_not_called()
-        mock_storage.write.assert_not_called()
+        mock_storage.upload_file.assert_not_called()
