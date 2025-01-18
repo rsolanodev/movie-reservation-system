@@ -24,7 +24,6 @@ pydantic-settings = "^2.4.0"
 pyjwt = "^2.8.0"
 pillow = "^10.4.0"
 sqlalchemy-utils = "^0.41.2"
-celery = "^5.4.0"
 redis = "^5.1.1"
 apscheduler = "^3.11.0"
 stripe = "^11.4.1"
@@ -41,7 +40,6 @@ types-passlib = "^1.7.7.20240106"
 freezegun = "^1.5.1"
 types-sqlalchemy-utils = "^1.1.0"
 pytest-mock = "^3.14.0"
-celery-types = "^0.22.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

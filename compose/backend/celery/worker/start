@@ -1,6 +1,0 @@
-#!/bin/sh
-
-set -u -e
-
-
-celery -A app.celery worker -l INFO
