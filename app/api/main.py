@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.auth.infrastructure.api import endpoints as auth_endpoints
 from app.movies.infrastructure.api import endpoints as movie_endpoints
+from app.payments.infrastructure.api import webhooks as payments_webhooks
 from app.reservations.infrastructure.api import endpoints as reservations_endpoints
 from app.rooms.infrastructure.api import endpoints as rooms_endpoints
 from app.showtimes.infrastructure.api import endpoints as showtimes_endpoints
@@ -14,3 +15,4 @@ api_router.include_router(movie_endpoints.router, prefix="/movies", tags=["movie
 api_router.include_router(showtimes_endpoints.router, prefix="/showtimes", tags=["showtimes"])
 api_router.include_router(rooms_endpoints.router, prefix="/rooms", tags=["rooms"])
 api_router.include_router(reservations_endpoints.router, prefix="/reservations", tags=["reservations"])
+api_router.include_router(payments_webhooks.router, prefix="/payments", tags=["payments"])
