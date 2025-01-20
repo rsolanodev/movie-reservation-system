@@ -31,6 +31,7 @@ class Settings(BaseSettings):
 
     STRIPE_API_KEY: str = ""
     STRIPE_DEFAULT_CURRENCY: str = "eur"
+    STRIPE_WEBHOOK_SECRET: str = ""
 
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
