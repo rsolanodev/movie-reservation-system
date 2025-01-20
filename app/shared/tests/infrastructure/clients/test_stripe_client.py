@@ -14,7 +14,7 @@ from app.shared.infrastructure.clients.stripe_client import StripeClient
 class TestStripeClient:
     @pytest.fixture
     def mock_stripe(self) -> Generator[Mock, None, None]:
-        with patch("app.shared.infrastructure.clients.stripe_client.stripe", autospec=True, spec_set=True) as mock:
+        with patch("app.shared.infrastructure.clients.stripe_client.stripe", autospec=True) as mock:
             yield mock
 
     @pytest.fixture(autouse=True)
@@ -60,7 +60,7 @@ class TestStripeClient:
             type="payment_intent.succeeded", payment_intent_id="test_provider_payment_id"
         )
 
-    def test_raises_invalid_signature_when_verification_fails(self, mock_stripe: Mock) -> None:
+    def test_raises_invalid_signature_when_payment_verification_fails(self, mock_stripe: Mock) -> None:
         mock_stripe.Webhook.construct_event.side_effect = SignatureVerificationError(  # type: ignore
             "Invalid signature", "test_sig_header"
         )
