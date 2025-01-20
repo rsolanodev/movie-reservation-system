@@ -13,6 +13,7 @@ class ReservationBuilderTest:
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
         self.status: str = ReservationStatus.PENDING
         self.seats: Seats = Seats([])
+        self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: DateTime = DateTime.now()
 
     def with_id(self, id: Id) -> "ReservationBuilderTest":
@@ -39,6 +40,10 @@ class ReservationBuilderTest:
         self.created_at = created_at
         return self
 
+    def with_provider_payment_id(self, provider_payment_id: str) -> "ReservationBuilderTest":
+        self.provider_payment_id = provider_payment_id
+        return self
+
     def build(self) -> Reservation:
         return Reservation(
             id=self.id,
@@ -46,5 +51,6 @@ class ReservationBuilderTest:
             showtime_id=self.showtime_id,
             status=self.status,
             seats=self.seats,
+            provider_payment_id=self.provider_payment_id,
             created_at=self.created_at,
         )

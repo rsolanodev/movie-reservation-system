@@ -24,6 +24,7 @@ class TestSqlModelReservationRepository:
             ReservationBuilderTest()
             .with_user_id(Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
             .with_showtime_id(Id("ffa502e6-8869-490c-8799-5bea26c7146d"))
+            .with_provider_payment_id("pi_3MtwBwLkdIwHu7ix28a3tqPa")
             .with_seats(
                 Seats(
                     [
@@ -41,6 +42,7 @@ class TestSqlModelReservationRepository:
         assert reservation_model.user_id == UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a")
         assert reservation_model.showtime_id == UUID("ffa502e6-8869-490c-8799-5bea26c7146d")
         assert reservation_model.status == ReservationStatus.PENDING
+        assert reservation_model.provider_payment_id == "pi_3MtwBwLkdIwHu7ix28a3tqPa"
 
         session.refresh(main_seat)
         assert main_seat.reservation_id == reservation.id.to_uuid()

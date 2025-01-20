@@ -35,10 +35,12 @@ class SeatModel(SQLModel, table=True):
 
 class ReservationModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    status: str
-    created_at: datetime
     user_id: uuid.UUID = Field(foreign_key="usermodel.id")
     showtime_id: uuid.UUID = Field(foreign_key="showtimemodel.id")
+    provider_payment_id: str | None = None
+    status: str
+    created_at: datetime
+
     showtime: "ShowtimeModel" = Relationship(back_populates="reservations")
     user: "UserModel" = Relationship(back_populates="reservations")
     seats: list["SeatModel"] = Relationship(back_populates="reservation")
@@ -50,6 +52,7 @@ class ReservationModel(SQLModel, table=True):
             user_id=reservation.user_id.to_uuid(),
             showtime_id=reservation.showtime_id.to_uuid(),
             status=reservation.status,
+            provider_payment_id=reservation.provider_payment_id,
             created_at=reservation.created_at.value,
         )
 
