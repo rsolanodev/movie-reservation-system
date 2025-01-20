@@ -1,5 +1,7 @@
 import stripe
+from stripe import SignatureVerificationError
 
+from app.payments.domain.exceptions import InvalidSignature
 from app.settings import get_settings
 from app.shared.domain.clients.payment_client import PaymentClient
 from app.shared.domain.payment_event import PaymentEvent
@@ -26,7 +28,10 @@ class StripeClient(PaymentClient):
         )
 
     def verify_payment(self, payload: bytes, signature: str) -> PaymentEvent:
-        return PaymentEvent(
-            type="payment_intent.succeeded",
-            payment_intent_id="test_provider_payment_id",
-        )
+        try:
+            event = self._provider.Webhook.construct_event(  # type: ignore
+                payload=payload, sig_header=signature, secret=settings.STRIPE_WEBHOOK_SECRET
+            )
+            return PaymentEvent(type=event.type, payment_intent_id=event.data.object["id"])
+        except SignatureVerificationError:
+            raise InvalidSignature()
