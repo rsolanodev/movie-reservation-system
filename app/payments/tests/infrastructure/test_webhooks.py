@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.payments.application.commands.confirm_payment import ConfirmPaymentParams
-from app.payments.domain.exceptions import InvalidSignature
+from app.payments.domain.exceptions import InvalidSignature, ReservationNotFound
 
 
 class TestStripeWebhook:
@@ -39,3 +39,15 @@ class TestStripeWebhook:
 
         assert response.status_code == 400
         assert response.json()["detail"] == "Invalid signature"
+
+    def test_returns_404_when_reservation_is_not_found(self, client: TestClient, mock_confirm_payment: Mock) -> None:
+        mock_confirm_payment.return_value.execute.side_effect = ReservationNotFound
+
+        response = client.post(
+            "api/v1/payments/stripe/",
+            content=b'{"type": "payment_intent.succeeded"}',
+            headers={"stripe-signature": "test_signature"},
+        )
+
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Reservation not found"
