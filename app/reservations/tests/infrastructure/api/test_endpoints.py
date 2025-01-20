@@ -18,13 +18,13 @@ from app.reservations.domain.exceptions import (
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
-from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
 from app.shared.domain.payment_intent import PaymentIntent
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
+from app.shared.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.users.infrastructure.models import UserModel
 
 
@@ -218,7 +218,7 @@ class TestListReservationsEndpoint:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(user.id)
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build()
         )
         (
