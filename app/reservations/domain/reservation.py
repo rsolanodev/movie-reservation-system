@@ -23,6 +23,8 @@ class Reservation:
     seats: Seats
     created_at: DateTime
 
+    provider_payment_id: str | None = None
+
     @classmethod
     def create(cls, user_id: Id, showtime_id: Id, seats: Seats | None = None) -> "Reservation":
         return cls(
@@ -42,3 +44,6 @@ class Reservation:
 
     def cancel(self) -> None:
         self.status = ReservationStatus.CANCELLED
+
+    def assign_payment_id(self, provider_payment_id: str) -> None:
+        self.provider_payment_id = provider_payment_id

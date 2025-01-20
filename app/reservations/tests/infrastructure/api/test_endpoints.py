@@ -82,6 +82,7 @@ class TestCreateReservationEndpoint:
         assert seat.status == SeatStatus.RESERVED
         assert seat.reservation_id is not None
         assert seat.reservation.user_id == user.id
+        assert seat.reservation.provider_payment_id == "test_payment_id"
 
     def test_returns_201_and_calls_create_reservation(
         self,

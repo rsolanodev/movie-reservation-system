@@ -33,10 +33,11 @@ class CreateReservation:
         if not seats.are_available():
             raise SeatsNotAvailable()
 
-        reservation = Reservation.create(user_id=params.user_id, showtime_id=params.showtime_id, seats=seats)
         total_amount = seats.calculate_total_price(settings.GENERAL_ADMISSION_PRICE)
-
-        self._reservation_repository.create(reservation=reservation)
         payment_intent = self._payment_client.create_payment_intent(amount=total_amount)
+
+        reservation = Reservation.create(user_id=params.user_id, showtime_id=params.showtime_id, seats=seats)
+        reservation.assign_payment_id(payment_intent.provider_payment_id)
+        self._reservation_repository.create(reservation=reservation)
 
         return payment_intent
