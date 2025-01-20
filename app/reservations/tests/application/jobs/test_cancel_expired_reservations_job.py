@@ -9,9 +9,9 @@ from sqlmodel import Session
 from app.reservations.application.jobs.cancel_expired_reservations_job import cancel_expired_reservations_job
 from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
-from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.settings import Settings
+from app.shared.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 
 
 class TestCancelExpiredReservationsJob:
@@ -55,7 +55,7 @@ class TestCancelExpiredReservationsJob:
     def test_integration(self, mock_db_session: Session) -> None:
         reservation_model = (
             SqlModelReservationBuilderTest(mock_db_session)
-            .with_status(ReservationStatus.PENDING)
+            .with_status(ReservationStatus.PENDING.value)
             .with_created_at(datetime(2025, 1, 10, 00, 19, 59))
             .build()
         )

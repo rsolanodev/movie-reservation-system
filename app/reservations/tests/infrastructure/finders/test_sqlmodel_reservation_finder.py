@@ -10,11 +10,11 @@ from app.reservations.domain.movie_show_reservation import Movie, MovieShowReser
 from app.reservations.domain.reservation import Reservation, ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
-from app.reservations.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
+from app.shared.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
 
 
 @freeze_time("2025-01-10T12:00:00Z")
@@ -47,12 +47,12 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
             .with_user_id(UUID("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
             .with_showtime_id(UUID("ffa502e6-8869-490c-8799-5bea26c7146d"))
-            .with_status(ReservationStatus.PENDING)
+            .with_status(ReservationStatus.PENDING.value)
             .build()
         )
-        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CANCELLED).build()
-        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CONFIRMED).build()
-        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.REFUNDED).build()
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CANCELLED.value).build()
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.CONFIRMED.value).build()
+        SqlModelReservationBuilderTest(session).with_status(ReservationStatus.REFUNDED.value).build()
 
         reservations = SqlModelReservationFinder(session).find_pending()
 
@@ -86,7 +86,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build()
         )
         (
@@ -143,13 +143,13 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build(),
             SqlModelReservationBuilderTest(session)
             .with_id(UUID("89ad8d2e-e9c1-4fd0-b2be-0e6295b6b886"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("ef18bb4c-2109-443f-883d-cb48cfbddd58"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build(),
         )
         (
@@ -211,7 +211,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build(),
         )
         (
@@ -262,7 +262,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.CONFIRMED)
+            .with_status(ReservationStatus.CONFIRMED.value)
             .build()
         )
         (
@@ -294,7 +294,7 @@ class TestSqlModelReservationFinder:
             .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
             .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
             .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
-            .with_status(ReservationStatus.PENDING)
+            .with_status(ReservationStatus.PENDING.value)
             .build()
         )
         (
