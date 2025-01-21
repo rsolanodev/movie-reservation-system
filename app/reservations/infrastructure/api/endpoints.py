@@ -5,10 +5,10 @@ from app.reservations.application.commands.cancel_reservation import CancelReser
 from app.reservations.application.commands.create_reservation import CreateReservation, CreateReservationParams
 from app.reservations.application.queries.find_reservations import FindReservations
 from app.reservations.domain.exceptions import (
-    ReservationDoesNotBelongToUser,
+    CancellationNotAllowed,
     ReservationDoesNotExist,
     SeatsNotAvailable,
-    ShowtimeHasStarted,
+    UnauthorizedCancellation,
 )
 from app.reservations.infrastructure.api.payloads import CreateReservationPayload
 from app.reservations.infrastructure.api.responses import PaymentIntentResponse, ReservationResponse
@@ -54,6 +54,7 @@ def list_reservations(session: SessionDep, current_user: CurrentUser) -> list[Re
 def cancel_reservation(session: SessionDep, reservation_id: str, current_user: CurrentUser) -> None:
     try:
         CancelReservation(
+            finder=SqlModelReservationFinder(session=session),
             repository=SqlModelReservationRepository(session=session),
         ).execute(
             params=CancelReservationParams(
@@ -63,7 +64,7 @@ def cancel_reservation(session: SessionDep, reservation_id: str, current_user: C
         )
     except ReservationDoesNotExist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found")
-    except ReservationDoesNotBelongToUser:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reservation does not belong to user")
-    except ShowtimeHasStarted:
+    except UnauthorizedCancellation:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unauthorized to cancel this reservation")
+    except CancellationNotAllowed:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Showtime has started")
