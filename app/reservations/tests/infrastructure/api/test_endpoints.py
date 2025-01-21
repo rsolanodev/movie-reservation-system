@@ -10,10 +10,10 @@ from sqlmodel import Session
 from app.reservations.application.commands.cancel_reservation import CancelReservationParams
 from app.reservations.application.commands.create_reservation import CreateReservationParams
 from app.reservations.domain.exceptions import (
-    ReservationDoesNotBelongToUser,
+    CancellationNotAllowed,
     ReservationDoesNotExist,
     SeatsNotAvailable,
-    ShowtimeHasStarted,
+    UnauthorizedCancellation,
 )
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
 from app.reservations.domain.reservation import ReservationStatus
@@ -329,11 +329,17 @@ class TestCancelReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationRepository") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_reservation_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationFinder") as mock:
+            yield mock.return_value
+
     def test_returns_200_and_calls_cancel_reservation(
         self,
         client: TestClient,
         mock_cancel_reservation: Mock,
         mock_reservation_repository: Mock,
+        mock_reservation_finder: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
@@ -341,7 +347,9 @@ class TestCancelReservationEndpoint:
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
         )
 
-        mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
+        mock_cancel_reservation.assert_called_once_with(
+            finder=mock_reservation_finder, repository=mock_reservation_repository
+        )
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
             params=CancelReservationParams(
                 reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=Id.from_uuid(user.id)
@@ -361,12 +369,7 @@ class TestCancelReservationEndpoint:
         assert response.json() == {"detail": "Not authenticated"}
 
     def test_returns_404_when_reservation_does_not_exist(
-        self,
-        client: TestClient,
-        mock_cancel_reservation: Mock,
-        mock_reservation_repository: Mock,
-        user_token_headers: dict[str, str],
-        user: UserModel,
+        self, client: TestClient, mock_cancel_reservation: Mock, user_token_headers: dict[str, str], user: UserModel
     ) -> None:
         mock_cancel_reservation.return_value.execute.side_effect = ReservationDoesNotExist
 
@@ -374,59 +377,28 @@ class TestCancelReservationEndpoint:
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
         )
 
-        mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
-        mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(
-                reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=Id.from_uuid(user.id)
-            )
-        )
-
         assert response.status_code == 404
         assert response.json() == {"detail": "Reservation not found"}
 
     def test_returns_400_when_reservation_does_not_belong_to_user(
-        self,
-        client: TestClient,
-        mock_cancel_reservation: Mock,
-        mock_reservation_repository: Mock,
-        user_token_headers: dict[str, str],
-        user: UserModel,
+        self, client: TestClient, mock_cancel_reservation: Mock, user_token_headers: dict[str, str]
     ) -> None:
-        mock_cancel_reservation.return_value.execute.side_effect = ReservationDoesNotBelongToUser
+        mock_cancel_reservation.return_value.execute.side_effect = UnauthorizedCancellation
 
         response = client.delete(
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
-        )
-
-        mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
-        mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(
-                reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=Id.from_uuid(user.id)
-            )
         )
 
         assert response.status_code == 400
-        assert response.json() == {"detail": "Reservation does not belong to user"}
+        assert response.json() == {"detail": "Unauthorized to cancel this reservation"}
 
     def test_returns_400_when_showtime_has_started(
-        self,
-        client: TestClient,
-        mock_cancel_reservation: Mock,
-        mock_reservation_repository: Mock,
-        user_token_headers: dict[str, str],
-        user: UserModel,
+        self, client: TestClient, mock_cancel_reservation: Mock, user_token_headers: dict[str, str]
     ) -> None:
-        mock_cancel_reservation.return_value.execute.side_effect = ShowtimeHasStarted
+        mock_cancel_reservation.return_value.execute.side_effect = CancellationNotAllowed
 
         response = client.delete(
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
-        )
-
-        mock_cancel_reservation.assert_called_once_with(repository=mock_reservation_repository)
-        mock_cancel_reservation.return_value.execute.assert_called_once_with(
-            params=CancelReservationParams(
-                reservation_id=Id("5661455d-de5a-47ba-b99f-f6d50fdfc00b"), user_id=Id.from_uuid(user.id)
-            )
         )
 
         assert response.status_code == 400
