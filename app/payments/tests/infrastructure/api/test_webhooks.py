@@ -24,6 +24,16 @@ class TestStripeWebhook:
         with patch("app.payments.infrastructure.api.webhooks.StripeClient") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_reservation_repository(self) -> Generator[Mock, None, None]:
+        with patch("app.payments.infrastructure.api.webhooks.SqlModelReservationRepository") as mock:
+            yield mock.return_value
+
+    @pytest.fixture
+    def mock_reservation_finder(self) -> Generator[Mock, None, None]:
+        with patch("app.payments.infrastructure.api.webhooks.SqlModelReservationFinder") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     def test_integration(self, client: TestClient, session: Session, mock_stripe_client: Mock) -> None:
         reservation_model = (
@@ -47,11 +57,24 @@ class TestStripeWebhook:
         assert response.status_code == 200
         assert reservation_model.status == ReservationStatus.CONFIRMED.value
 
-    def test_returns_200_and_calls_confirm_payment(self, client: TestClient, mock_confirm_payment: Mock) -> None:
+    def test_returns_200_and_calls_confirm_payment(
+        self,
+        client: TestClient,
+        mock_confirm_payment: Mock,
+        mock_reservation_repository: Mock,
+        mock_reservation_finder: Mock,
+        mock_stripe_client: Mock,
+    ) -> None:
         response = client.post(
             "api/v1/payments/stripe/",
             content=b'{"type": "payment_intent.succeeded"}',
             headers={"stripe-signature": "test_signature"},
+        )
+
+        mock_confirm_payment.assert_called_once_with(
+            reservation_repository=mock_reservation_repository,
+            reservation_finder=mock_reservation_finder,
+            payment_client=mock_stripe_client,
         )
         mock_confirm_payment.return_value.execute.assert_called_once_with(
             params=ConfirmPaymentParams(
@@ -59,6 +82,7 @@ class TestStripeWebhook:
                 signature="test_signature",
             )
         )
+
         assert response.status_code == 200
 
     def test_returns_400_when_signature_is_invalid(self, client: TestClient, mock_confirm_payment: Mock) -> None:
