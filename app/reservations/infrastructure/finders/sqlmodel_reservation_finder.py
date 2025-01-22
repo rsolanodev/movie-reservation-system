@@ -62,4 +62,16 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
         return sorted(seats, key=lambda seat: (seat.row, seat.number))
 
     def find_cancellable_reservation(self, reservation_id: Id) -> CancellableReservation | None:
-        return None
+        reservation_model = self._session.exec(
+            select(ReservationModel)
+            .options(joinedload(ReservationModel.showtime))  # type: ignore
+            .where(ReservationModel.id == reservation_id.to_uuid())
+        ).first()
+
+        if not reservation_model:
+            return None
+
+        return CancellableReservation(
+            reservation=reservation_model.to_domain(),
+            show_datetime=DateTime.from_datetime(reservation_model.showtime.show_datetime),
+        )
