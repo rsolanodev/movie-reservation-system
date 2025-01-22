@@ -6,7 +6,7 @@ from sqlmodel import Session
 from app.reservations.infrastructure.models import ReservationModel
 
 
-class SqlModelReservationBuilderTest:
+class SqlModelReservationBuilder:
     def __init__(self, session: Session) -> None:
         self._session = session
 
@@ -17,27 +17,27 @@ class SqlModelReservationBuilderTest:
         self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: datetime = datetime.now()
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelReservationBuilderTest":
+    def with_id(self, id: uuid.UUID) -> "SqlModelReservationBuilder":
         self.id = id
         return self
 
-    def with_user_id(self, user_id: uuid.UUID) -> "SqlModelReservationBuilderTest":
+    def with_user_id(self, user_id: uuid.UUID) -> "SqlModelReservationBuilder":
         self.user_id = user_id
         return self
 
-    def with_showtime_id(self, showtime_id: uuid.UUID) -> "SqlModelReservationBuilderTest":
+    def with_showtime_id(self, showtime_id: uuid.UUID) -> "SqlModelReservationBuilder":
         self.showtime_id = showtime_id
         return self
 
-    def with_status(self, status: str) -> "SqlModelReservationBuilderTest":
+    def with_status(self, status: str) -> "SqlModelReservationBuilder":
         self.status = status
         return self
 
-    def with_provider_payment_id(self, provider_payment_id: str) -> "SqlModelReservationBuilderTest":
+    def with_provider_payment_id(self, provider_payment_id: str) -> "SqlModelReservationBuilder":
         self.provider_payment_id = provider_payment_id
         return self
 
-    def with_created_at(self, created_at: datetime) -> "SqlModelReservationBuilderTest":
+    def with_created_at(self, created_at: datetime) -> "SqlModelReservationBuilder":
         self.created_at = created_at
         return self
 

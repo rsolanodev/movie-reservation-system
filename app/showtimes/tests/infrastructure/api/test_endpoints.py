@@ -9,8 +9,8 @@ from sqlmodel import Session, select
 
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
+from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 from app.showtimes.application.commands.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.seat import Seat, SeatStatus
@@ -256,9 +256,7 @@ class TestListSeatsEndpoint:
     def test_integration(self, session: Session, client: TestClient, status: SeatStatus) -> None:
         showtime_id = UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601")
 
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=showtime_id,
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
             room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),

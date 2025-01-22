@@ -11,7 +11,7 @@ from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import ReservationStatus
-from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
+from app.reservations.tests.domain.builders.reservation_builder import ReservationBuilder
 from app.settings import Settings
 from app.shared.domain.value_objects.date_time import DateTime
 
@@ -38,7 +38,7 @@ class TestCancelExpiredReservations:
         self, mock_reservation_repository: Mock, mock_reservation_finder: Mock
     ) -> None:
         expected_reservation = (
-            ReservationBuilderTest()
+            ReservationBuilder()
             .with_status(ReservationStatus.PENDING)
             .with_created_at(DateTime.from_datetime(datetime(2025, 1, 10, 00, 19, 59)))
             .build()
@@ -55,7 +55,7 @@ class TestCancelExpiredReservations:
         self, mock_reservation_repository: Mock, mock_reservation_finder: Mock
     ) -> None:
         expected_reservation = (
-            ReservationBuilderTest()
+            ReservationBuilder()
             .with_status(ReservationStatus.PENDING)
             .with_created_at(DateTime.from_datetime(datetime(2025, 1, 10, 00, 20, 0)))
             .build()

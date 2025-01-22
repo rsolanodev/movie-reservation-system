@@ -7,12 +7,12 @@ from app.reservations.domain.reservation import ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
-from app.reservations.tests.builders.reservation_builder_test import ReservationBuilderTest
-from app.reservations.tests.builders.seat_builder_test import SeatBuilderTest
-from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
+from app.reservations.tests.domain.builders.reservation_builder import ReservationBuilder
+from app.reservations.tests.domain.builders.seat_builder import SeatBuilder
 from app.reservations.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
+from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import SqlModelSeatBuilder
 from app.shared.domain.value_objects.id import Id
-from app.shared.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
+from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 
 class TestSqlModelReservationRepository:
@@ -21,15 +21,15 @@ class TestSqlModelReservationRepository:
         parent_seat = SqlModelSeatFactoryTest(session).create_available()
 
         reservation = (
-            ReservationBuilderTest()
+            ReservationBuilder()
             .with_user_id(Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"))
             .with_showtime_id(Id("ffa502e6-8869-490c-8799-5bea26c7146d"))
             .with_provider_payment_id("pi_3MtwBwLkdIwHu7ix28a3tqPa")
             .with_seats(
                 Seats(
                     [
-                        SeatBuilderTest().with_id(Id.from_uuid(main_seat.id)).build(),
-                        SeatBuilderTest().with_id(Id.from_uuid(parent_seat.id)).build(),
+                        SeatBuilder().with_id(Id.from_uuid(main_seat.id)).build(),
+                        SeatBuilder().with_id(Id.from_uuid(parent_seat.id)).build(),
                     ]
                 ),
             )
@@ -53,9 +53,9 @@ class TestSqlModelReservationRepository:
         assert parent_seat.status == SeatStatus.RESERVED
 
     def test_release_reservation(self, session: Session) -> None:
-        reservation_model = SqlModelReservationBuilderTest(session).with_status(ReservationStatus.PENDING.value).build()
+        reservation_model = SqlModelReservationBuilder(session).with_status(ReservationStatus.PENDING.value).build()
         seat_model = (
-            SqlModelSeatBuilderTest(session)
+            SqlModelSeatBuilder(session)
             .with_status(SeatStatus.RESERVED)
             .with_reservation_id(reservation_model.id)
             .build()
@@ -71,9 +71,9 @@ class TestSqlModelReservationRepository:
         assert seat_model.reservation_id is None
 
     def test_cancel_reservations_and_release_seats(self, session: Session) -> None:
-        reservation_model = SqlModelReservationBuilderTest(session).with_status(ReservationStatus.PENDING.value).build()
+        reservation_model = SqlModelReservationBuilder(session).with_status(ReservationStatus.PENDING.value).build()
         seat_model = (
-            SqlModelSeatBuilderTest(session)
+            SqlModelSeatBuilder(session)
             .with_status(SeatStatus.RESERVED)
             .with_reservation_id(reservation_model.id)
             .build()

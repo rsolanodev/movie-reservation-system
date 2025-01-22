@@ -4,11 +4,11 @@ from datetime import datetime
 from sqlmodel import Session
 
 from app.movies.infrastructure.models import GenreModel, MovieModel
-from app.shared.tests.builders.sqlmodel_showtime_builder_test import SqlModelShowtimeBuilderTest
+from app.shared.tests.infrastructure.builders.sqlmodel_showtime_builder import SqlModelShowtimeBuilder
 from app.showtimes.infrastructure.models import ShowtimeModel
 
 
-class SqlModelMovieBuilderTest:
+class SqlModelMovieBuilder:
     def __init__(self, session: Session) -> None:
         self._session = session
 
@@ -20,31 +20,31 @@ class SqlModelMovieBuilderTest:
         self.genres: list[GenreModel] = []
         self.showtimes: list[ShowtimeModel] = []
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelMovieBuilderTest":
+    def with_id(self, id: uuid.UUID) -> "SqlModelMovieBuilder":
         self.id = id
         return self
 
-    def with_title(self, title: str) -> "SqlModelMovieBuilderTest":
+    def with_title(self, title: str) -> "SqlModelMovieBuilder":
         self.title = title
         return self
 
-    def with_description(self, description: str) -> "SqlModelMovieBuilderTest":
+    def with_description(self, description: str) -> "SqlModelMovieBuilder":
         self.description = description
         return self
 
-    def with_poster_image(self, poster_image: str | None) -> "SqlModelMovieBuilderTest":
+    def with_poster_image(self, poster_image: str | None) -> "SqlModelMovieBuilder":
         self.poster_image = poster_image
         return self
 
-    def with_genre(self, genre_model: GenreModel) -> "SqlModelMovieBuilderTest":
+    def with_genre(self, genre_model: GenreModel) -> "SqlModelMovieBuilder":
         self.genres.append(genre_model)
         return self
 
     def with_showtime(
         self, show_datetime: datetime, id: uuid.UUID | None = None, room_id: uuid.UUID | None = None
-    ) -> "SqlModelMovieBuilderTest":
+    ) -> "SqlModelMovieBuilder":
         showtime_model = (
-            SqlModelShowtimeBuilderTest(session=self._session)
+            SqlModelShowtimeBuilder(session=self._session)
             .with_id(id=id or uuid.uuid4())
             .with_movie_id(movie_id=self.id)
             .with_room_id(room_id=room_id or uuid.uuid4())
