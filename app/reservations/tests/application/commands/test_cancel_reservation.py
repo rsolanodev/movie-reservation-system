@@ -10,7 +10,7 @@ from app.reservations.domain.exceptions import CancellationNotAllowed, Reservati
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
 from app.reservations.domain.reservation import CancellableReservation, ReservationStatus
-from app.reservations.tests.domain.reservation_mother import ReservationMother
+from app.reservations.tests.domain.mothers.reservation_mother import ReservationMother
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 

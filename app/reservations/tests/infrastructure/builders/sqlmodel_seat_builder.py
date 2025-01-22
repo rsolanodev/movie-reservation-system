@@ -6,7 +6,7 @@ from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import SeatModel
 
 
-class SqlModelSeatBuilderTest:
+class SqlModelSeatBuilder:
     def __init__(self, session: Session) -> None:
         self._session = session
 
@@ -17,27 +17,27 @@ class SqlModelSeatBuilderTest:
         self.showtime_id: uuid.UUID = uuid.uuid4()
         self.reservation_id: uuid.UUID | None = None
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelSeatBuilderTest":
+    def with_id(self, id: uuid.UUID) -> "SqlModelSeatBuilder":
         self.id = id
         return self
 
-    def with_row(self, row: int) -> "SqlModelSeatBuilderTest":
+    def with_row(self, row: int) -> "SqlModelSeatBuilder":
         self.row = row
         return self
 
-    def with_number(self, number: int) -> "SqlModelSeatBuilderTest":
+    def with_number(self, number: int) -> "SqlModelSeatBuilder":
         self.number = number
         return self
 
-    def with_status(self, status: SeatStatus) -> "SqlModelSeatBuilderTest":
+    def with_status(self, status: SeatStatus) -> "SqlModelSeatBuilder":
         self.status = status
         return self
 
-    def with_showtime_id(self, showtime_id: uuid.UUID) -> "SqlModelSeatBuilderTest":
+    def with_showtime_id(self, showtime_id: uuid.UUID) -> "SqlModelSeatBuilder":
         self.showtime_id = showtime_id
         return self
 
-    def with_reservation_id(self, reservation_id: uuid.UUID) -> "SqlModelSeatBuilderTest":
+    def with_reservation_id(self, reservation_id: uuid.UUID) -> "SqlModelSeatBuilder":
         self.reservation_id = reservation_id
         return self
 

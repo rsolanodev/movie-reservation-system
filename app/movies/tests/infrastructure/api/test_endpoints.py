@@ -30,8 +30,8 @@ from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenre
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
 from app.shared.tests.domain.builders.movie_builder import MovieBuilder
+from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 
 
 class TestCreateMovieEndpoint:
@@ -236,7 +236,7 @@ class TestUpdateMovieEndpoint:
     ) -> None:
         mock_storage.upload_file.return_value = "movies/posters/new_poster.jpg"
 
-        movie_model = SqlModelMovieBuilderTest(session=session).build()
+        movie_model = SqlModelMovieBuilder(session=session).build()
 
         response = client.patch(
             f"api/v1/movies/{movie_model.id}/",
@@ -438,7 +438,7 @@ class TestDeleteMovieEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        movie_model = SqlModelMovieBuilderTest(session=session).build()
+        movie_model = SqlModelMovieBuilder(session=session).build()
 
         response = client.delete(
             f"api/v1/movies/{movie_model.id}/",
@@ -602,7 +602,7 @@ class TestAddMovieGenreEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        movie_model = SqlModelMovieBuilderTest(session=session).build()
+        movie_model = SqlModelMovieBuilder(session=session).build()
         genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
 
         response = client.post(
@@ -688,7 +688,7 @@ class TestRemoveMovieGenreEndpoint:
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
         genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
-        movie_model = SqlModelMovieBuilderTest(session=session).with_genre(genre_model=genre_model).build()
+        movie_model = SqlModelMovieBuilder(session=session).with_genre(genre_model=genre_model).build()
 
         response = client.delete(
             f"api/v1/movies/{movie_model.id}/genres/{genre_model.id}/",
@@ -765,7 +765,7 @@ class TestGetMovieEndpoint:
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient) -> None:
         movie_model = (
-            SqlModelMovieBuilderTest(session=session)
+            SqlModelMovieBuilder(session=session)
             .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(
                 SqlModelGenreFactoryTest(session=session).create(
@@ -893,7 +893,7 @@ class TestListMoviesEndpoint:
         )
         comedy_genre = SqlModelGenreFactoryTest(session=session).create(name="Comedy")
         (
-            SqlModelMovieBuilderTest(session=session)
+            SqlModelMovieBuilder(session=session)
             .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
             .with_genre(genre_model=action_genre)
             .with_showtime(
@@ -902,10 +902,10 @@ class TestListMoviesEndpoint:
             )
             .build()
         )
-        SqlModelMovieBuilderTest(session=session).with_genre(genre_model=comedy_genre).with_showtime(
+        SqlModelMovieBuilder(session=session).with_genre(genre_model=comedy_genre).with_showtime(
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).build()
-        SqlModelMovieBuilderTest(session=session).with_genre(genre_model=action_genre).with_showtime(
+        SqlModelMovieBuilder(session=session).with_genre(genre_model=action_genre).with_showtime(
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
 

@@ -10,7 +10,7 @@ from app.payments.application.commands.confirm_payment import ConfirmPaymentPara
 from app.payments.domain.exceptions import InvalidSignature, ReservationNotFound
 from app.payments.domain.reservation import ReservationStatus
 from app.shared.domain.payment_event import PaymentEvent
-from app.shared.tests.builders.sqlmodel_reservation_builder_test import SqlModelReservationBuilderTest
+from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 
 class TestStripeWebhook:
@@ -37,7 +37,7 @@ class TestStripeWebhook:
     @pytest.mark.integration
     def test_integration(self, client: TestClient, session: Session, mock_stripe_client: Mock) -> None:
         reservation_model = (
-            SqlModelReservationBuilderTest(session)
+            SqlModelReservationBuilder(session)
             .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
             .with_status(ReservationStatus.PENDING.value)
             .with_provider_payment_id("pi_3MtwBwLkdIwHu7ix28a3tqPa")

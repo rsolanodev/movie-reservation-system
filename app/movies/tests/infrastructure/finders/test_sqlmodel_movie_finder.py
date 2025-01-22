@@ -14,7 +14,7 @@ from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenre
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-from app.shared.tests.builders.sqlmodel_movie_builder_test import SqlModelMovieBuilderTest
+from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 
 
 class TestSqlModelMovieFinder:
@@ -25,7 +25,7 @@ class TestSqlModelMovieFinder:
     def test_find_movie(self, session: Session, finder: SqlModelMovieFinder) -> None:
         genre_model_factory = SqlModelGenreFactoryTest(session=session)
         movie_model = (
-            SqlModelMovieBuilderTest(session=session)
+            SqlModelMovieBuilder(session=session)
             .with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_genre(
                 genre_model=genre_model_factory.create(
@@ -58,9 +58,7 @@ class TestSqlModelMovieFinder:
         )
 
     def test_find_movie_by_showtime_date(self, session: Session, finder: SqlModelMovieFinder) -> None:
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).with_showtime(
@@ -105,16 +103,12 @@ class TestSqlModelMovieFinder:
         assert movie is None
 
     def test_find_movies_by_showtime_date(self, session: Session, finder: SqlModelMovieFinder) -> None:
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
         ).build()
 
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
@@ -142,16 +136,12 @@ class TestSqlModelMovieFinder:
     def test_find_movies_by_showtime_date_with_showtimes_on_date(
         self, session: Session, finder: SqlModelMovieFinder
     ) -> None:
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
         ).build()
 
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("fc725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("dbdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
@@ -179,9 +169,7 @@ class TestSqlModelMovieFinder:
     def test_find_movies_by_showtime_date_with_showtimes_ordered(
         self, session: Session, finder: SqlModelMovieFinder
     ) -> None:
-        SqlModelMovieBuilderTest(session=session).with_id(
-            id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")
-        ).with_showtime(
+        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
             id=UUID("ebdd7b54-c561-4cbb-a55f-15853c60e601"),
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).with_showtime(
