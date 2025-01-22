@@ -6,7 +6,7 @@ from app.reservations.application.commands.create_reservation import CreateReser
 from app.reservations.application.queries.find_reservations import FindReservations
 from app.reservations.domain.exceptions import (
     CancellationNotAllowed,
-    ReservationDoesNotExist,
+    ReservationNotFound,
     SeatsNotAvailable,
     UnauthorizedCancellation,
 )
@@ -62,7 +62,7 @@ def cancel_reservation(session: SessionDep, reservation_id: str, current_user: C
                 user_id=Id.from_uuid(current_user.id),
             )
         )
-    except ReservationDoesNotExist:
+    except ReservationNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found")
     except UnauthorizedCancellation:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unauthorized to cancel this reservation")

@@ -47,3 +47,5 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
             .values(status=SeatStatus.AVAILABLE, reservation_id=None)
         )
         self._session.commit()
+
+    def save(self, reservation: Reservation) -> None: ...

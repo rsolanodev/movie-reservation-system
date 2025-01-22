@@ -4,7 +4,7 @@ from sqlmodel import select
 from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.domain.reservation import CancellableReservation, Reservation, ReservationStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -60,3 +60,6 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
 
     def _sort_reserved_seats(self, seats: list[SeatLocation]) -> list[SeatLocation]:
         return sorted(seats, key=lambda seat: (seat.row, seat.number))
+
+    def find_cancellable_reservation(self, reservation_id: Id) -> CancellableReservation | None:
+        return None
