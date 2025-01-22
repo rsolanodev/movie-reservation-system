@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from app.reservations.domain.collections.seats import Seats
+from app.reservations.domain.exceptions import CancellationNotAllowed, UnauthorizedCancellation
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 
@@ -47,3 +48,22 @@ class Reservation:
 
     def assign_payment_id(self, provider_payment_id: str) -> None:
         self.provider_payment_id = provider_payment_id
+
+
+@dataclass
+class CancellableReservation:
+    reservation: Reservation
+    show_datetime: DateTime
+
+    @property
+    def user_id(self) -> Id:
+        return self.reservation.user_id
+
+    def cancel_by_owner(self, user_id: Id) -> None:
+        if self.user_id != user_id:
+            raise UnauthorizedCancellation()
+
+        if DateTime.now() >= self.show_datetime:
+            raise CancellationNotAllowed()
+
+        self.reservation.cancel()

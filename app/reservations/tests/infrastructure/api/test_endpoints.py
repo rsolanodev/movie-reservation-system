@@ -11,7 +11,7 @@ from app.reservations.application.commands.cancel_reservation import CancelReser
 from app.reservations.application.commands.create_reservation import CreateReservationParams
 from app.reservations.domain.exceptions import (
     CancellationNotAllowed,
-    ReservationDoesNotExist,
+    ReservationNotFound,
     SeatsNotAvailable,
     UnauthorizedCancellation,
 )
@@ -371,7 +371,7 @@ class TestCancelReservationEndpoint:
     def test_returns_404_when_reservation_does_not_exist(
         self, client: TestClient, mock_cancel_reservation: Mock, user_token_headers: dict[str, str], user: UserModel
     ) -> None:
-        mock_cancel_reservation.return_value.execute.side_effect = ReservationDoesNotExist
+        mock_cancel_reservation.return_value.execute.side_effect = ReservationNotFound
 
         response = client.delete(
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
