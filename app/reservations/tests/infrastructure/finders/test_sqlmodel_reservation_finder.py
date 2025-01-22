@@ -7,7 +7,7 @@ from sqlmodel import Session
 from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.domain.reservation import CancellableReservation, Reservation, ReservationStatus
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.tests.builders.sqlmodel_seat_builder_test import SqlModelSeatBuilderTest
@@ -309,3 +309,44 @@ class TestSqlModelReservationFinder:
         )
 
         assert reservations == []
+
+    def test_find_cancellable_reservation(self, session: Session) -> None:
+        (
+            SqlModelMovieBuilderTest(session=session)
+            .with_showtime(
+                id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                show_datetime=datetime(2025, 1, 11, 19, 0, 0, tzinfo=timezone.utc),
+            )
+            .build()
+        )
+        (
+            SqlModelReservationBuilderTest(session)
+            .with_id(UUID("a41707bd-ae9c-43b8-bba5-8c4844e73e77"))
+            .with_user_id(UUID("bee0a37c-67bc-4038-a8fc-39e68ea1453a"))
+            .with_showtime_id(UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601"))
+            .with_status(ReservationStatus.CONFIRMED.value)
+            .build()
+        )
+
+        cancellable_reservation = SqlModelReservationFinder(session).find_cancellable_reservation(
+            reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77")
+        )
+
+        assert cancellable_reservation == CancellableReservation(
+            reservation=Reservation(
+                id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
+                user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a"),
+                showtime_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
+                status=ReservationStatus.CONFIRMED.value,
+                created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+                seats=Seats(),
+            ),
+            show_datetime=DateTime.from_datetime(datetime(2025, 1, 11, 19, 0, 0)),
+        )
+
+    def test_does_not_find_cancellable_reservation_when_reservation_does_not_exist(self, session: Session) -> None:
+        cancellable_reservation = SqlModelReservationFinder(session).find_cancellable_reservation(
+            reservation_id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77")
+        )
+
+        assert cancellable_reservation is None
