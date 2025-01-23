@@ -8,7 +8,7 @@ from app.rooms.infrastructure.repositories.sqlmodel_room_repository import SqlMo
 class TestSqlModelRoomRepository:
     def test_create_room(self, session: Session) -> None:
         room = Room.create(name="Room 1", seat_configuration=[{"row": 1, "number": 1}])
-        SqlModelRoomRepository(session=session).create(room)
+        SqlModelRoomRepository(session).create(room)
 
         room_model = session.get_one(RoomModel, room.id.to_uuid())
         assert room_model.name == "Room 1"

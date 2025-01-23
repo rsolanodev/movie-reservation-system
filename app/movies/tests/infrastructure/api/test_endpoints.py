@@ -22,11 +22,12 @@ from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.poster_image import PosterImage
 from app.movies.infrastructure.models import MovieModel
-from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
-from app.movies.tests.factories.movie_showtime_factory_test import (
-    MovieShowtimeFactoryTest,
+from app.movies.tests.domain.mothers.genre_mother import GenreMother
+from app.movies.tests.domain.mothers.movie_showtime_mother import (
+    MovieShowtimeMother,
 )
-from app.movies.tests.factories.sqlmodel_genre_factory_test import SqlModelGenreFactoryTest
+from app.movies.tests.infrastructure.mothers.sqlmodel_genre_mother import SqlModelGenreMother
+from app.movies.tests.infrastructure.mothers.sqlmodel_movie_mother import SqlModelMovieMother
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -236,10 +237,10 @@ class TestUpdateMovieEndpoint:
     ) -> None:
         mock_storage.upload_file.return_value = "movies/posters/new_poster.jpg"
 
-        movie_model = SqlModelMovieBuilder(session=session).build()
+        movie_model = SqlModelMovieMother(session).create()
 
         response = client.patch(
-            f"api/v1/movies/{movie_model.id}/",
+            "api/v1/movies/ec725625-f502-4d39-9401-a415d8c1f964/",
             data={
                 "title": "New Title",
                 "description": "New description",
@@ -438,15 +439,15 @@ class TestDeleteMovieEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        movie_model = SqlModelMovieBuilder(session=session).build()
+        SqlModelMovieMother(session).create()
 
         response = client.delete(
-            f"api/v1/movies/{movie_model.id}/",
+            "api/v1/movies/ec725625-f502-4d39-9401-a415d8c1f964/",
             headers=superuser_token_headers,
         )
 
         assert response.status_code == 200
-        assert session.get(MovieModel, movie_model.id) is None
+        assert session.get(MovieModel, UUID("ec725625-f502-4d39-9401-a415d8c1f964")) is None
 
     def test_returns_200_and_calls_delete_movie(
         self,
@@ -543,16 +544,25 @@ class TestListGenresEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient) -> None:
-        genre_factory = SqlModelGenreFactoryTest(session=session)
-        genre_action = genre_factory.create(name="Action")
-        genre_comedy = genre_factory.create(name="Comedy")
+        (
+            SqlModelGenreMother(session)
+            .with_id(UUID("393210d5-80ce-4d03-b896-5d89f15aa77a"))
+            .with_name("Action")
+            .create()
+        )
+        (
+            SqlModelGenreMother(session)
+            .with_id(UUID("393210d5-80ce-4d03-b896-5d89f15aa77b"))
+            .with_name("Comedy")
+            .create()
+        )
 
         response = client.get("api/v1/movies/genres/")
 
         assert response.status_code == 200
         assert response.json() == [
-            {"id": str(genre_action.id), "name": "Action"},
-            {"id": str(genre_comedy.id), "name": "Comedy"},
+            {"id": "393210d5-80ce-4d03-b896-5d89f15aa77a", "name": "Action"},
+            {"id": "393210d5-80ce-4d03-b896-5d89f15aa77b", "name": "Comedy"},
         ]
 
     def test_returns_200_and_calls_find_all_genres(
@@ -602,17 +612,17 @@ class TestAddMovieGenreEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        movie_model = SqlModelMovieBuilder(session=session).build()
-        genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
+        movie_model = SqlModelMovieMother(session).create()
+        SqlModelGenreMother(session).create()
 
         response = client.post(
             f"api/v1/movies/{movie_model.id}/genres/",
-            data={"genre_id": str(genre_model.id)},
+            data={"genre_id": "393210d5-80ce-4d03-b896-5d89f15aa77a"},
             headers=superuser_token_headers,
         )
 
         assert response.status_code == 200
-        assert movie_model.genres[0].id == genre_model.id
+        assert movie_model.genres[0].id == UUID("393210d5-80ce-4d03-b896-5d89f15aa77a")
         assert movie_model.genres[0].name == "Action"
 
     def test_returns_200_and_calls_add_movie_genre(
@@ -687,11 +697,10 @@ class TestRemoveMovieGenreEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        genre_model = SqlModelGenreFactoryTest(session=session).create(name="Action")
-        movie_model = SqlModelMovieBuilder(session=session).with_genre(genre_model=genre_model).build()
+        movie_model = SqlModelMovieBuilder(session).with_genre(SqlModelGenreMother(session).create()).build()
 
         response = client.delete(
-            f"api/v1/movies/{movie_model.id}/genres/{genre_model.id}/",
+            f"api/v1/movies/{movie_model.id}/genres/393210d5-80ce-4d03-b896-5d89f15aa77a/",
             headers=superuser_token_headers,
         )
 
@@ -764,14 +773,10 @@ class TestGetMovieEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient) -> None:
-        movie_model = (
-            SqlModelMovieBuilder(session=session)
+        (
+            SqlModelMovieBuilder(session)
             .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_genre(
-                SqlModelGenreFactoryTest(session=session).create(
-                    id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
-                )
-            )
+            .with_genre(SqlModelGenreMother(session).create())
             .with_showtime(
                 id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                 show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
@@ -779,7 +784,7 @@ class TestGetMovieEndpoint:
             .build()
         )
 
-        response = client.get(f"api/v1/movies/{movie_model.id}/?showtime_date=2023-04-03")
+        response = client.get("api/v1/movies/913822a0-750b-4cb6-b7b9-e01869d7d62d/?showtime_date=2023-04-03")
 
         assert response.status_code == 200
         assert response.json() == {
@@ -789,7 +794,7 @@ class TestGetMovieEndpoint:
             "poster_image": "deadpool_and_wolverine.jpg",
             "genres": [
                 {
-                    "id": "d108f84b-3568-446b-896c-3ba2bc74cda9",
+                    "id": "393210d5-80ce-4d03-b896-5d89f15aa77a",
                     "name": "Action",
                 },
             ],
@@ -806,25 +811,10 @@ class TestGetMovieEndpoint:
     ) -> None:
         mock_find_movie.return_value.execute.return_value = (
             MovieBuilder()
-            .with_id(id=Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_genre(
-                genre=GenreFactoryTest().create(
-                    id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
-                    name="Action",
-                )
-            )
-            .with_genre(
-                genre=GenreFactoryTest().create(
-                    id=Id("d108f84b-3568-446b-896c-3ba2bc74cda8"),
-                    name="Comedy",
-                )
-            )
-            .with_showtime(
-                showtime=MovieShowtimeFactoryTest().create(
-                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
-                )
-            )
+            .with_id(Id("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
+            .with_genre(GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda9")).with_name("Action").create())
+            .with_genre(GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda8")).with_name("Comedy").create())
+            .with_showtime(MovieShowtimeMother().create())
             .build()
         )
 
@@ -888,24 +878,27 @@ class TestListMoviesEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient) -> None:
-        action_genre = SqlModelGenreFactoryTest(session=session).create(
-            id=UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"
+        action_genre = (
+            SqlModelGenreMother(session)
+            .with_id(UUID("d108f84b-3568-446b-896c-3ba2bc74cda9"))
+            .with_name("Action")
+            .create()
         )
-        comedy_genre = SqlModelGenreFactoryTest(session=session).create(name="Comedy")
+        comedy_genre = SqlModelGenreMother(session).with_name("Comedy").create()
         (
-            SqlModelMovieBuilder(session=session)
+            SqlModelMovieBuilder(session)
             .with_id(UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d"))
-            .with_genre(genre_model=action_genre)
+            .with_genre(action_genre)
             .with_showtime(
                 id=UUID("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
                 show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
             )
             .build()
         )
-        SqlModelMovieBuilder(session=session).with_genre(genre_model=comedy_genre).with_showtime(
+        SqlModelMovieBuilder(session).with_genre(comedy_genre).with_showtime(
             show_datetime=datetime(2023, 4, 3, 23, 0, tzinfo=timezone.utc),
         ).build()
-        SqlModelMovieBuilder(session=session).with_genre(genre_model=action_genre).with_showtime(
+        SqlModelMovieBuilder(session).with_genre(action_genre).with_showtime(
             show_datetime=datetime(2023, 4, 4, 22, 0, tzinfo=timezone.utc),
         ).build()
 
@@ -942,27 +935,29 @@ class TestListMoviesEndpoint:
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
+            .with_genre(
+                GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda8")).with_name("Comedy").create(),
+            )
             .with_showtime(
-                showtime=MovieShowtimeFactoryTest().create(
-                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
-                )
+                MovieShowtimeMother()
+                .with_id(Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"))
+                .with_show_datetime(DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)))
+                .create()
             )
             .build(),
             MovieBuilder()
-            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_id(Id("ec725625-f502-4d39-9401-a415d8c1f965"))
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
             .with_genre(
-                genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
+                GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda9")).with_name("Adventure").create()
             )
             .with_showtime(
-                showtime=MovieShowtimeFactoryTest().create(
-                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd44f"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 23)),
-                )
+                MovieShowtimeMother()
+                .with_id(Id("d7c10c00-9598-4618-956a-ff3aa82dd44f"))
+                .with_show_datetime(DateTime.from_datetime(datetime(2023, 4, 3, 23)))
+                .create()
             )
             .build(),
         ]
@@ -1010,23 +1005,18 @@ class TestListMoviesEndpoint:
         mock_find_movies.return_value.execute.return_value = [
             MovieBuilder()
             .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f964"))
-            .with_genre(genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Action"))
-            .with_showtime(
-                showtime=MovieShowtimeFactoryTest().create(
-                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22)),
-                )
-            )
+            .with_genre(GenreMother().create())
+            .with_showtime(MovieShowtimeMother().create())
             .build()
         ]
 
-        response = client.get("api/v1/movies/?showtime_date=2023-04-03&genre_id=d108f84b-3568-446b-896c-3ba2bc74cda9")
+        response = client.get("api/v1/movies/?showtime_date=2023-04-03&genre_id=c8693e5a-ac9c-4560-9970-7ae4f22ddf0a")
 
         mock_find_movies.assert_called_once_with(finder=mock_movie_finder)
         mock_find_movies.return_value.execute.assert_called_once_with(
             params=FindMoviesParams(
                 showtime_date=Date.from_datetime_date(date(2023, 4, 3)),
-                genre_id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"),
+                genre_id=Id("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
             )
         )
 
@@ -1037,7 +1027,7 @@ class TestListMoviesEndpoint:
                 "title": "Deadpool & Wolverine",
                 "description": "Deadpool and a variant of Wolverine.",
                 "poster_image": "deadpool_and_wolverine.jpg",
-                "genres": [{"id": "d108f84b-3568-446b-896c-3ba2bc74cda9", "name": "Action"}],
+                "genres": [{"id": "c8693e5a-ac9c-4560-9970-7ae4f22ddf0a", "name": "Adventure"}],
                 "showtimes": [
                     {
                         "id": "d7c10c00-9598-4618-956a-ff3aa82dd33f",

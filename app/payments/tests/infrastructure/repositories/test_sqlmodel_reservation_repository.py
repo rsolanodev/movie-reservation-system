@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from sqlmodel import Session
 
 from app.payments.domain.reservation import Reservation, ReservationStatus
@@ -10,14 +8,9 @@ from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder impor
 
 class TestSqlModelReservationRepository:
     def test_update_reservation(self, session: Session) -> None:
-        reservation_model = (
-            SqlModelReservationBuilder(session)
-            .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
-            .with_status(ReservationStatus.PENDING.value)
-            .build()
-        )
+        reservation_model = SqlModelReservationBuilder(session).pending().build()
 
-        reservation = Reservation(id=Id(reservation_model.id), status=ReservationStatus.CONFIRMED)
+        reservation = Reservation(id=Id.from_uuid(reservation_model.id), status=ReservationStatus.CONFIRMED)
         SqlModelReservationRepository(session).update(reservation)
 
         assert reservation_model.status == ReservationStatus.CONFIRMED.value

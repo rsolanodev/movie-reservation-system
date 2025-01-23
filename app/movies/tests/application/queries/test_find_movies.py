@@ -12,8 +12,8 @@ from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
-from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
-from app.movies.tests.factories.movie_showtime_factory_test import MovieShowtimeFactoryTest
+from app.movies.tests.domain.mothers.genre_mother import GenreMother
+from app.movies.tests.domain.mothers.movie_showtime_mother import MovieShowtimeMother
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -34,31 +34,31 @@ class TestFindMovies:
     def movies(self) -> list[Movie]:
         return [
             MovieBuilder()
-            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_id(Id("ec725625-f502-4d39-9401-a415d8c1f964"))
             .with_title("Deadpool & Wolverine")
             .with_description("Deadpool and a variant of Wolverine.")
             .with_poster_image("deadpool_and_wolverine.jpg")
-            .with_genre(genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda8"), name="Comedy"))
+            .with_genre(GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda8")).with_name("Comedy").create())
             .with_showtime(
-                MovieShowtimeFactoryTest().create(
-                    id=Id("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
-                )
+                MovieShowtimeMother()
+                .with_id(Id("b6439a2d-c0c0-45c8-81b7-7d7b155830ba"))
+                .with_show_datetime(DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)))
+                .create()
             )
             .build(),
             MovieBuilder()
-            .with_id(id=Id("ec725625-f502-4d39-9401-a415d8c1f965"))
+            .with_id(Id("ec725625-f502-4d39-9401-a415d8c1f965"))
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
             .with_genre(
-                genre=GenreFactoryTest().create(id=Id("d108f84b-3568-446b-896c-3ba2bc74cda9"), name="Adventure")
+                GenreMother().with_id(Id("d108f84b-3568-446b-896c-3ba2bc74cda9")).with_name("Adventure").create()
             )
             .with_showtime(
-                MovieShowtimeFactoryTest().create(
-                    id=Id("f48c4dae-b0e2-43f6-a659-599f5e254270"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
-                )
+                MovieShowtimeMother()
+                .with_id(Id("f48c4dae-b0e2-43f6-a659-599f5e254270"))
+                .with_show_datetime(DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)))
+                .create()
             )
             .build(),
         ]

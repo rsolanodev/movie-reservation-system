@@ -18,11 +18,11 @@ class TestSqlModelGenreFinder:
         ]
         session.add_all(genre_models)
 
-        genres = SqlModelGenreFinder(session=session).find_all()
+        genres = SqlModelGenreFinder(session).find_all()
 
         assert genres == [action_genre, adventure_genre, comedy_genre]
 
     def test_find_all_genres_when_no_genres(self, session: Session) -> None:
-        genres = SqlModelGenreFinder(session=session).find_all()
+        genres = SqlModelGenreFinder(session).find_all()
 
         assert genres == []

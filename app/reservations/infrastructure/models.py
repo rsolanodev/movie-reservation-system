@@ -17,12 +17,13 @@ if TYPE_CHECKING:
 
 class SeatModel(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    showtime_id: uuid.UUID = Field(foreign_key="showtimemodel.id")
+    reservation_id: uuid.UUID = Field(foreign_key="reservationmodel.id", nullable=True)
     row: int
     number: int
     status: str
-    showtime_id: uuid.UUID = Field(foreign_key="showtimemodel.id")
+
     showtime: "ShowtimeModel" = Relationship(back_populates="seats")
-    reservation_id: uuid.UUID = Field(foreign_key="reservationmodel.id", nullable=True)
     reservation: "ReservationModel" = Relationship(back_populates="seats")
 
     @classmethod

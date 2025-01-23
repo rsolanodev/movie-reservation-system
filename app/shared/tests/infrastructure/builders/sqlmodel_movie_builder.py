@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Self
 
 from sqlmodel import Session
 
@@ -20,35 +21,35 @@ class SqlModelMovieBuilder:
         self.genres: list[GenreModel] = []
         self.showtimes: list[ShowtimeModel] = []
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelMovieBuilder":
+    def with_id(self, id: uuid.UUID) -> Self:
         self.id = id
         return self
 
-    def with_title(self, title: str) -> "SqlModelMovieBuilder":
+    def with_title(self, title: str) -> Self:
         self.title = title
         return self
 
-    def with_description(self, description: str) -> "SqlModelMovieBuilder":
+    def with_description(self, description: str) -> Self:
         self.description = description
         return self
 
-    def with_poster_image(self, poster_image: str | None) -> "SqlModelMovieBuilder":
+    def with_poster_image(self, poster_image: str | None) -> Self:
         self.poster_image = poster_image
         return self
 
-    def with_genre(self, genre_model: GenreModel) -> "SqlModelMovieBuilder":
+    def with_genre(self, genre_model: GenreModel) -> Self:
         self.genres.append(genre_model)
         return self
 
     def with_showtime(
         self, show_datetime: datetime, id: uuid.UUID | None = None, room_id: uuid.UUID | None = None
-    ) -> "SqlModelMovieBuilder":
+    ) -> Self:
         showtime_model = (
-            SqlModelShowtimeBuilder(session=self._session)
-            .with_id(id=id or uuid.uuid4())
-            .with_movie_id(movie_id=self.id)
-            .with_room_id(room_id=room_id or uuid.uuid4())
-            .with_show_datetime(show_datetime=show_datetime)
+            SqlModelShowtimeBuilder(self._session)
+            .with_id(id or uuid.uuid4())
+            .with_movie_id(self.id)
+            .with_room_id(room_id or uuid.uuid4())
+            .with_show_datetime(show_datetime)
             .build()
         )
         self.showtimes.append(showtime_model)

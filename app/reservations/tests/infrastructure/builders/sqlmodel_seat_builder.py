@@ -1,4 +1,5 @@
 import uuid
+from typing import Self
 
 from sqlmodel import Session
 
@@ -13,31 +14,43 @@ class SqlModelSeatBuilder:
         self.id: uuid.UUID = uuid.uuid4()
         self.row: int = 1
         self.number: int = 1
-        self.status: SeatStatus = SeatStatus.AVAILABLE
+        self.status: str = SeatStatus.AVAILABLE.value
         self.showtime_id: uuid.UUID = uuid.uuid4()
         self.reservation_id: uuid.UUID | None = None
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelSeatBuilder":
+    def with_id(self, id: uuid.UUID) -> Self:
         self.id = id
         return self
 
-    def with_row(self, row: int) -> "SqlModelSeatBuilder":
+    def with_row(self, row: int) -> Self:
         self.row = row
         return self
 
-    def with_number(self, number: int) -> "SqlModelSeatBuilder":
+    def with_number(self, number: int) -> Self:
         self.number = number
         return self
 
-    def with_status(self, status: SeatStatus) -> "SqlModelSeatBuilder":
+    def with_status(self, status: str) -> Self:
         self.status = status
         return self
 
-    def with_showtime_id(self, showtime_id: uuid.UUID) -> "SqlModelSeatBuilder":
+    def available(self) -> Self:
+        self.status = SeatStatus.AVAILABLE.value
+        return self
+
+    def reserved(self) -> Self:
+        self.status = SeatStatus.RESERVED.value
+        return self
+
+    def occupied(self) -> Self:
+        self.status = SeatStatus.OCCUPIED.value
+        return self
+
+    def with_showtime_id(self, showtime_id: uuid.UUID) -> Self:
         self.showtime_id = showtime_id
         return self
 
-    def with_reservation_id(self, reservation_id: uuid.UUID) -> "SqlModelSeatBuilder":
+    def with_reservation_id(self, reservation_id: uuid.UUID) -> Self:
         self.reservation_id = reservation_id
         return self
 
