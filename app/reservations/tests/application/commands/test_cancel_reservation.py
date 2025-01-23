@@ -36,7 +36,9 @@ class TestCancelReservation:
         )
 
         mock_reservation_finder.find_cancellable_reservation.assert_called_once_with(reservation_id=reservation.id)
-        mock_reservation_repository.save.assert_called_once_with(reservation=ReservationMother().cancelled().create())
+        mock_reservation_repository.release.assert_called_once_with(
+            reservation=ReservationMother().cancelled().create()
+        )
 
     def test_raise_exception_when_reservation_not_found(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock
@@ -54,7 +56,7 @@ class TestCancelReservation:
         mock_reservation_finder.find_cancellable_reservation.assert_called_once_with(
             reservation_id=Id("434d5682-0a19-499e-a72a-c08f47b43e09")
         )
-        mock_reservation_repository.save.assert_not_called()
+        mock_reservation_repository.release.assert_not_called()
 
     def test_raise_exception_when_user_is_not_the_owner_of_the_reservation(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock
@@ -73,7 +75,7 @@ class TestCancelReservation:
             )
 
         mock_reservation_finder.find_cancellable_reservation.assert_called_once_with(reservation_id=reservation.id)
-        mock_reservation_repository.save.assert_not_called()
+        mock_reservation_repository.release.assert_not_called()
 
     def test_raise_exception_when_showtime_has_started(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock
@@ -89,4 +91,4 @@ class TestCancelReservation:
             )
 
         mock_reservation_finder.find_cancellable_reservation.assert_called_once_with(reservation_id=reservation.id)
-        mock_reservation_repository.save.assert_not_called()
+        mock_reservation_repository.release.assert_not_called()

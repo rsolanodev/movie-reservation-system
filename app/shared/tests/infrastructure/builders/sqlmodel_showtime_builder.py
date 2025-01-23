@@ -33,9 +33,11 @@ class SqlModelShowtimeBuilder:
         return self
 
     def build(self) -> ShowtimeModel:
-        return ShowtimeModel(
+        showtime_model = ShowtimeModel(
             id=self.id,
             movie_id=self.movie_id,
             room_id=self.room_id,
             show_datetime=self.show_datetime,
         )
+        self._session.add(showtime_model)
+        return showtime_model

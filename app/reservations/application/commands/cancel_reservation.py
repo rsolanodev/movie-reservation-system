@@ -24,4 +24,4 @@ class CancelReservation:
             raise ReservationNotFound()
 
         cancellable_reservation.cancel_by_owner(user_id=params.user_id)
-        self._repository.save(reservation=cancellable_reservation.reservation)
+        self._repository.release(reservation=cancellable_reservation.reservation)

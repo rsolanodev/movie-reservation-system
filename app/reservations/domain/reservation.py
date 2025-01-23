@@ -32,12 +32,6 @@ class Reservation:
             created_at=DateTime.now(),
         )
 
-    def add_seats(self, seats: Seats) -> None:
-        self.seats.extend(seats)
-
-    def is_confirmed(self) -> bool:
-        return self.status.is_confirmed()
-
     def cancel(self) -> None:
         self.status = ReservationStatus.CANCELLED
 
