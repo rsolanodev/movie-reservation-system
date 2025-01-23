@@ -3,7 +3,6 @@ from uuid import UUID
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.reservations.tests.domain.builders.reservation_builder import ReservationBuilder
@@ -11,6 +10,7 @@ from app.reservations.tests.domain.builders.seat_builder import SeatBuilder
 from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import SqlModelSeatBuilder
 from app.shared.domain.value_objects.id import Id
 from app.shared.domain.value_objects.reservation_status import ReservationStatus
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 
@@ -45,11 +45,11 @@ class TestSqlModelReservationRepository:
 
         session.refresh(main_seat)
         assert main_seat.reservation_id == reservation.id.to_uuid()
-        assert main_seat.status == SeatStatus.RESERVED
+        assert main_seat.status == SeatStatus.RESERVED.value
 
         session.refresh(parent_seat)
         assert parent_seat.reservation_id == reservation.id.to_uuid()
-        assert parent_seat.status == SeatStatus.RESERVED
+        assert parent_seat.status == SeatStatus.RESERVED.value
 
     def test_release_reservation(self, session: Session) -> None:
         reservation_model = SqlModelReservationBuilder(session).pending().build()

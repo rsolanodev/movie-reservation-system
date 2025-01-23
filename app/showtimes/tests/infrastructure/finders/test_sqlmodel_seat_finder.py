@@ -4,8 +4,9 @@ from uuid import UUID
 from sqlmodel import Session
 
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import Seat
 from app.showtimes.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.showtimes.tests.infrastructure.mothers.sqlmodel_seat_mother import SqlModelSeatMother
 

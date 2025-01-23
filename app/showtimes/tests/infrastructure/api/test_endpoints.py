@@ -9,12 +9,13 @@ from sqlmodel import Session, select
 
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 from app.shared.tests.infrastructure.mothers.sqlmodel_room_mother import SqlModelRoomMother
 from app.shared.tests.infrastructure.mothers.sqlmodel_showtime_mother import SqlModelShowtimeMother
 from app.showtimes.application.commands.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import Seat
 from app.showtimes.infrastructure.models import ShowtimeModel
 from app.showtimes.tests.infrastructure.mothers.sqlmodel_seat_mother import SqlModelSeatMother
 
@@ -246,9 +247,7 @@ class TestListSeatsEndpoint:
             yield mock.return_value
 
     @pytest.mark.integration
-    @pytest.mark.parametrize(
-        "status", [SeatStatus.AVAILABLE.value, SeatStatus.RESERVED.value, SeatStatus.OCCUPIED.value]
-    )
+    @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])
     def test_integration(self, session: Session, client: TestClient, status: SeatStatus) -> None:
         showtime_id = UUID("39ce0103-fe6d-4bc4-a876-1556e9291bbe")
         (
@@ -276,7 +275,7 @@ class TestListSeatsEndpoint:
 
         assert response.status_code == 200
         assert response.json() == [
-            {"id": "7846b1f9-218e-4c67-bc65-0e870be65a07", "row": 1, "number": 2, "status": status}
+            {"id": "7846b1f9-218e-4c67-bc65-0e870be65a07", "row": 1, "number": 2, "status": status.value}
         ]
 
     @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])
@@ -296,5 +295,5 @@ class TestListSeatsEndpoint:
 
         assert response.status_code == 200
         assert response.json() == [
-            {"id": "cbdd7b54-c561-4cbb-a55f-15853c60e600", "row": 1, "number": 2, "status": status}
+            {"id": "cbdd7b54-c561-4cbb-a55f-15853c60e600", "row": 1, "number": 2, "status": status.value}
         ]

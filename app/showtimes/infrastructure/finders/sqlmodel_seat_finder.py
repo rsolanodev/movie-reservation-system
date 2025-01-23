@@ -2,9 +2,10 @@ from sqlmodel import select
 
 from app.reservations.infrastructure.models import SeatModel
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.infrastructure.finders.sqlmodel_finder import SqlModelFinder
 from app.showtimes.domain.finders.seat_finder import SeatFinder
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import Seat
 
 
 class SqlModelSeatFinder(SeatFinder, SqlModelFinder):

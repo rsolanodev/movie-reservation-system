@@ -1,4 +1,5 @@
-from app.reservations.domain.seat import Seat, SeatStatus
+from app.reservations.domain.seat import Seat
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 
 class Seats(list[Seat]):

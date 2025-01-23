@@ -7,10 +7,10 @@ from freezegun import freeze_time
 from sqlmodel import Session
 
 from app.reservations.application.jobs.cancel_expired_reservations_job import cancel_expired_reservations_job
-from app.reservations.domain.seat import SeatStatus
 from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import SqlModelSeatBuilder
 from app.settings import Settings
 from app.shared.domain.value_objects.reservation_status import ReservationStatus
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 

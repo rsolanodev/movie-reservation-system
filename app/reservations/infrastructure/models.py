@@ -10,6 +10,7 @@ from app.reservations.domain.seat import Seat
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.domain.value_objects.reservation_status import ReservationStatus
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel
@@ -29,10 +30,20 @@ class SeatModel(SQLModel, table=True):
 
     @classmethod
     def from_domain(cls, seat: Seat) -> "SeatModel":
-        return cls(id=seat.id.to_uuid(), row=seat.row, number=seat.number, status=seat.status)
+        return cls(
+            id=seat.id.to_uuid(),
+            row=seat.row,
+            number=seat.number,
+            status=seat.status.value,
+        )
 
     def to_domain(self) -> Seat:
-        return Seat(id=Id.from_uuid(self.id), row=self.row, number=self.number, status=self.status)
+        return Seat(
+            id=Id.from_uuid(self.id),
+            row=self.row,
+            number=self.number,
+            status=SeatStatus(self.status),
+        )
 
 
 class ReservationModel(SQLModel, table=True):
@@ -53,7 +64,7 @@ class ReservationModel(SQLModel, table=True):
             id=reservation.id.to_uuid(),
             user_id=reservation.user_id.to_uuid(),
             showtime_id=reservation.showtime_id.to_uuid(),
-            status=reservation.status,
+            status=reservation.status.value,
             provider_payment_id=reservation.provider_payment_id,
             created_at=reservation.created_at.value,
         )
@@ -65,5 +76,5 @@ class ReservationModel(SQLModel, table=True):
             showtime_id=Id.from_uuid(self.showtime_id),
             status=ReservationStatus(self.status),
             created_at=DateTime.from_datetime(self.created_at),
-            seats=Seats([]),
+            seats=Seats(),
         )

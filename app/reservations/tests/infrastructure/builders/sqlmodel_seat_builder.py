@@ -3,8 +3,8 @@ from typing import Self
 
 from sqlmodel import Session
 
-from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import SeatModel
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 
 class SqlModelSeatBuilder:
