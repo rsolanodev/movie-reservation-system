@@ -5,6 +5,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from freezegun import freeze_time
 from sqlmodel import Session
 
 from app.reservations.application.commands.cancel_reservation import CancelReservationParams
@@ -20,9 +21,11 @@ from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import
 from app.shared.domain.payment_intent import PaymentIntent
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
+from app.shared.tests.infrastructure.builders.sqlmodel_showtime_builder import SqlModelShowtimeBuilder
 from app.users.infrastructure.models import UserModel
 
 
@@ -332,7 +335,42 @@ class TestCancelReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationFinder") as mock:
             yield mock.return_value
 
-    def test_returns_200_and_calls_cancel_reservation(
+    @pytest.mark.integration
+    @freeze_time("2025-01-22T21:00:00Z")
+    def test_integration(
+        self, session: Session, client: TestClient, user_token_headers: dict[str, str], user: UserModel
+    ) -> None:
+        showtime_model = (
+            SqlModelShowtimeBuilder(session)
+            .with_show_datetime(datetime(2025, 1, 22, 22, 0, tzinfo=timezone.utc))
+            .build()
+        )
+        reservation_model = (
+            SqlModelReservationBuilder(session)
+            .with_id(UUID("5661455d-de5a-47ba-b99f-f6d50fdfc00b"))
+            .with_user_id(user.id)
+            .with_showtime_id(showtime_model.id)
+            .confirmed()
+            .build()
+        )
+        seat_model = (
+            SqlModelSeatBuilder(session)
+            .with_row(1)
+            .with_number(2)
+            .occupied()
+            .with_reservation_id(reservation_model.id)
+            .build()
+        )
+
+        response = client.delete(
+            "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
+        )
+
+        assert response.status_code == 204
+        assert reservation_model.status == ReservationStatus.CANCELLED.value
+        assert seat_model.status == SeatStatus.AVAILABLE.value
+
+    def test_returns_204_and_calls_cancel_reservation(
         self,
         client: TestClient,
         mock_cancel_reservation: Mock,
