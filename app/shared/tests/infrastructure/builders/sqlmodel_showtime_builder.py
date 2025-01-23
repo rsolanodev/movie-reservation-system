@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Self
 
 from sqlmodel import Session
 
@@ -15,19 +16,19 @@ class SqlModelShowtimeBuilder:
         self.room_id: uuid.UUID = uuid.uuid4()
         self.show_datetime: datetime = datetime.now()
 
-    def with_id(self, id: uuid.UUID) -> "SqlModelShowtimeBuilder":
+    def with_id(self, id: uuid.UUID) -> Self:
         self.id = id
         return self
 
-    def with_movie_id(self, movie_id: uuid.UUID) -> "SqlModelShowtimeBuilder":
+    def with_movie_id(self, movie_id: uuid.UUID) -> Self:
         self.movie_id = movie_id
         return self
 
-    def with_room_id(self, room_id: uuid.UUID) -> "SqlModelShowtimeBuilder":
+    def with_room_id(self, room_id: uuid.UUID) -> Self:
         self.room_id = room_id
         return self
 
-    def with_show_datetime(self, show_datetime: datetime) -> "SqlModelShowtimeBuilder":
+    def with_show_datetime(self, show_datetime: datetime) -> Self:
         self.show_datetime = show_datetime
         return self
 

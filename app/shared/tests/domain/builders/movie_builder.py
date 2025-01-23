@@ -1,4 +1,5 @@
 import uuid
+from typing import Self
 
 from app.movies.domain.collections.movie_genres import MovieGenres
 from app.movies.domain.collections.movie_showtimes import MovieShowtimes
@@ -18,31 +19,31 @@ class MovieBuilder:
         self.genres: MovieGenres = MovieGenres([])
         self.showtimes: MovieShowtimes = MovieShowtimes([])
 
-    def with_id(self, id: Id) -> "MovieBuilder":
+    def with_id(self, id: Id) -> Self:
         self.id = id
         return self
 
-    def with_title(self, title: str) -> "MovieBuilder":
+    def with_title(self, title: str) -> Self:
         self.title = title
         return self
 
-    def with_description(self, description: str) -> "MovieBuilder":
+    def with_description(self, description: str) -> Self:
         self.description = description
         return self
 
-    def with_poster_image(self, poster_image: str) -> "MovieBuilder":
+    def with_poster_image(self, poster_image: str) -> Self:
         self.poster_image = poster_image
         return self
 
-    def without_poster_image(self) -> "MovieBuilder":
+    def without_poster_image(self) -> Self:
         self.poster_image = None
         return self
 
-    def with_genre(self, genre: Genre) -> "MovieBuilder":
+    def with_genre(self, genre: Genre) -> Self:
         self.genres.append(genre)
         return self
 
-    def with_showtime(self, showtime: MovieShowtime) -> "MovieBuilder":
+    def with_showtime(self, showtime: MovieShowtime) -> Self:
         self.showtimes.append(showtime)
         return self
 

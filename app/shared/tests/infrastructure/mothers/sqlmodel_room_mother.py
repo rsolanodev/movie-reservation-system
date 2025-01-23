@@ -1,3 +1,4 @@
+from typing import Self
 from uuid import UUID
 
 from sqlmodel import Session
@@ -14,7 +15,7 @@ class SqlModelRoomMother:
             seat_configuration=[{"row": 1, "number": 2}],
         )
 
-    def with_seat_configuration(self, seat_configuration: list[dict[str, int]]) -> "SqlModelRoomMother":
+    def with_seat_configuration(self, seat_configuration: list[dict[str, int]]) -> Self:
         self._room.seat_configuration = seat_configuration
         return self
 

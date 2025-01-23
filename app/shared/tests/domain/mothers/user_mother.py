@@ -1,3 +1,5 @@
+from typing import Self
+
 from app.shared.domain.user import User
 from app.shared.domain.value_objects.id import Id
 
@@ -13,7 +15,7 @@ class UserMother:
             is_superuser=False,
         )
 
-    def superuser(self) -> "UserMother":
+    def superuser(self) -> Self:
         self._user.is_superuser = True
         return self
 
