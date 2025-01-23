@@ -55,21 +55,16 @@ class TestCancelExpiredReservationsJob:
     def test_integration(self, mock_db_session: Session) -> None:
         reservation_model = (
             SqlModelReservationBuilder(mock_db_session)
-            .with_status(ReservationStatus.PENDING.value)
             .with_created_at(datetime(2025, 1, 10, 00, 19, 59))
+            .pending()
             .build()
         )
-        seat_model = (
-            SqlModelSeatBuilder(mock_db_session)
-            .with_status(SeatStatus.RESERVED)
-            .with_reservation_id(reservation_model.id)
-            .build()
-        )
+        seat_model = SqlModelSeatBuilder(mock_db_session).reserved().with_reservation_id(reservation_model.id).build()
 
         cancel_expired_reservations_job()
 
-        assert reservation_model.status == ReservationStatus.CANCELLED
-        assert seat_model.status == SeatStatus.AVAILABLE
+        assert reservation_model.status == ReservationStatus.CANCELLED.value
+        assert seat_model.status == SeatStatus.AVAILABLE.value
         assert seat_model.reservation_id is None
 
     def test_calls_cancel_expired_reservations(

@@ -14,7 +14,7 @@ class TestSqlModelReservationFinder:
             SqlModelReservationBuilder(session)
             .with_id(UUID("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"))
             .with_provider_payment_id("pi_3MtwBwLkdIwHu7ix28a3tqPa")
-            .with_status(ReservationStatus.PENDING.value)
+            .pending()
             .build()
         )
 

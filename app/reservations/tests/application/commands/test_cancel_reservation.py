@@ -9,7 +9,7 @@ from app.reservations.application.commands.cancel_reservation import CancelReser
 from app.reservations.domain.exceptions import CancellationNotAllowed, ReservationNotFound, UnauthorizedCancellation
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.reservation import CancellableReservation, ReservationStatus
+from app.reservations.domain.reservation import CancellableReservation
 from app.reservations.tests.domain.mothers.reservation_mother import ReservationMother
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -36,9 +36,7 @@ class TestCancelReservation:
         )
 
         mock_reservation_finder.find_cancellable_reservation.assert_called_once_with(reservation_id=reservation.id)
-        mock_reservation_repository.save.assert_called_once_with(
-            reservation=ReservationMother().with_status(ReservationStatus.CANCELLED.value).create()
-        )
+        mock_reservation_repository.save.assert_called_once_with(reservation=ReservationMother().cancelled().create())
 
     def test_raise_exception_when_reservation_not_found(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock

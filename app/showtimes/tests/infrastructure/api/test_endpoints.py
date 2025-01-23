@@ -9,14 +9,14 @@ from sqlmodel import Session, select
 
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-from app.shared.tests.factories.sqlmodel_room_factory_test import SqlModelRoomFactoryTest
 from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
+from app.shared.tests.infrastructure.mothers.sqlmodel_room_mother import SqlModelRoomMother
+from app.shared.tests.infrastructure.mothers.sqlmodel_showtime_mother import SqlModelShowtimeMother
 from app.showtimes.application.commands.create_showtime import CreateShowtimeParams
 from app.showtimes.domain.exceptions import ShowtimeAlreadyExists
 from app.showtimes.domain.seat import Seat, SeatStatus
 from app.showtimes.infrastructure.models import ShowtimeModel
-from app.showtimes.tests.factories.sqlmodel_seat_factory_test import SqlModelSeatFactoryTest
-from app.showtimes.tests.factories.sqlmodel_showtime_factory_test import SqlModelShowtimeFactoryTest
+from app.showtimes.tests.infrastructure.mothers.sqlmodel_seat_mother import SqlModelSeatMother
 
 
 class TestCreateShowtimeEndpoint:
@@ -32,9 +32,7 @@ class TestCreateShowtimeEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        SqlModelRoomFactoryTest(session=session).create(
-            id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"), name="Room 1", seat_configuration=[{"row": 1, "number": 2}]
-        )
+        SqlModelRoomMother(session).create()
 
         response = client.post(
             "api/v1/showtimes/",
@@ -48,8 +46,7 @@ class TestCreateShowtimeEndpoint:
 
         assert response.status_code == 201
 
-        showtime_model = session.exec(select(ShowtimeModel)).first()
-        assert showtime_model is not None
+        showtime_model = session.exec(select(ShowtimeModel)).one()
         assert showtime_model.movie_id == UUID("913822a0-750b-4cb6-b7b9-e01869d7d62d")
         assert showtime_model.room_id == UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600")
         assert showtime_model.show_datetime == datetime(2022, 8, 10, 22, 0, 0)
@@ -171,10 +168,7 @@ class TestDeleteShowtimeEndpoint:
 
     @pytest.mark.integration
     def test_integration(self, session: Session, client: TestClient, superuser_token_headers: dict[str, str]) -> None:
-        showtime_model = SqlModelShowtimeFactoryTest(session=session).create(
-            id=UUID("cbdd7b54-c561-4cbb-a55f-15853c60e600"),
-            show_datetime=datetime(2023, 4, 1, 20, 0, tzinfo=timezone.utc),
-        )
+        showtime_model = SqlModelShowtimeMother(session).create()
 
         response = client.delete(
             "api/v1/showtimes/cbdd7b54-c561-4cbb-a55f-15853c60e600/",
@@ -252,30 +246,37 @@ class TestListSeatsEndpoint:
             yield mock.return_value
 
     @pytest.mark.integration
-    @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])
+    @pytest.mark.parametrize(
+        "status", [SeatStatus.AVAILABLE.value, SeatStatus.RESERVED.value, SeatStatus.OCCUPIED.value]
+    )
     def test_integration(self, session: Session, client: TestClient, status: SeatStatus) -> None:
-        showtime_id = UUID("cbdd7b54-c561-4cbb-a55f-15853c60e601")
-
-        SqlModelMovieBuilder(session=session).with_id(id=UUID("ec725625-f502-4d39-9401-a415d8c1f964")).with_showtime(
-            id=showtime_id,
-            show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
-            room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
-        ).build()
-
-        seat_model_factory = SqlModelSeatFactoryTest(session=session)
-        seat_model_expected = seat_model_factory.create(showtime_id=showtime_id, row=1, number=2, status=status)
-        seat_model_factory.create(row=1, number=1)
+        showtime_id = UUID("39ce0103-fe6d-4bc4-a876-1556e9291bbe")
+        (
+            SqlModelMovieBuilder(session)
+            .with_id(UUID("ec725625-f502-4d39-9401-a415d8c1f964"))
+            .with_showtime(
+                id=showtime_id,
+                show_datetime=datetime(2023, 4, 3, 22, 0, tzinfo=timezone.utc),
+                room_id=UUID("fbdd7b54-c561-4cbb-a55f-15853c60e600"),
+            )
+            .build()
+        )
+        (
+            SqlModelSeatMother(session)
+            .with_id(UUID("7846b1f9-218e-4c67-bc65-0e870be65a07"))
+            .with_showtime_id(showtime_id)
+            .with_row(1)
+            .with_number(2)
+            .with_status(status)
+            .create()
+        )
+        SqlModelSeatMother(session).with_row(1).with_number(1).create()
 
         response = client.get(f"api/v1/showtimes/{showtime_id}/seats/")
 
         assert response.status_code == 200
         assert response.json() == [
-            {
-                "id": str(seat_model_expected.id),
-                "row": seat_model_expected.row,
-                "number": seat_model_expected.number,
-                "status": seat_model_expected.status,
-            }
+            {"id": "7846b1f9-218e-4c67-bc65-0e870be65a07", "row": 1, "number": 2, "status": status}
         ]
 
     @pytest.mark.parametrize("status", [SeatStatus.AVAILABLE, SeatStatus.RESERVED, SeatStatus.OCCUPIED])

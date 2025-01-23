@@ -22,5 +22,13 @@ class ReservationMother:
         self._reservation.status = status
         return self
 
+    def cancelled(self) -> "ReservationMother":
+        self._reservation.status = ReservationStatus.CANCELLED.value
+        return self
+
+    def with_created_at(self, created_at: DateTime) -> "ReservationMother":
+        self._reservation.created_at = created_at
+        return self
+
     def create(self) -> Reservation:
         return self._reservation

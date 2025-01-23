@@ -13,8 +13,8 @@ from app.movies.domain.finders.movie_finder import MovieFinder
 from app.movies.domain.genre import Genre
 from app.movies.domain.movie import Movie
 from app.movies.domain.movie_showtime import MovieShowtime
-from app.movies.tests.factories.genre_factory_test import GenreFactoryTest
-from app.movies.tests.factories.movie_showtime_factory_test import MovieShowtimeFactoryTest
+from app.movies.tests.domain.mothers.genre_mother import GenreMother
+from app.movies.tests.domain.mothers.movie_showtime_mother import MovieShowtimeMother
 from app.shared.domain.value_objects.date import Date
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
@@ -34,18 +34,8 @@ class TestFindMovie:
             .with_title("The Super Mario Bros. Movie")
             .with_description("An animated adaptation of the video game.")
             .with_poster_image("super_mario_bros.jpg")
-            .with_genre(
-                genre=GenreFactoryTest().create(
-                    id=Id("c8693e5a-ac9c-4560-9970-7ae4f22ddf0a"),
-                    name="Adventure",
-                )
-            )
-            .with_showtime(
-                showtime=MovieShowtimeFactoryTest().create(
-                    id=Id("d7c10c00-9598-4618-956a-ff3aa82dd33f"),
-                    show_datetime=DateTime.from_datetime(datetime(2023, 4, 3, 22, 0)),
-                )
-            )
+            .with_genre(GenreMother().create())
+            .with_showtime(MovieShowtimeMother().create())
             .build()
         )
 

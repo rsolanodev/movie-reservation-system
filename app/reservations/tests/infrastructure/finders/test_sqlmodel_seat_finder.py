@@ -16,7 +16,7 @@ class TestSqlModelSeatFinder:
             .with_id(UUID("0a157516-12cd-4633-af2c-ae8d74f7edce"))
             .with_row(1)
             .with_number(1)
-            .with_status(SeatStatus.AVAILABLE)
+            .available()
             .build()
         )
         seat_reserved = (
@@ -24,7 +24,7 @@ class TestSqlModelSeatFinder:
             .with_id(UUID("a0f28786-73e6-4234-b92d-1dd7bb39cde1"))
             .with_row(2)
             .with_number(2)
-            .with_status(SeatStatus.RESERVED)
+            .reserved()
             .build()
         )
         (
@@ -32,7 +32,7 @@ class TestSqlModelSeatFinder:
             .with_id(UUID("20d7416a-ab97-458b-a9a2-9552ed34cf0a"))
             .with_row(3)
             .with_number(3)
-            .with_status(SeatStatus.OCCUPIED)
+            .occupied()
             .build()
         )
 

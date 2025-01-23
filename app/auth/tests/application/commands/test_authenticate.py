@@ -14,7 +14,7 @@ from app.auth.domain.exceptions import (
 )
 from app.settings import Settings
 from app.shared.domain.finders.user_finder import UserFinder
-from app.shared.tests.factories.user_factory_test import UserFactoryTest
+from app.shared.tests.domain.mothers.user_mother import UserMother
 
 
 class TestAuthenticate:
@@ -24,7 +24,7 @@ class TestAuthenticate:
 
     @freeze_time("2021-08-01T12:00:00Z")
     def test_authenticate_user(self, mock_user_finder: Mock, settings: Settings) -> None:
-        mock_user_finder.find_user_by_email.return_value = UserFactoryTest().create()
+        mock_user_finder.find_user_by_email.return_value = UserMother().create()
 
         token = Authenticate(finder=mock_user_finder).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
@@ -35,7 +35,7 @@ class TestAuthenticate:
         assert decoded_token["exp"] == datetime(2021, 8, 9, 12, 0, 0, tzinfo=timezone.utc).timestamp()
 
     def test_does_not_authenticate_user_when_password_is_incorrect(self, mock_user_finder: Mock) -> None:
-        mock_user_finder.find_user_by_email.return_value = UserFactoryTest().create()
+        mock_user_finder.find_user_by_email.return_value = UserMother().create()
 
         with pytest.raises(IncorrectPassword):
             Authenticate(finder=mock_user_finder).execute(email="rubensoljim@gmail.com", password="Password!")
@@ -47,7 +47,7 @@ class TestAuthenticate:
             Authenticate(finder=mock_user_finder).execute(email="rubensoljim@gmail.com", password="Passw0rd!")
 
     def test_raises_exception_when_user_is_inactive(self, mock_user_finder: Mock) -> None:
-        user = UserFactoryTest().create()
+        user = UserMother().create()
         user.mark_as_inactive()
         mock_user_finder.find_user_by_email.return_value = user
 
