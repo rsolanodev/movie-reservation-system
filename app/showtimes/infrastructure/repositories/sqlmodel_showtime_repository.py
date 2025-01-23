@@ -2,9 +2,9 @@ from sqlmodel import select
 
 from app.reservations.infrastructure.models import SeatModel
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 from app.showtimes.domain.repositories.showtime_repository import ShowtimeRepository
-from app.showtimes.domain.seat import SeatStatus
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 
@@ -34,7 +34,7 @@ class SqlModelShowtimeRepository(ShowtimeRepository, SqlModelRepository):
                     showtime_id=showtime_model.id,
                     row=seat_config["row"],
                     number=seat_config["number"],
-                    status=SeatStatus.AVAILABLE,
+                    status=SeatStatus.AVAILABLE.value,
                 ),
             )
         self._session.add_all(seat_models)

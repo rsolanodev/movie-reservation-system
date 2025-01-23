@@ -1,13 +1,7 @@
 from dataclasses import dataclass
-from enum import StrEnum
 
 from app.shared.domain.value_objects.id import Id
-
-
-class SeatStatus(StrEnum):
-    AVAILABLE = "available"
-    RESERVED = "reserved"
-    OCCUPIED = "occupied"
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 
 @dataclass

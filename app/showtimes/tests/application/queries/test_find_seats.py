@@ -4,9 +4,10 @@ from unittest.mock import Mock, create_autospec
 import pytest
 
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.showtimes.application.queries.find_seats import FindSeats
 from app.showtimes.domain.finders.seat_finder import SeatFinder
-from app.showtimes.domain.seat import Seat, SeatStatus
+from app.showtimes.domain.seat import Seat
 
 
 class TestFindSeats:

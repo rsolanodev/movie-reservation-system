@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlmodel import Session
 
 from app.reservations.infrastructure.models import SeatModel
-from app.showtimes.domain.seat import SeatStatus
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 
 class SqlModelSeatMother:
@@ -25,8 +25,8 @@ class SqlModelSeatMother:
         self._seat_model.showtime_id = showtime_id
         return self
 
-    def with_status(self, status: str) -> "SqlModelSeatMother":
-        self._seat_model.status = status
+    def with_status(self, status: SeatStatus) -> "SqlModelSeatMother":
+        self._seat_model.status = status.value
         return self
 
     def occupied(self) -> "SqlModelSeatMother":

@@ -13,7 +13,7 @@ class ReservationBuilder:
         self.user_id: Id = Id.from_uuid(uuid.uuid4())
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
         self.status: ReservationStatus = ReservationStatus.PENDING
-        self.seats: Seats = Seats([])
+        self.seats: Seats = Seats()
         self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: DateTime = DateTime.now()
 

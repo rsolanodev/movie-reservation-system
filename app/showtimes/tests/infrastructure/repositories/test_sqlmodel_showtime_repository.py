@@ -5,9 +5,9 @@ from sqlmodel import Session
 
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 from app.shared.tests.infrastructure.mothers.sqlmodel_room_mother import SqlModelRoomMother
 from app.shared.tests.infrastructure.mothers.sqlmodel_showtime_mother import SqlModelShowtimeMother
-from app.showtimes.domain.seat import SeatStatus
 from app.showtimes.domain.showtime import Showtime
 from app.showtimes.infrastructure.models import ShowtimeModel
 from app.showtimes.infrastructure.repositories.sqlmodel_showtime_repository import SqlModelShowtimeRepository
@@ -58,11 +58,11 @@ class TestSqlModelShowtimeRepository:
 
         assert showtime_model.seats[0].row == 1
         assert showtime_model.seats[0].number == 2
-        assert showtime_model.seats[0].status == SeatStatus.AVAILABLE
+        assert showtime_model.seats[0].status == SeatStatus.AVAILABLE.value
 
         assert showtime_model.seats[1].row == 3
         assert showtime_model.seats[1].number == 4
-        assert showtime_model.seats[1].status == SeatStatus.AVAILABLE
+        assert showtime_model.seats[1].status == SeatStatus.AVAILABLE.value
 
     def test_deletes_showtime(self, session: Session) -> None:
         SqlModelShowtimeMother(session).create()

@@ -3,10 +3,11 @@ from uuid import UUID
 from sqlmodel import Session
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.seat import Seat, SeatStatus
+from app.reservations.domain.seat import Seat
 from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlModelSeatFinder
 from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import SqlModelSeatBuilder
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.seat_status import SeatStatus
 
 
 class TestSqlModelSeatFinder:
