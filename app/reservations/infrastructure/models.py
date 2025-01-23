@@ -76,5 +76,6 @@ class ReservationModel(SQLModel, table=True):
             showtime_id=Id.from_uuid(self.showtime_id),
             status=ReservationStatus(self.status),
             created_at=DateTime.from_datetime(self.created_at),
+            provider_payment_id=self.provider_payment_id,
             seats=Seats(),
         )

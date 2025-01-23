@@ -38,6 +38,7 @@ class TestSqlModelReservationFinder:
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
             status=ReservationStatus.PENDING,
             created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+            provider_payment_id="pi_3MtwBwLkdIwHu7ix28a3tqPa",
             seats=Seats(),
         )
 
@@ -64,6 +65,7 @@ class TestSqlModelReservationFinder:
                     showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
                     status=ReservationStatus.PENDING,
                     created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+                    provider_payment_id="pi_3MtwBwLkdIwHu7ix28a3tqPa",
                     seats=Seats(),
                 )
             ]
@@ -339,6 +341,7 @@ class TestSqlModelReservationFinder:
                 showtime_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
                 status=ReservationStatus.CONFIRMED,
                 created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
+                provider_payment_id="pi_3MtwBwLkdIwHu7ix28a3tqPa",
                 seats=Seats(),
             ),
             show_datetime=DateTime.from_datetime(datetime(2025, 1, 11, 19, 0, 0)),
