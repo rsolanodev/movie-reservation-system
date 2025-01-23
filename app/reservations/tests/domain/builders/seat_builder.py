@@ -1,4 +1,5 @@
 import uuid
+from typing import Self
 
 from app.reservations.domain.seat import Seat
 from app.shared.domain.value_objects.id import Id
@@ -12,15 +13,15 @@ class SeatBuilder:
         self.number: int = 1
         self.status: SeatStatus = SeatStatus.AVAILABLE
 
-    def with_id(self, id: Id) -> "SeatBuilder":
+    def with_id(self, id: Id) -> Self:
         self.id = id
         return self
 
-    def with_row(self, row: int) -> "SeatBuilder":
+    def with_row(self, row: int) -> Self:
         self.row = row
         return self
 
-    def with_number(self, number: int) -> "SeatBuilder":
+    def with_number(self, number: int) -> Self:
         self.number = number
         return self
 

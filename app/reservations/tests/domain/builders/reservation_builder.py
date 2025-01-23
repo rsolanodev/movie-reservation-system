@@ -1,4 +1,5 @@
 import uuid
+from typing import Self
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.reservation import Reservation
@@ -17,27 +18,27 @@ class ReservationBuilder:
         self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: DateTime = DateTime.now()
 
-    def with_id(self, id: Id) -> "ReservationBuilder":
+    def with_id(self, id: Id) -> Self:
         self.id = id
         return self
 
-    def with_user_id(self, user_id: Id) -> "ReservationBuilder":
+    def with_user_id(self, user_id: Id) -> Self:
         self.user_id = user_id
         return self
 
-    def with_showtime_id(self, showtime_id: Id) -> "ReservationBuilder":
+    def with_showtime_id(self, showtime_id: Id) -> Self:
         self.showtime_id = showtime_id
         return self
 
-    def with_seats(self, seats: Seats) -> "ReservationBuilder":
+    def with_seats(self, seats: Seats) -> Self:
         self.seats = seats
         return self
 
-    def with_created_at(self, created_at: DateTime) -> "ReservationBuilder":
+    def with_created_at(self, created_at: DateTime) -> Self:
         self.created_at = created_at
         return self
 
-    def with_provider_payment_id(self, provider_payment_id: str) -> "ReservationBuilder":
+    def with_provider_payment_id(self, provider_payment_id: str) -> Self:
         self.provider_payment_id = provider_payment_id
         return self
 

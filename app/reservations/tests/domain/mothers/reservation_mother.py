@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Self
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.reservation import Reservation
@@ -19,11 +20,11 @@ class ReservationMother:
             created_at=DateTime.from_datetime(datetime(2024, 12, 12, 22, 0)),
         )
 
-    def cancelled(self) -> "ReservationMother":
+    def cancelled(self) -> Self:
         self._reservation.status = ReservationStatus.CANCELLED
         return self
 
-    def with_created_at(self, created_at: DateTime) -> "ReservationMother":
+    def with_created_at(self, created_at: DateTime) -> Self:
         self._reservation.created_at = created_at
         return self
 
