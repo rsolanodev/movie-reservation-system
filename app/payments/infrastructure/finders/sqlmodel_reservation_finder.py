@@ -1,9 +1,10 @@
 from sqlmodel import select
 
 from app.payments.domain.finders.reservation_finder import ReservationFinder
-from app.payments.domain.reservation import Reservation, ReservationStatus
+from app.payments.domain.reservation import Reservation
 from app.reservations.infrastructure.models import ReservationModel
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.infrastructure.finders.sqlmodel_finder import SqlModelFinder
 
 

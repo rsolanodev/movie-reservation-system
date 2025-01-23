@@ -7,11 +7,12 @@ from sqlmodel import Session
 from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import CancellableReservation, Reservation, ReservationStatus
+from app.reservations.domain.reservation import CancellableReservation, Reservation
 from app.reservations.infrastructure.finders.sqlmodel_reservation_finder import SqlModelReservationFinder
 from app.reservations.tests.infrastructure.builders.sqlmodel_seat_builder import SqlModelSeatBuilder
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_movie_builder import SqlModelMovieBuilder
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
@@ -35,7 +36,7 @@ class TestSqlModelReservationFinder:
             id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
             user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
             showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
-            status=ReservationStatus.PENDING.value,
+            status=ReservationStatus.PENDING,
             created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
             seats=Seats(),
         )
@@ -61,7 +62,7 @@ class TestSqlModelReservationFinder:
                     id=Id("92ab35a6-ae79-4039-85b3-e8b2b8abb27d"),
                     user_id=Id("47d653d5-971e-42c3-86ab-2c7f40ef783a"),
                     showtime_id=Id("ffa502e6-8869-490c-8799-5bea26c7146d"),
-                    status=ReservationStatus.PENDING.value,
+                    status=ReservationStatus.PENDING,
                     created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
                     seats=Seats(),
                 )
@@ -336,7 +337,7 @@ class TestSqlModelReservationFinder:
                 id=Id("a41707bd-ae9c-43b8-bba5-8c4844e73e77"),
                 user_id=Id("bee0a37c-67bc-4038-a8fc-39e68ea1453a"),
                 showtime_id=Id("cbdd7b54-c561-4cbb-a55f-15853c60e601"),
-                status=ReservationStatus.CONFIRMED.value,
+                status=ReservationStatus.CONFIRMED,
                 created_at=DateTime.from_datetime(datetime(2025, 1, 10, 12, 0, 0)),
                 seats=Seats(),
             ),

@@ -23,9 +23,5 @@ class SeatBuilder:
         self.number = number
         return self
 
-    def with_status(self, status: SeatStatus) -> "SeatBuilder":
-        self.status = status
-        return self
-
     def build(self) -> Seat:
         return Seat(id=self.id, row=self.row, number=self.number, status=self.status)

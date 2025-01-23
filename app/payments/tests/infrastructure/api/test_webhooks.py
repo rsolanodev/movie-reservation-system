@@ -8,8 +8,8 @@ from sqlmodel import Session
 
 from app.payments.application.commands.confirm_payment import ConfirmPaymentParams
 from app.payments.domain.exceptions import InvalidSignature, ReservationNotFound
-from app.payments.domain.reservation import ReservationStatus
 from app.shared.domain.payment_event import PaymentEvent
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 

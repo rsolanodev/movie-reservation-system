@@ -1,9 +1,10 @@
 import uuid
 
 from app.reservations.domain.collections.seats import Seats
-from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.domain.reservation import Reservation
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 class ReservationBuilder:
@@ -11,7 +12,7 @@ class ReservationBuilder:
         self.id: Id = Id.from_uuid(uuid.uuid4())
         self.user_id: Id = Id.from_uuid(uuid.uuid4())
         self.showtime_id: Id = Id.from_uuid(uuid.uuid4())
-        self.status: str = ReservationStatus.PENDING
+        self.status: ReservationStatus = ReservationStatus.PENDING
         self.seats: Seats = Seats([])
         self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: DateTime = DateTime.now()
@@ -30,10 +31,6 @@ class ReservationBuilder:
 
     def with_seats(self, seats: Seats) -> "ReservationBuilder":
         self.seats = seats
-        return self
-
-    def with_status(self, status: ReservationStatus) -> "ReservationBuilder":
-        self.status = status
         return self
 
     def with_created_at(self, created_at: DateTime) -> "ReservationBuilder":

@@ -4,10 +4,11 @@ from sqlmodel import select
 from app.reservations.domain.collections.reservations import Reservations
 from app.reservations.domain.finders.reservation_finder import ReservationFinder
 from app.reservations.domain.movie_show_reservation import Movie, MovieShowReservation, SeatLocation
-from app.reservations.domain.reservation import CancellableReservation, Reservation, ReservationStatus
+from app.reservations.domain.reservation import CancellableReservation, Reservation
 from app.reservations.infrastructure.models import ReservationModel
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.infrastructure.finders.sqlmodel_finder import SqlModelFinder
 from app.showtimes.infrastructure.models import ShowtimeModel
 
@@ -19,7 +20,7 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
 
     def find_pending(self) -> Reservations:
         reservation_models = self._session.exec(
-            select(ReservationModel).where(ReservationModel.status == ReservationStatus.PENDING)
+            select(ReservationModel).where(ReservationModel.status == ReservationStatus.PENDING.value)
         ).all()
         return Reservations([reservation_model.to_domain() for reservation_model in reservation_models])
 
@@ -32,7 +33,7 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
             )
             .where(
                 ReservationModel.user_id == user_id.to_uuid(),
-                ReservationModel.status == ReservationStatus.CONFIRMED,
+                ReservationModel.status == ReservationStatus.CONFIRMED.value,
             )
         ).all()
         return self._sort_movie_show_reservations(
