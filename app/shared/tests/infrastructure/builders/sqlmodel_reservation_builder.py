@@ -5,6 +5,7 @@ from typing import Self
 from sqlmodel import Session
 
 from app.reservations.infrastructure.models import ReservationModel
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 class SqlModelReservationBuilder:
@@ -14,7 +15,7 @@ class SqlModelReservationBuilder:
         self.id: uuid.UUID = uuid.uuid4()
         self.user_id: uuid.UUID = uuid.uuid4()
         self.showtime_id: uuid.UUID = uuid.uuid4()
-        self.status: str = "pending"
+        self.status: str = ReservationStatus.PENDING.value
         self.provider_payment_id: str = "pi_3MtwBwLkdIwHu7ix28a3tqPa"
         self.created_at: datetime = datetime.now()
 
@@ -30,24 +31,20 @@ class SqlModelReservationBuilder:
         self.showtime_id = showtime_id
         return self
 
-    def with_status(self, status: str) -> Self:
-        self.status = status
-        return self
-
     def pending(self) -> Self:
-        self.status = "pending"
+        self.status = ReservationStatus.PENDING.value
         return self
 
     def confirmed(self) -> Self:
-        self.status = "confirmed"
+        self.status = ReservationStatus.CONFIRMED.value
         return self
 
     def cancelled(self) -> Self:
-        self.status = "cancelled"
+        self.status = ReservationStatus.CANCELLED.value
         return self
 
     def refunded(self) -> Self:
-        self.status = "refunded"
+        self.status = ReservationStatus.REFUNDED.value
         return self
 
     def with_provider_payment_id(self, provider_payment_id: str) -> Self:

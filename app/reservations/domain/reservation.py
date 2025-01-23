@@ -1,18 +1,11 @@
 import uuid
 from dataclasses import dataclass
-from enum import StrEnum
 
 from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.exceptions import CancellationNotAllowed, UnauthorizedCancellation
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
-
-
-class ReservationStatus(StrEnum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    CANCELLED = "cancelled"
-    REFUNDED = "refunded"
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 @dataclass
@@ -20,7 +13,7 @@ class Reservation:
     id: Id
     user_id: Id
     showtime_id: Id
-    status: str
+    status: ReservationStatus
     seats: Seats
     created_at: DateTime
 
@@ -41,7 +34,7 @@ class Reservation:
         self.seats.extend(seats)
 
     def is_confirmed(self) -> bool:
-        return self.status == ReservationStatus.CONFIRMED
+        return self.status.is_confirmed()
 
     def cancel(self) -> None:
         self.status = ReservationStatus.CANCELLED

@@ -9,6 +9,7 @@ from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 if TYPE_CHECKING:
     from app.showtimes.infrastructure.models import ShowtimeModel
@@ -62,7 +63,7 @@ class ReservationModel(SQLModel, table=True):
             id=Id.from_uuid(self.id),
             user_id=Id.from_uuid(self.user_id),
             showtime_id=Id.from_uuid(self.showtime_id),
-            status=self.status,
+            status=ReservationStatus(self.status),
             created_at=DateTime.from_datetime(self.created_at),
             seats=Seats([]),
         )

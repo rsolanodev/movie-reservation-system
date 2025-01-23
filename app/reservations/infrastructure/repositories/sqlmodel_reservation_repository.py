@@ -1,10 +1,11 @@
 from sqlmodel import update
 
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import SeatStatus
 from app.reservations.infrastructure.models import ReservationModel, SeatModel
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.infrastructure.repositories.sqlmodel_repository import SqlModelRepository
 
 
@@ -39,12 +40,12 @@ class SqlModelReservationRepository(ReservationRepository, SqlModelRepository):
         self._session.exec(
             update(ReservationModel)
             .where(ReservationModel.id.in_(reversation_model_ids))  # type: ignore
-            .values(status=ReservationStatus.CANCELLED)
+            .values(status=ReservationStatus.CANCELLED.value)
         )
         self._session.exec(
             update(SeatModel)
             .where(SeatModel.reservation_id.in_(reversation_model_ids))  # type: ignore
-            .values(status=SeatStatus.AVAILABLE, reservation_id=None)
+            .values(status=SeatStatus.AVAILABLE.value, reservation_id=None)
         )
         self._session.commit()
 

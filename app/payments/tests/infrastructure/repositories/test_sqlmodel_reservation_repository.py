@@ -1,8 +1,9 @@
 from sqlmodel import Session
 
-from app.payments.domain.reservation import Reservation, ReservationStatus
+from app.payments.domain.reservation import Reservation
 from app.payments.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 from app.shared.tests.infrastructure.builders.sqlmodel_reservation_builder import SqlModelReservationBuilder
 
 

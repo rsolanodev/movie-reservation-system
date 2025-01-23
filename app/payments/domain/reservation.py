@@ -1,12 +1,7 @@
 from dataclasses import dataclass
-from enum import StrEnum
 
 from app.shared.domain.value_objects.id import Id
-
-
-class ReservationStatus(StrEnum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 @dataclass

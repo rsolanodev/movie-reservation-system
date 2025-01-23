@@ -7,10 +7,11 @@ from app.payments.application.commands.confirm_payment import ConfirmPayment, Co
 from app.payments.domain.exceptions import ReservationNotFound
 from app.payments.domain.finders.reservation_finder import ReservationFinder
 from app.payments.domain.repositories.reservation_repository import ReservationRepository
-from app.payments.domain.reservation import Reservation, ReservationStatus
+from app.payments.domain.reservation import Reservation
 from app.shared.domain.clients.payment_client import PaymentClient
 from app.shared.domain.payment_event import PaymentEvent
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 class TestConfirmPayment:

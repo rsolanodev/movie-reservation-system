@@ -30,10 +30,6 @@ class SqlModelSeatBuilder:
         self.number = number
         return self
 
-    def with_status(self, status: str) -> Self:
-        self.status = status
-        return self
-
     def available(self) -> Self:
         self.status = SeatStatus.AVAILABLE.value
         return self

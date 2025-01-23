@@ -11,13 +11,14 @@ from app.reservations.domain.collections.seats import Seats
 from app.reservations.domain.exceptions import SeatsNotAvailable
 from app.reservations.domain.finders.seat_finder import SeatFinder
 from app.reservations.domain.repositories.reservation_repository import ReservationRepository
-from app.reservations.domain.reservation import Reservation, ReservationStatus
+from app.reservations.domain.reservation import Reservation
 from app.reservations.domain.seat import Seat, SeatStatus
 from app.settings import Settings
 from app.shared.domain.clients.payment_client import PaymentClient
 from app.shared.domain.payment_intent import PaymentIntent
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
+from app.shared.domain.value_objects.reservation_status import ReservationStatus
 
 
 @freeze_time("2025-01-10T12:00:00Z")
