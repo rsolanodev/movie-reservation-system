@@ -15,18 +15,20 @@ class Reservation:
     showtime_id: Id
     status: ReservationStatus
     seats: Seats
+    provider_payment_id: str | None
     created_at: DateTime
 
-    provider_payment_id: str | None = None
-
     @classmethod
-    def create(cls, user_id: Id, showtime_id: Id, seats: Seats | None = None) -> "Reservation":
+    def create(
+        cls, user_id: Id, showtime_id: Id, provider_payment_id: str, seats: Seats | None = None
+    ) -> "Reservation":
         return cls(
             id=Id.from_uuid(uuid.uuid4()),
             user_id=user_id,
             showtime_id=showtime_id,
             status=ReservationStatus.PENDING,
-            seats=seats or Seats([]),
+            seats=seats or Seats(),
+            provider_payment_id=provider_payment_id,
             created_at=DateTime.now(),
         )
 
@@ -38,9 +40,6 @@ class Reservation:
 
     def cancel(self) -> None:
         self.status = ReservationStatus.CANCELLED
-
-    def assign_payment_id(self, provider_payment_id: str) -> None:
-        self.provider_payment_id = provider_payment_id
 
 
 @dataclass
