@@ -2,7 +2,9 @@ import uuid
 from dataclasses import dataclass
 
 from app.reservations.domain.collections.seats import Seats
+from app.reservations.domain.events import ReservationCancelled
 from app.reservations.domain.exceptions import CancellationNotAllowed, UnauthorizedCancellation
+from app.shared.domain.events.aggregate_root import AggregateRoot
 from app.shared.domain.value_objects.date_time import DateTime
 from app.shared.domain.value_objects.id import Id
 from app.shared.domain.value_objects.reservation_status import ReservationStatus
@@ -37,9 +39,13 @@ class Reservation:
 
 
 @dataclass
-class CancellableReservation:
+class CancellableReservation(AggregateRoot):
     reservation: Reservation
     show_datetime: DateTime
+
+    @property
+    def reservation_id(self) -> Id:
+        return self.reservation.id
 
     @property
     def user_id(self) -> Id:
@@ -53,3 +59,4 @@ class CancellableReservation:
             raise CancellationNotAllowed()
 
         self.reservation.cancel()
+        self.record(ReservationCancelled(reservation_id=self.reservation_id))

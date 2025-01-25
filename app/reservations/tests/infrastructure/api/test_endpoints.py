@@ -335,10 +335,20 @@ class TestCancelReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationFinder") as mock:
             yield mock.return_value
 
+    @pytest.fixture
+    def mock_event_bus(self) -> Generator[Mock, None, None]:
+        with patch("app.reservations.infrastructure.api.endpoints.RabbitMQEventBus") as mock:
+            yield mock.return_value
+
     @pytest.mark.integration
     @freeze_time("2025-01-22T21:00:00Z")
     def test_integration(
-        self, session: Session, client: TestClient, user_token_headers: dict[str, str], user: UserModel
+        self,
+        session: Session,
+        client: TestClient,
+        user_token_headers: dict[str, str],
+        user: UserModel,
+        mock_event_bus: Mock,
     ) -> None:
         showtime_model = (
             SqlModelShowtimeBuilder(session)
@@ -366,6 +376,8 @@ class TestCancelReservationEndpoint:
             "api/v1/reservations/5661455d-de5a-47ba-b99f-f6d50fdfc00b/", headers=user_token_headers
         )
 
+        mock_event_bus.publish.assert_called_once()
+
         assert response.status_code == 204
         assert reservation_model.status == ReservationStatus.CANCELLED.value
         assert seat_model.status == SeatStatus.AVAILABLE.value
@@ -376,6 +388,7 @@ class TestCancelReservationEndpoint:
         mock_cancel_reservation: Mock,
         mock_reservation_repository: Mock,
         mock_reservation_finder: Mock,
+        mock_event_bus: Mock,
         user_token_headers: dict[str, str],
         user: UserModel,
     ) -> None:
@@ -384,7 +397,7 @@ class TestCancelReservationEndpoint:
         )
 
         mock_cancel_reservation.assert_called_once_with(
-            finder=mock_reservation_finder, repository=mock_reservation_repository
+            finder=mock_reservation_finder, repository=mock_reservation_repository, event_bus=mock_event_bus
         )
         mock_cancel_reservation.return_value.execute.assert_called_once_with(
             params=CancelReservationParams(

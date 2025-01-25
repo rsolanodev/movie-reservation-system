@@ -17,6 +17,8 @@ from app.reservations.infrastructure.finders.sqlmodel_seat_finder import SqlMode
 from app.reservations.infrastructure.repositories.sqlmodel_reservation_repository import SqlModelReservationRepository
 from app.shared.domain.value_objects.id import Id
 from app.shared.infrastructure.clients.stripe_client import StripeClient
+from app.shared.infrastructure.events.rabbitmq_configurer import RabbitMQConfigurer
+from app.shared.infrastructure.events.rabbitmq_event_bus import RabbitMQEventBus
 
 router = APIRouter()
 
@@ -56,6 +58,7 @@ def cancel_reservation(session: SessionDep, reservation_id: str, current_user: C
         CancelReservation(
             finder=SqlModelReservationFinder(session=session),
             repository=SqlModelReservationRepository(session=session),
+            event_bus=RabbitMQEventBus(configurer=RabbitMQConfigurer()),
         ).execute(
             params=CancelReservationParams(
                 reservation_id=Id(reservation_id),
