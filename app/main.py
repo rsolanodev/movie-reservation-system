@@ -9,7 +9,6 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 from app.reservations.application.jobs.cancel_expired_reservations_job import cancel_expired_reservations_job
-from app.reservations.application.subscribers.refund_when_reservation_cancelled import RefundWhenReservationCancelled
 from app.settings import get_settings
 from app.shared.infrastructure.events.rabbitmq_configurer_factory import RabbitMQConfigurerFactory
 
@@ -24,7 +23,6 @@ def setup_jobs_scheduler() -> None:
 
 def setup_event_subscribers() -> None:
     configurer = RabbitMQConfigurerFactory.create()
-    configurer.add_subscriber(RefundWhenReservationCancelled)
     configurer.start()
 
 
