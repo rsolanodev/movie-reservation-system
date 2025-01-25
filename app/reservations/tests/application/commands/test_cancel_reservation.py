@@ -47,7 +47,7 @@ class TestCancelReservation:
         mock_reservation_repository.release.assert_called_once_with(
             reservation=ReservationMother().cancelled().create()
         )
-        mock_event_bus.publish.assert_called_once_with([ReservationCancelled(reservation_id=reservation.id)])
+        mock_event_bus.publish.assert_called_once_with([ReservationCancelled(reservation_id=reservation.id.value)])
 
     def test_raise_exception_when_reservation_not_found(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock, mock_event_bus: Mock

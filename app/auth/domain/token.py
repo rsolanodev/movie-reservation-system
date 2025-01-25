@@ -27,7 +27,7 @@ class Token:
     ) -> "Token":
         expire_date = datetime.now(tz=timezone.utc) + timedelta(minutes=expire_minutes)
         access_token = jwt.encode(
-            payload={"exp": expire_date, "sub": user_id},
+            payload={"exp": expire_date, "sub": user_id.value},
             key=secret_key,
             algorithm="HS256",
         )

@@ -11,7 +11,7 @@ class GenreResponse(SQLModel):
 
     @classmethod
     def from_domain(cls, genre: Genre) -> "GenreResponse":
-        return cls(id=genre.id, name=genre.name)
+        return cls(id=genre.id.value, name=genre.name)
 
     @classmethod
     def from_domain_list(cls, genres: list[Genre]) -> list["GenreResponse"]:
@@ -24,7 +24,7 @@ class MovieShowtimeResponse(SQLModel):
 
     @classmethod
     def from_domain(cls, showtime: MovieShowtime) -> "MovieShowtimeResponse":
-        return cls(id=showtime.id, show_datetime=showtime.show_datetime.to_string())
+        return cls(id=showtime.id.value, show_datetime=showtime.show_datetime.to_string())
 
     @classmethod
     def from_domain_list(cls, showtimes: list[MovieShowtime]) -> list["MovieShowtimeResponse"]:
@@ -39,7 +39,7 @@ class MovieResponse(SQLModel):
 
     @classmethod
     def from_domain(cls, movie: Movie) -> "MovieResponse":
-        return cls(id=movie.id, title=movie.title, description=movie.description, poster_image=movie.poster_image)
+        return cls(id=movie.id.value, title=movie.title, description=movie.description, poster_image=movie.poster_image)
 
 
 class MovieExtendedResponse(MovieResponse):
@@ -49,7 +49,7 @@ class MovieExtendedResponse(MovieResponse):
     @classmethod
     def from_domain(cls, movie: Movie) -> "MovieExtendedResponse":
         return cls(
-            id=movie.id,
+            id=movie.id.value,
             title=movie.title,
             description=movie.description,
             poster_image=movie.poster_image,

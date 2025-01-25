@@ -59,4 +59,4 @@ class CancellableReservation(AggregateRoot):
             raise CancellationNotAllowed()
 
         self.reservation.cancel()
-        self.record(ReservationCancelled(reservation_id=self.reservation_id))
+        self.record(ReservationCancelled(reservation_id=self.reservation_id.value))

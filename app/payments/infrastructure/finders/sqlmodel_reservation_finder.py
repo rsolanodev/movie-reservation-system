@@ -17,6 +17,6 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
 
     def _build_reservation(self, reservation_model: ReservationModel) -> Reservation:
         return Reservation(
-            id=Id(reservation_model.id),
+            id=Id.from_uuid(reservation_model.id),
             status=ReservationStatus(reservation_model.status),
         )

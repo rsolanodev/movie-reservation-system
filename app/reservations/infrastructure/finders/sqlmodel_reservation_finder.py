@@ -42,10 +42,10 @@ class SqlModelReservationFinder(ReservationFinder, SqlModelFinder):
 
     def _build_movie_show_reservation(self, reservation_model: ReservationModel) -> MovieShowReservation:
         return MovieShowReservation(
-            reservation_id=Id(reservation_model.id),
+            reservation_id=Id.from_uuid(reservation_model.id),
             show_datetime=DateTime.from_datetime(reservation_model.showtime.show_datetime),
             movie=Movie(
-                id=Id(reservation_model.showtime.movie_id),
+                id=Id.from_uuid(reservation_model.showtime.movie_id),
                 title=reservation_model.showtime.movie.title,
                 poster_image=reservation_model.showtime.movie.poster_image,
             ),
