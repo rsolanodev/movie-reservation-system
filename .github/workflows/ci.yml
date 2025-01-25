@@ -18,9 +18,7 @@ jobs:
       POSTGRES_DB: app
       SECRET_KEY: secretkey
       ENVIRONMENT: local
-      BACKEND_CORS_ORIGINS: "http://localhost,https://localhost"
       POSTGRES_PORT: 5432
-      REDIS_URL: redis://redis:6379/0
 
     steps:
       - name: Checkout repository
@@ -38,9 +36,7 @@ jobs:
           echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> .env
           echo "SECRET_KEY=${{ env.SECRET_KEY }}" >> .env
           echo "ENVIRONMENT=${{ env.ENVIRONMENT }}" >> .env
-          echo "BACKEND_CORS_ORIGINS=${{ env.BACKEND_CORS_ORIGINS }}" >> .env
           echo "POSTGRES_PORT=${{ env.POSTGRES_PORT }}" >> .env
-          echo "REDIS_URL=${{ env.REDIS_URL }}" >> .env
 
       - name: Build and start services
         run: |
