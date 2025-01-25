@@ -588,9 +588,9 @@ class TestListGenresEndpoint:
 
         assert response.status_code == 200
         assert response.json() == [
-            {"id": str(action_genre.id), "name": "Action"},
-            {"id": str(adventure_genre.id), "name": "Adventure"},
-            {"id": str(comedy_genre.id), "name": "Comedy"},
+            {"id": action_genre.id.value, "name": "Action"},
+            {"id": adventure_genre.id.value, "name": "Adventure"},
+            {"id": comedy_genre.id.value, "name": "Comedy"},
         ]
 
 

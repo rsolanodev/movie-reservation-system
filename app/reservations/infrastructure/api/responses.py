@@ -11,7 +11,7 @@ class MovieResponse(SQLModel):
 
     @classmethod
     def from_domain(cls, movie: Movie) -> "MovieResponse":
-        return cls(id=movie.id, title=movie.title, poster_image=movie.poster_image)
+        return cls(id=movie.id.value, title=movie.title, poster_image=movie.poster_image)
 
 
 class SeatResponse(SQLModel):
@@ -32,7 +32,7 @@ class ReservationResponse(SQLModel):
     @classmethod
     def from_domain(cls, reservation: MovieShowReservation) -> "ReservationResponse":
         return cls(
-            reservation_id=reservation.reservation_id,
+            reservation_id=reservation.reservation_id.value,
             show_datetime=reservation.show_datetime.to_string(),
             movie=MovieResponse.from_domain(reservation.movie),
             seats=[SeatResponse.from_domain(seat) for seat in reservation.seats],
