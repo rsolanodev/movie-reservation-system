@@ -35,6 +35,12 @@ services:
       - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls.certresolver=le
       - traefik.http.services.${STACK_NAME?Variable not set}-adminer.loadbalancer.server.port=8080
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   backend:
     restart: always
     command: /start
@@ -43,6 +49,7 @@ services:
       - default
     depends_on:
       - db
+      - rabbitmq
     env_file:
       - .env
     environment:
