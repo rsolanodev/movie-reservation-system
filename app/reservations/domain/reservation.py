@@ -51,6 +51,10 @@ class CancellableReservation(AggregateRoot):
     def user_id(self) -> Id:
         return self.reservation.user_id
 
+    @property
+    def provider_payment_id(self) -> str | None:
+        return self.reservation.provider_payment_id
+
     def cancel_by_owner(self, user_id: Id) -> None:
         if self.user_id != user_id:
             raise UnauthorizedCancellation()
@@ -59,4 +63,9 @@ class CancellableReservation(AggregateRoot):
             raise CancellationNotAllowed()
 
         self.reservation.cancel()
-        self.record(ReservationCancelled(reservation_id=self.reservation_id.value))
+        self.record(
+            ReservationCancelled(
+                reservation_id=self.reservation_id.value,
+                provider_payment_id=self.provider_payment_id,
+            )
+        )
