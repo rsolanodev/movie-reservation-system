@@ -32,7 +32,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "80:8888"
+      - "80:8000"
     depends_on:
       - db
       - rabbitmq
