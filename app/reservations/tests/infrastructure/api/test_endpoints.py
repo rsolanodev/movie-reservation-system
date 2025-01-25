@@ -335,7 +335,7 @@ class TestCancelReservationEndpoint:
         with patch("app.reservations.infrastructure.api.endpoints.SqlModelReservationFinder") as mock:
             yield mock.return_value
 
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def mock_event_bus(self) -> Generator[Mock, None, None]:
         with patch("app.reservations.infrastructure.api.endpoints.RabbitMQEventBus") as mock:
             yield mock.return_value
