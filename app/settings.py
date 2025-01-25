@@ -1,18 +1,10 @@
 import secrets
 from functools import lru_cache
-from typing import Annotated, Any, Literal
+from typing import Literal
 
-from pydantic import AnyUrl, BeforeValidator, computed_field
+from pydantic import computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-def parse_cors(v: Any) -> list[str] | str:
-    if isinstance(v, str) and not v.startswith("["):
-        return [i.strip() for i in v.split(",")]
-    elif isinstance(v, list | str):
-        return v
-    raise ValueError(v)
 
 
 class Settings(BaseSettings):
@@ -24,7 +16,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
-    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
 
     RESERVATION_EXPIRATION_MINUTES: int = 30
     GENERAL_ADMISSION_PRICE: float = 10.0
@@ -48,7 +39,6 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
-    REDIS_URL: str = "redis://redis:6379/0"
 
     @computed_field  # type: ignore[prop-decorator]
     @property
