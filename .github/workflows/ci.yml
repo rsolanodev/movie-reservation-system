@@ -19,6 +19,7 @@ jobs:
       SECRET_KEY: secretkey
       ENVIRONMENT: local
       POSTGRES_PORT: 5432
+      INSTALL_DEV: true
 
     steps:
       - name: Checkout repository
