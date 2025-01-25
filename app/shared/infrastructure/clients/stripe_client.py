@@ -1,9 +1,10 @@
 import stripe
-from stripe import SignatureVerificationError
+from stripe import SignatureVerificationError, StripeError
 
 from app.payments.domain.exceptions import InvalidSignature
 from app.settings import get_settings
 from app.shared.domain.clients.payment_client import PaymentClient
+from app.shared.domain.exceptions import RefundError
 from app.shared.domain.payment_event import PaymentEvent
 from app.shared.domain.payment_intent import PaymentIntent
 
@@ -35,3 +36,9 @@ class StripeClient(PaymentClient):
             return PaymentEvent(type=event.type, payment_intent_id=event.data.object["id"])
         except SignatureVerificationError:
             raise InvalidSignature()
+
+    def refund_payment(self, payment_id: str) -> None:
+        try:
+            self._provider.Refund.create(payment_intent=payment_id)
+        except StripeError:
+            raise RefundError()

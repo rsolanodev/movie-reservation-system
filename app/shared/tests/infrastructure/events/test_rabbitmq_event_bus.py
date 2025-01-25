@@ -27,12 +27,19 @@ class TestRabbitMQEventBus:
         mock_channel.basic_publish.assert_not_called()
 
     def test_publishes_reservation_cancelled_event(self, mock_configurer: Mock, mock_channel: Mock) -> None:
-        event = ReservationCancelled(reservation_id="a41707bd-ae9c-43b8-bba5-8c4844e73e77")
+        event = ReservationCancelled(
+            reservation_id="a41707bd-ae9c-43b8-bba5-8c4844e73e77", provider_payment_id="pi_3MtwBwLkdIwHu7ix28a3tqPa"
+        )
 
         RabbitMQEventBus(mock_configurer).publish([event])
 
         mock_channel.basic_publish.assert_called_once_with(
             exchange=mock_configurer.exchange_name,
             routing_key="reservation.cancelled",
-            body=json.dumps({"reservation_id": "a41707bd-ae9c-43b8-bba5-8c4844e73e77"}),
+            body=json.dumps(
+                {
+                    "reservation_id": "a41707bd-ae9c-43b8-bba5-8c4844e73e77",
+                    "provider_payment_id": "pi_3MtwBwLkdIwHu7ix28a3tqPa",
+                }
+            ),
         )

@@ -31,7 +31,7 @@ class TestCancelReservation:
     def mock_event_bus(self) -> Any:
         return create_autospec(spec=EventBus, instance=True, spec_set=True)
 
-    def test_cancel_reservation(
+    def test_cancels_reservation(
         self, mock_reservation_repository: Mock, mock_reservation_finder: Mock, mock_event_bus: Mock
     ) -> None:
         reservation = ReservationMother().create()
@@ -47,7 +47,14 @@ class TestCancelReservation:
         mock_reservation_repository.release.assert_called_once_with(
             reservation=ReservationMother().cancelled().create()
         )
-        mock_event_bus.publish.assert_called_once_with([ReservationCancelled(reservation_id=reservation.id.value)])
+        mock_event_bus.publish.assert_called_once_with(
+            [
+                ReservationCancelled(
+                    reservation_id=reservation.id.value,
+                    provider_payment_id="pi_3MtwBwLkdIwHu7ix28a3tqPa",
+                )
+            ]
+        )
 
     def test_raise_exception_when_reservation_not_found(
         self, mock_reservation_finder: Mock, mock_reservation_repository: Mock, mock_event_bus: Mock
