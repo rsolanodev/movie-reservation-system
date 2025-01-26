@@ -11,8 +11,17 @@ from app.reservations.domain.events import ReservationCancelled
 class TestRefundWhenReservationCancelled:
     @pytest.fixture
     def mock_refund_payment(self) -> Generator[Mock, None, None]:
-        with patch("app.payments.application.subscribers.refund_when_reservation_cancelled.RefundPayment") as mock:
+        with patch(
+            "app.payments.application.subscribers.refund_when_reservation_cancelled.RefundPayment", autospec=True
+        ) as mock:
             yield mock
+
+    @pytest.fixture
+    def mock_reservation_repository(self) -> Generator[Mock, None, None]:
+        with patch(
+            "app.payments.application.subscribers.refund_when_reservation_cancelled.SqlModelReservationRepository"
+        ) as mock:
+            yield mock.return_value
 
     @pytest.fixture
     def mock_stripe_client(self) -> Generator[Mock, None, None]:
@@ -24,12 +33,16 @@ class TestRefundWhenReservationCancelled:
         assert subscriber.event_class == ReservationCancelled
         assert subscriber.action == "refund"
 
-    def test_calls_refund_payment(self, mock_refund_payment: Mock, mock_stripe_client: Mock) -> None:
+    def test_calls_refund_payment(
+        self, mock_refund_payment: Mock, mock_stripe_client: Mock, mock_reservation_repository: Mock
+    ) -> None:
         RefundWhenReservationCancelled().on(
             ReservationCancelled(reservation_id="test_reservation_id", provider_payment_id="test_payment_id")
         )
 
-        mock_refund_payment.assert_called_once_with(payment_client=mock_stripe_client)
+        mock_refund_payment.assert_called_once_with(
+            payment_client=mock_stripe_client, reservation_repository=mock_reservation_repository
+        )
         mock_refund_payment.return_value.execute.assert_called_once_with(
             RefundPaymentParams(reservation_id="test_reservation_id", provider_payment_id="test_payment_id")
         )
