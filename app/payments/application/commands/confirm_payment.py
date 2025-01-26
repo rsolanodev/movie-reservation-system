@@ -19,20 +19,20 @@ class ConfirmPayment:
         reservation_repository: ReservationRepository,
         payment_client: PaymentClient,
     ):
-        self.reservation_finder = reservation_finder
-        self.reservation_repository = reservation_repository
-        self.payment_client = payment_client
+        self._reservation_finder = reservation_finder
+        self._reservation_repository = reservation_repository
+        self._payment_client = payment_client
 
     def execute(self, params: ConfirmPaymentParams) -> None:
-        payment_event = self.payment_client.verify_payment(payload=params.payload, signature=params.signature)
+        payment_event = self._payment_client.verify_payment(payload=params.payload, signature=params.signature)
 
         if not payment_event.was_successful():
             return
 
-        reservation = self.reservation_finder.find_by_payment_id(provider_payment_id=payment_event.payment_intent_id)
+        reservation = self._reservation_finder.find_by_payment_id(provider_payment_id=payment_event.payment_intent_id)
 
         if not reservation:
             raise ReservationNotFound()
 
         reservation.confirm()
-        self.reservation_repository.update(reservation=reservation)
+        self._reservation_repository.update(reservation=reservation)
